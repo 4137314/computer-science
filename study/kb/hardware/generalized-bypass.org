@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       generalized-bypass
+:DOMAIN:   hardware
+:AREA:     logic-synthesis
+:KIND:     construction
+:REQUIRES: tree-height-reduction boolean-difference
+:SEE:      carry-lookahead-adder false-path
+:ALIASES:  generalized bypass transform, generalized select transform, bypass, carry skip, carry select, speculation, Shannon expansion for delay
+:END:
+#+title: Generalized bypass and select transforms
+#+summary: To speed up a late signal \(x\) that crosses a long chain to \(f\), the bypass transform adds a path that uses \(x\) only where it matters (\(f=\partial f/\partial x\cdot(\dots)\)), and the select transform computes \(f_x\) and \(f_{\bar x}\) in advance and lets \(x\) choose between them with a multiplexer; carry-skip and carry-select adders are the arithmetic instances.
+
+* Construction
+Let \(x\) arrive late and \(f\) depend on it through a long path.
+- *Generalized select (Shannon)*: \(f=x\,f_x+\bar x\,f_{\bar x}\). Compute both cofactors from the early inputs, then a multiplexer driven by \(x\). The delay from \(x\) to \(f\) becomes one mux; area roughly doubles for the cone.
+- *Generalized bypass*: when \(x\) propagates to an intermediate node \(g\) and then along a chain to \(f\), add a path from \(x\) straight to the end, enabled by the Boolean difference \(\partial f/\partial g\) (computed from early signals): the long path is used only when the bypass is not, which makes it [[id:false-path][false]] for timing.
+
+* Carry instances
+For a block of \(k\) bits of an adder with carry-in \(c_{in}\), propagate \(p_i=a_i\oplus b_i\), generate \(g_i=a_ib_i\):
+- *carry-skip*: if \(P=\prod_i p_i=1\) the block propagates, \(c_{out}=c_{in}\); a mux selects \(c_{in}\) or the ripple carry. Ripple through the block happens only when \(P=0\), where the carry does not depend on \(c_{in}\).
+- *carry-select*: compute the block sum for \(c_{in}=0\) and \(c_{in}=1\) in parallel; \(c_{in}\) selects. Delay \(O(\sqrt n)\) with blocks of growing size.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\draw (0,0) rectangle (2,0.8); \node at (1,0.4) {$f$ with $x=0$};
+\draw (0,-1.1) rectangle (2,-0.3); \node at (1,-0.7) {$f$ with $x=1$};
+\draw[kbcyan] (3,-1.0) -- (3,0.7) -- (3.6,0.4) -- (3.6,-0.7) -- cycle;
+\draw (2,0.4) -- (3,0.4); \draw (2,-0.7) -- (3,-0.7); \draw (3.6,-0.15) -- (4.2,-0.15) node[right] {$f$};
+\draw[kbmagenta, line width=1pt] (3.3,-1.6) node[below] {$x$ (late)} -- (3.3,-0.85);
+\end{tikzpicture}
+The late signal only drives the final multiplexer.
+
+* Intuition
+If you have to wait for a decision, prepare all the answers and pick one when the decision arrives.
+
+* Pitfall
+Speculation costs area and power — both cofactors switch all the time — so it is applied only to the critical inputs.

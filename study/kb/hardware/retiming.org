@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       retiming
+:DOMAIN:   hardware
+:AREA:     timing
+:KIND:     method
+:REQUIRES: static-timing-analysis
+:SEE:      pipelining fir-filter setup-hold-time
+:ALIASES:  retiming, register moving, Leiserson Saxe, retiming lag, clock period minimisation
+:END:
+#+title: Retiming
+#+summary: Moving registers across combinational gates — from all inputs of a gate to its output or back — does not change the input–output behaviour seen at the cycle level but changes the length of the register-to-register paths, so the clock period can be reduced (or the number of registers minimised).
+
+* Method
+Model the circuit as a graph: nodes are combinational blocks with delay \(d(v)\), edges carry a weight \(w(e)\) = number of registers on them. A retiming assigns an integer lag \(r(v)\) to each node: \(r(v)\) registers are moved from its outputs to its inputs. The new weights are
+\[ w_r(u\to v)=w(u\to v)+r(v)-r(u), \]
+legal if all \(w_r\ge0\). Around any cycle the total weight is unchanged (the lags cancel), so loops keep their latency, and the cycle-level behaviour is preserved. The clock period is the longest path with zero registers; Leiserson and Saxe find the minimum period by testing candidate periods, each check being a system of difference constraints solved as shortest paths.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, g/.style={draw, minimum width=0.8cm, minimum height=0.5cm}, r/.style={draw, fill=kbamber, fill opacity=0.4, text opacity=1, minimum width=0.25cm, minimum height=0.5cm, inner sep=0}]
+\node[g] (a) at (0,0) {+3}; \node[g] (b) at (1.6,0) {+3}; \node[g] (c) at (3.2,0) {+3}; \node[r] (r1) at (4.2,0) {}; \node[r] (r2) at (4.6,0) {};
+\draw[-{Stealth}] (-0.9,0) -- (a); \draw[-{Stealth}] (a) -- (b); \draw[-{Stealth}] (b) -- (c); \draw[-{Stealth}] (c) -- (r1); \draw (r2) -- (5.2,0);
+\node at (2.2,-0.6) {period 9};
+\node[g] (d) at (0,-1.6) {+3}; \node[r] at (0.85,-1.6) {}; \node[g] (e) at (1.7,-1.6) {+3}; \node[r] at (2.55,-1.6) {}; \node[g] (f) at (3.4,-1.6) {+3};
+\draw[-{Stealth}] (-0.9,-1.6) -- (d); \draw (f) -- (4.4,-1.6);
+\node at (2.2,-2.2) {period 3, same latency};
+\end{tikzpicture}
+Two registers at the end moved backwards into the chain.
+
+* Intuition
+Registers are checkpoints; retiming moves them along the road so that no stretch between two checkpoints is too long.
+
+* Pitfall
+Moving registers changes their initial (reset) states: an equivalent reset state may not exist after a backward move, and the registers no longer correspond to the names in the RTL, which complicates debugging and verification.

@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       gate-delay-model
+:DOMAIN:   hardware
+:AREA:     timing
+:KIND:     model
+:REQUIRES:
+:SEE:      static-timing-analysis timing-driven-mapping cmos-power glitches
+:ALIASES:  gate delay, propagation delay, load-dependent delay, fanout, slew, transition time, delay table, wire delay, Elmore delay, RC delay
+:END:
+#+title: Gate and wire delay models
+#+summary: A gate's delay grows with the capacitance it drives: to first order \(d=d_0+k\,C_L\), an intrinsic part plus a part proportional to the load (fanout gates and wire); libraries tabulate delay and output slew against input slew and load, and wires add an RC delay.
+
+* Model
+- *Linear model*: \(d = d_0 + R_{drive}\,C_L\), with \(C_L=\sum_{\text{fanout}} C_{in} + C_{wire}\). A stronger gate (smaller \(R_{drive}\)) is bigger and loads its own driver more.
+- *Table model* (standard-cell libraries): delay and output transition time \(t_{out}\) are looked up in 2-D tables indexed by input transition \(t_{in}\) and load \(C_L\), interpolating between entries; rise and fall differ.
+- *Unit delay*: every gate takes 1; good for counting levels, useless for sizing.
+- *Wires*: a long wire is a distributed RC line; the Elmore delay of a line of length \(\ell\) is \(\approx\tfrac12 r c\,\ell^2\): quadratic in length, so long wires are split by buffers.
+
+* Picture
+\begin{tikzpicture}
+\begin{axis}[width=6.8cm, height=4.6cm, axis lines=left, xlabel={load $C_L$ (fF)}, ylabel={delay (ps)}, xmin=0, xmax=40, ymin=0, ymax=260, legend pos=north west]
+\addplot+[domain=0:40] {20+6*x}; \addlegendentry{INV x1}
+\addplot+[domain=0:40] {28+3*x}; \addlegendentry{INV x2}
+\addplot+[domain=0:40] {40+1.5*x}; \addlegendentry{INV x4}
+\end{axis}
+\end{tikzpicture}
+Bigger gates have more intrinsic delay but a smaller slope: each wins in a range of loads.
+
+* Intuition
+A gate is a current source charging a capacitor. More capacitance, more time; more current (a bigger gate), less time.
+
+* Pitfall
+Delay depends on the load, and the load depends on what is connected later: mapping and sizing decisions interact, which is why [[id:timing-driven-mapping][timing-driven mapping]] must model loads.

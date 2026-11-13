@@ -1,0 +1,43 @@
+:PROPERTIES:
+:ID:       event-handling
+:DOMAIN:   programming
+:AREA:     gui
+:KIND:     model
+:REQUIRES: javafx-scene-graph abstract-class-interface
+:SEE:      lambda-expressions threads-data-race user-input
+:ALIASES:  event-driven programming, EventHandler, listener, callback, anonymous class, event capturing, event bubbling, filter, consume
+:END:
+#+title: Event-driven programming and event handlers
+#+summary: A GUI program does not follow a fixed sequence: it registers handlers and waits; each user action becomes an =Event= object delivered to the handlers of the target node, travelling from the stage down to the target (capturing, seen by filters) and back up (bubbling, seen by handlers).
+
+* Model
+- *Events* form a hierarchy (=MouseEvent=, =KeyEvent=, =ActionEvent=, …), each with its own attributes (position, key, source) and sub-types (=MOUSE_CLICKED=, =KEY_PRESSED=).
+- A *handler* implements =EventHandler<T extends Event>=, whose only method is =void handle(T e)=. It is registered on a node with =addEventHandler(type, h)= or with convenience methods =setOnAction=, =setOnMouseClicked=, =setOnKeyPressed=.
+- The *target* is the node that has the keyboard focus (key events) or the topmost node under the cursor (mouse events).
+- *Dispatch chain*: from the stage to the target (*capturing*, intercepted by filters registered with =addEventFilter=), then back from the target to the stage (*bubbling*, handlers). =e.consume()= stops the propagation.
+
+* Ways to write a handler
+#+begin_src java
+  class Clicker implements EventHandler<ActionEvent> {          // external class
+      public void handle(ActionEvent e) { System.out.println("click"); }
+  }
+  btn.setOnAction(new Clicker());
+  btn.setOnAction(new EventHandler<ActionEvent>() {             // anonymous inner class
+      public void handle(ActionEvent e) { counter++; }          // sees the outer fields
+  });
+  btn.setOnAction(e -> counter++);                              // lambda (Java 8)
+#+end_src
+Inner and anonymous classes can access the members of the enclosing object, which keeps state in one place and improves encapsulation.
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\node[draw] (s) at (0,0) {Stage}; \node[draw] (sc) at (0,-0.9) {Scene}; \node[draw] (p) at (0,-1.8) {Pane}; \node[draw, kbamber] (b) at (0,-2.7) {Button};
+\draw[-{Stealth}, kbcyan] (-1.2,0) -- node[left, font=\scriptsize]{capturing (filters)} (-1.2,-2.7);
+\draw[-{Stealth}, kbmagenta] (1.2,-2.7) -- node[right, font=\scriptsize]{bubbling (handlers)} (1.2,0);
+\end{tikzpicture}
+
+* Intuition
+Instead of asking "what next?", the program says "call me when this happens". The main loop belongs to the library.
+
+* Pitfall
+Handlers run on the single JavaFX application thread: a long computation inside one freezes the whole window. Long work goes to a background thread, and only the UI update comes back.

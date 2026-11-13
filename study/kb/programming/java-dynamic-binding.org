@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       java-dynamic-binding
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     theorem
+:REQUIRES: polymorphism method-overloading
+:SEE:      virtual-functions java-object-class casting-instanceof
+:ALIASES:  method dispatch, binding rule, static binding, dynamic dispatch, most specific method
+:END:
+#+title: The Java method selection rule
+#+summary: For a call =x.f(a1,…,an)= the compiler fixes the signature, choosing among the methods of the static type of =x= the most specific one applicable to the static types of the arguments; at run time the JVM executes the override of that exact signature in the dynamic type of =x=.
+
+* Statement
+Two phases.
+1. *Compile time*: look at the static type \(S\) of =x= and at the static types of the arguments. Among the methods named =f= visible in \(S\) (declared or inherited) that are applicable, pick the most specific signature \(\sigma\). If none or more than one is maximal, compilation fails.
+2. *Run time*: let \(D\) be the dynamic type of the object. Starting from \(D\) and moving up the hierarchy, execute the first method with exactly the signature \(\sigma\).
+Static, private and final methods and constructors are bound at compile time.
+
+* Example
+#+begin_src java
+  class A           { void m(A a) { System.out.println("A.m(A)"); } }
+  class B extends A { void m(B b) { System.out.println("B.m(B)"); }      // overload, not override
+                      @Override void m(A a) { System.out.println("B.m(A)"); } }
+  A x = new B();  B y = new B();
+  x.m(y);   // B.m(A): static type A only knows m(A); the override in B runs
+  y.m(y);   // B.m(B): static type B, most specific is m(B)
+  y.m(x);   // B.m(A)
+#+end_src
+
+* Derivation
+For =x.m(y)=: the static type of =x= is =A=, whose only method is =m(A)=, applicable because =B= is a subtype of =A=, so \(\sigma=\)=m(A)=. The dynamic type is =B=, which overrides =m(A)=: =B.m(A)= runs. =B.m(B)= is never considered, because the signature was fixed in phase 1.
+
+* Intuition
+The compiler chooses *which* message is sent; the object chooses *how* to answer it.
+
+* Pitfall
+Writing =equals(Point p)= instead of =equals(Object o)= adds an overload: collections call =equals(Object)= and never see it.

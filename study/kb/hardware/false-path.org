@@ -1,0 +1,32 @@
+:PROPERTIES:
+:ID:       false-path
+:DOMAIN:   hardware
+:AREA:     timing
+:KIND:     definition
+:REQUIRES: static-timing-analysis
+:SEE:      generalized-bypass
+:ALIASES:  false path, sensitizable path, true path, controlling value, path sensitization, multicycle path
+:END:
+#+title: False paths
+#+summary: A path is false if no input vector can propagate a transition along it, because the conditions that make one gate on the path sensitive force another gate on it into its controlling value; STA's longest topological path may be false, so the true delay of the circuit can be shorter.
+
+* Definition
+A gate input is *sensitised* when every other input of the gate holds the non-controlling value (1 for AND/NAND, 0 for OR/NOR; XOR is always sensitised). A path is *statically sensitisable* if some input vector sensitises all its gates at once. A path that no vector sensitises is *false*; the delay of the circuit is the length of its longest *true* path.
+
+* Example
+Two multiplexers in series with the same select \(s\): the long path through the "1" input of the first mux and the "0" input of the second needs \(s=1\) for the first and \(s=0\) for the second. No vector does both: the path is false, and the real critical path is shorter than the topological one. Carry-skip adders are built exactly this way: the long ripple path through a block is false when the skip path is taken.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\draw[kbcyan] (0,0) -- (0,1.4) -- (0.8,1.1) -- (0.8,0.3) -- cycle; \draw[kbcyan] (3,0) -- (3,1.4) -- (3.8,1.1) -- (3.8,0.3) -- cycle;
+\draw[kbmagenta, line width=1pt] (-0.8,1.1) -- (0,1.1); \draw (-0.8,0.3) -- (0,0.3); \node[anchor=east] at (-0.8,1.1) {long, needs $s=1$};
+\draw[kbmagenta, line width=1pt, decorate, decoration={zigzag, amplitude=1.5pt, segment length=4pt}] (0.8,0.7) -- (3,0.3);
+\draw (1.2,1.1) -- (3,1.1); \draw (3.8,0.7) -- (4.5,0.7) node[right] {$y$};
+\node at (0.4,-0.35) {$s$}; \node at (3.4,-0.35) {$s$}; \node[kbmagenta] at (2,-0.1) {needs $s=0$};
+\end{tikzpicture}
+
+* Intuition
+A path is a road on the map; whether a car can drive it depends on the traffic lights, and here the lights are wired never to be green together.
+
+* Pitfall
+Declaring paths false by hand (=set_false_path=) is dangerous: a wrong declaration hides a real violation. Multicycle paths (results needed only every \(k\) cycles) are a related, legitimate exception.

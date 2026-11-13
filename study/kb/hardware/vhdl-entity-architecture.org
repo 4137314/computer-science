@@ -1,0 +1,40 @@
+:PROPERTIES:
+:ID:       vhdl-entity-architecture
+:DOMAIN:   hardware
+:AREA:     vhdl
+:KIND:     definition
+:REQUIRES: digital-design-flow
+:SEE:      vhdl-structural std-logic vhdl-concurrent-assignments vhdl-process vhdl-testbench
+:ALIASES:  VHDL, entity, architecture, port, hardware description language, HDL, library, use, description styles
+:END:
+#+title: VHDL: entity and architecture
+#+summary: A VHDL design unit has an entity, the external view (name, generics and ports with mode and type), and one or more architectures, the implementation, written in structural, data-flow or behavioural style; a hardware description language describes concurrent hardware, not a sequence of instructions.
+
+* Definition
+#+begin_src vhdl
+  library ieee;
+  use ieee.std_logic_1164.all;
+
+  entity and2 is
+    port ( a, b : in  std_logic;
+           y    : out std_logic );
+  end entity and2;
+
+  architecture dataflow of and2 is
+  begin
+    y <= a and b;          -- a concurrent assignment: always active
+  end architecture dataflow;
+#+end_src
+- *Entity*: interface. Port modes: =in=, =out=, =inout= (bidirectional, tri-state), =buffer=. Optional =generic= parameters.
+- *Architecture*: body; between =architecture= and =begin= go declarations (signals, constants, types, components), after =begin= concurrent statements.
+- *Description styles*: *structural* (instances of components connected by signals), *data-flow* (concurrent signal assignments, equations), *behavioural* (processes with sequential statements). They can be mixed.
+- VHDL is case-insensitive, strongly typed; comments start with =--=.
+
+* Uses
+VHDL serves two purposes with one language: *simulation* (any construct, including time delays and file I/O) and *synthesis* (a subset that maps to gates and flip-flops). A [[id:vhdl-testbench][testbench]] is simulation only.
+
+* Intuition
+An entity is the chip's pinout; the architecture is what is soldered inside. Every statement in the architecture is a piece of hardware working at the same time as the others.
+
+* Pitfall
+Reading VHDL as a program in sequence is the classic mistake: the order of concurrent statements in an architecture does not matter, exactly as the order in which components are drawn on a schematic.

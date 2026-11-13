@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       lambda-expressions
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     definition
+:REQUIRES: function-objects
+:SEE:      stl-algorithms event-handling threads-data-race
+:ALIASES:  lambda, closure, capture, capture by value, capture by reference, anonymous function
+:END:
+#+title: Lambda expressions
+#+summary: =[captures](params) -> ret { body }= defines an unnamed function object where it is used; the capture list copies (~[=]~, =[x]=) or references (=[&]=, =[&x]=) variables of the enclosing scope, and that choice decides what the lambda sees when it runs later.
+
+* Definition
+A lambda is syntax for a [[id:function-objects][function object]] whose class the compiler generates. Captured variables become its members.
+- =[]= captures nothing; ~[=]~ all used variables by copy; =[&]= by reference;
+- =[x, &y]= mixes: =x= by copy (frozen at creation), =y= by reference (read at call time);
+- =mutable= allows changing the copies; =-> ret= fixes the return type when it cannot be deduced.
+Java has lambdas too (=x -> x * 2=), restricted to effectively final captures and used to implement single-method interfaces (=EventHandler=, =Comparator=).
+
+* Example
+#+begin_src c++
+  std::vector<std::function<float()>> vf(16);
+  int j = 0;
+  for (unsigned i = 0; i < vf.size(); ++i) {
+    vf[i] = [i, &j]() { return i / (1.0f * j); };   // i frozen, j shared
+    j += i;
+  }
+  for (auto& f : vf) std::cout << f() << " ";   // every f sees the final j = 120
+#+end_src
+Since =j= is captured by reference, all sixteen lambdas divide by its value at call time, \(\sum_{i<16} i = 120\): the output is \(0, 1/120, 2/120, \dots\).
+
+* Intuition
+A lambda is a function plus a snapshot (by value) or a window (by reference) on its surroundings.
+
+* Pitfall
+Capturing by reference a local that dies before the lambda runs (a lambda stored, returned, or given to a thread) is a dangling reference.

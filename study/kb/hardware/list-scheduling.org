@@ -1,0 +1,40 @@
+:PROPERTIES:
+:ID:       list-scheduling
+:DOMAIN:   hardware
+:AREA:     high-level-synthesis
+:KIND:     method
+:REQUIRES: asap-alap-scheduling np-hard-optimization
+:SEE:      resource-binding
+:ALIASES:  list scheduling, resource-constrained scheduling, latency-constrained scheduling, priority list, urgency, ready list, Hu algorithm
+:END:
+#+title: List scheduling
+#+summary: Scheduling with limited resources is NP-hard; list scheduling goes cycle by cycle, keeps the operations whose predecessors are done (ready list) and starts as many as the free units allow, choosing by priority — usually the smallest mobility or the longest path to the sink; a dual version minimises resources under a latency bound.
+
+* Method
+*Resource-constrained* (minimise latency with \(a_k\) units of type \(k\)): in each cycle \(l\), for each type \(k\)
+1. \(U_{l,k}\): ready operations of type \(k\) (all predecessors finished);
+2. \(T_{l,k}\): operations of type \(k\) still executing;
+3. start the \(a_k-|T_{l,k}|\) operations of \(U_{l,k}\) with highest priority.
+*Latency-constrained* (minimise units for a bound \(\bar\lambda\)): compute ALAP times; in each cycle schedule all ready operations with zero slack (forced), adding units if needed, then the others that fit in the units already allocated.
+
+* Algorithm
+\begin{algorithmic}[1]
+\Require sequencing graph, units $a_k$, priority (e.g. least mobility)
+\State $l\gets1$
+\Repeat
+\ForAll{resource types $k$}
+\State $U\gets$ ready operations of type $k$; $T\gets$ running ones
+\State start the $a_k-|T|$ highest-priority operations of $U$ at cycle $l$
+\EndFor
+\State $l\gets l+1$
+\Until{the sink is scheduled}
+\end{algorithmic}
+
+* Example
+Solver graph, one multiplier and one ALU (delays 1): cycle 1 \(\{\times_1,+\}\), 2 \(\{\times_2,<\}\), 3 \(\{\times_5\}\), … latency 7, against 4 with unlimited units. With two multipliers latency 4 or 5, depending on the priority function.
+
+* Intuition
+A greedy foreman: each morning, give the free machines to the most urgent jobs that are ready.
+
+* Pitfall
+List scheduling is a heuristic: a different priority can give a shorter schedule, and no single priority is best for every graph. It is fast, \(O(|V|\log|V|)\) plus the cycles, which is why it is the workhorse of HLS tools.

@@ -1,0 +1,49 @@
+:PROPERTIES:
+:ID:       java-exceptions
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     definition
+:REQUIRES: exception-handling java-object-class
+:SEE:      user-input java-collections
+:ALIASES:  checked exception, unchecked exception, RuntimeException, Error, Throwable, throws, finally, try-with-resources, AutoCloseable
+:END:
+#+title: Exceptions in Java: checked, unchecked, finally
+#+summary: Java exceptions are objects of subclasses of =Throwable=; checked exceptions (subclasses of =Exception= but not of =RuntimeException=) must be caught or declared with =throws=, unchecked ones need not; =finally= and try-with-resources guarantee clean-up.
+
+* Definition
+#+begin_src text
+  Throwable
+  ├── Error                    (JVM problems: OutOfMemoryError, StackOverflowError)  unchecked
+  └── Exception                                                                       checked
+      ├── IOException, FileNotFoundException, ...                                     checked
+      └── RuntimeException     (NullPointerException, ArrayIndexOutOfBounds,
+                                ClassCastException, IllegalArgumentException, ...)    unchecked
+#+end_src
+The *catch-or-declare* rule: a method in which a checked exception can arise must either handle it with =try/catch= or list it in its signature, =void load() throws IOException=. So callers know from the interface which failures to expect. Run-time exceptions signal programming errors and are exempt.
+
+* Example
+#+begin_src java
+  class EmptyStackException extends RuntimeException {}       // unchecked, by choice
+
+  static List<String> read(String path) throws IOException {  // declared
+      try (BufferedReader r = new BufferedReader(new FileReader(path))) {   // closed for us
+          return r.lines().toList();
+      }
+  }
+  try {
+      read("test.txt");
+  } catch (FileNotFoundException e) {     // more specific first
+      System.err.println("missing: " + e.getMessage());
+  } catch (IOException e) {
+      e.printStackTrace();
+  } finally {
+      System.out.println("always executed");
+  }
+#+end_src
+=finally= runs whether the block completes, throws or returns: the place for releasing resources, without duplicating code in every =catch=. Try-with-resources does it automatically for any =AutoCloseable=.
+
+* Intuition
+Checked exceptions are part of the contract: the signature tells you what can go wrong that is not your fault.
+
+* Pitfall
+=catch (Exception e) {}= swallows every error, including bugs; catch the narrowest type you can handle. A =catch= of a superclass placed before its subclass makes the second unreachable: compile error.

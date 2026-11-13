@@ -1,0 +1,27 @@
+:PROPERTIES:
+:ID:       implicit-conversion
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     definition
+:REQUIRES: cpp-special-members
+:SEE:      operator-overloading wrapper-autoboxing
+:ALIASES:  converting constructor, explicit, implicit type conversion, single-argument constructor
+:END:
+#+title: Converting constructors and explicit
+#+summary: A constructor callable with one argument is also an implicit conversion: with =A(int)=, =f(3)= compiles as =f(A(3))= and =a = 3= as =a = A(3)=; declaring it =explicit= forbids the silent conversion.
+
+* Definition
+Given
+#+begin_src c++
+  class A { int i; public: A(int i_) : i(i_) {} };
+  void f(A);
+#+end_src
+the call =f(3)= is accepted: the compiler looks for a way to turn =int= into =A= and finds the constructor, so it compiles =f(A(3))=. Likewise =A a; a = 3;= becomes =a.operator=(A(3))=.
+
+With =explicit A(int i_);= both lines are compile errors; the conversion must be written: =f(A(3))=, =a = A(3)=.
+
+* Intuition
+Every one-argument constructor is a door between two types. Sometimes the door is welcome (=std::string s = "abc";=); otherwise lock it with =explicit=.
+
+* Pitfall
+Implicit conversions also apply to arguments of overloaded operators defined as free functions, so =3 + a= can compile for =operator+(const A&, const A&)= but not for a member =A::operator+= (see [[id:operator-overloading][operator overloading]]).

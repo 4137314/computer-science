@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       risc-v-datapath
+:DOMAIN:   hardware
+:AREA:     processors
+:KIND:     construction
+:REQUIRES: risc-v-isa finite-state-machine alu-design
+:SEE:      fpga-architecture pipelining datapath-control
+:ALIASES:  RISC-V CPU, single-cycle processor, multi-cycle processor, instruction fetch, decode, execute, memory access, write back, program counter, soft core
+:END:
+#+title: A non-pipelined RISC-V processor
+#+summary: Each instruction goes through fetch (read the instruction at PC), decode (read \(rs1\), \(rs2\), build the immediate), execute (ALU, branch comparison, target address), memory (load or store) and write back (to \(rd\), next PC); on an FPGA a small FSM sequences these steps around synchronous block RAMs.
+
+* Construction
+- *Fetch*: =instr <= imem(pc)=; with a synchronous BRAM the instruction is available one cycle after the address.
+- *Decode*: register file read (distributed RAM, asynchronous read or latched output); immediate generator by format; opcode decoded into control signals.
+- *Execute*: ALU on (rs1, rs2 or imm); comparator for branches (=beq=, =bne=, =blt=, =bge=, unsigned variants); branch target \(pc+imm_B\), jump targets \(pc+imm_J\) (=jal=) and \((rs1+imm_I)\,\&\,\sim1\) (=jalr=).
+- *Memory*: loads read =dmem(rs1+imm)= (with byte/half selection and sign extension), stores write =rs2=.
+- *Write back*: \(rd\gets\) ALU result, loaded value, \(pc+4\) (jumps) or immediate (=lui=), unless \(rd=x0\).
+- *Next PC*: \(pc+4\), branch target if taken, jump target.
+A control FSM (FETCH → DECODE → EXECUTE → MEM → WB) handles the BRAM latencies: loads and jumps take extra states.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, s/.style={draw, rounded corners, minimum width=1.3cm, minimum height=0.6cm}]
+\node[s, draw=kbcyan] (f) at (0,0) {fetch}; \node[s] (d) at (2,0) {decode}; \node[s, draw=kbamber] (e) at (4,0) {execute}; \node[s] (m) at (6,0) {memory}; \node[s, draw=kbmagenta] (w) at (8,0) {write back};
+\foreach \a/\b in {f/d,d/e,e/m,m/w} \draw[-{Stealth}] (\a) -- (\b);
+\draw[-{Stealth}] (w.south) -- ++(0,-0.5) -| node[pos=0.25, below] {next PC} (f.south);
+\end{tikzpicture}
+
+* Verification
+Assemble small programs, load their hex into the instruction memory, and compare register and memory contents after simulation with the expected values; test every format and the corner cases (=x0= as destination, negative immediates, taken and not-taken branches).
+
+* Intuition
+Five questions per instruction: what is it, what are its operands, what does it compute, does it touch memory, where does the result go — and where is the next instruction.
+
+* Pitfall
+Synchronous block RAM returns data one cycle after the address: a design that expects the instruction or the loaded word in the same cycle works in a zero-delay mental model and fails in simulation and hardware.

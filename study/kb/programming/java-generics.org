@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       java-generics
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     construction
+:REQUIRES: generic-programming casting-instanceof
+:SEE:      generic-invariance java-collections wrapper-autoboxing stack-and-queue
+:ALIASES:  generics, type parameter, generic class, generic method, type erasure, raw type, diamond operator
+:END:
+#+title: Java generics and type erasure
+#+summary: Since Java 5 classes, interfaces and methods can take type parameters (=class Stack<T>=, =<T> T max(...)=) checked at compile time; the compiler then erases them to their bounds (usually =Object=) and inserts casts, so one class serves all instantiations and no type information remains at run time.
+
+* Construction
+#+begin_src java
+  public class Stack<T> {
+      private ArrayList<T> data = new ArrayList<>();   // diamond: T inferred
+      public void push(T x) { data.add(x); }
+      public T pop() { return data.remove(data.size() - 1); }
+  }
+  Stack<String> s = new Stack<>();
+  s.push("a");
+  String x = s.pop();        // no cast in the source
+  s.push(3);                 // compile error: int is not a String
+
+  static <T extends Comparable<T>> T max(T a, T b) { return a.compareTo(b) >= 0 ? a : b; }
+#+end_src
+
+* Type erasure
+After checking, the compiler replaces each type parameter with its bound (=Object=, or =Comparable= for =T extends Comparable<T>=) and inserts casts at the uses: =String x = (String) s.pop();=. Consequences:
+- one =.class= per generic class, no run-time overhead, compatibility with pre-generic code (raw types, with warnings);
+- type parameters cannot be primitive (=Stack<int>= is illegal; use =Stack<Integer>=);
+- no =new T()=, no =new T[n]=, no =x instanceof Stack<String>=, no static field of type =T=.
+
+* Intuition
+Generics are a compile-time contract. The compiler checks you keep it and then throws the contract away, leaving the casts it proved safe.
+
+* Pitfall
+Raw types (=Stack s = new Stack();=) switch the checks off and turn type errors into =ClassCastException= far from their cause. Always use the parameterised form.

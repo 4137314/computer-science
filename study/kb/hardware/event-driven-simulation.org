@@ -1,0 +1,50 @@
+:PROPERTIES:
+:ID:       event-driven-simulation
+:DOMAIN:   hardware
+:AREA:     simulation
+:KIND:     method
+:REQUIRES: big-o-complexity vhdl-concurrent-assignments
+:SEE:      delta-cycle vhdl-testbench glitches
+:ALIASES:  event-driven simulation, logic simulation, event queue, timing wheel, timing diagram, cycle-based simulation
+:END:
+#+title: Event-driven logic simulation
+#+summary: A logic simulator keeps a queue of future events ordered by time; it repeatedly takes the earliest events, updates the signals, evaluates only the gates whose inputs changed, and schedules their new outputs after their delays; the cost depends on how the queue is stored: linked list, balanced tree or timing wheel.
+
+* Method
+Types of simulation: compiled (evaluate every gate every cycle) or event-driven (evaluate only on change); zero-delay, unit-delay or real-delay. Only a small fraction of the circuit is active at any time, which event-driven simulation exploits.
+
+* Algorithm
+\begin{algorithmic}[1]
+\Require initial events in the queue $Q$
+\While{$Q$ not empty and $t<t_{stop}$}
+\State $t\gets$ time of the earliest event in $Q$
+\State $E\gets$ all events at $t$; remove them from $Q$
+\ForAll{$(s,v)\in E$ with $v\neq$ value of $s$}
+\State set $s\gets v$; mark the fanout gates of $s$
+\EndFor
+\ForAll{marked gates $g$}
+\State $v\gets$ evaluate $g$
+\State insert $(\mathrm{out}(g),v)$ into $Q$ at time $t+d(g)$
+\EndFor
+\EndWhile
+\end{algorithmic}
+
+* Complexity
+With \(n\) gates, simulated time \(T\) and activity proportional to \(n\) per time unit, about \(Tn\) events are processed. The cost of each queue insertion decides the total:
+- *sorted linked list*: insertion \(O(n)\) (scan for the position): total \(O(Tn^2)\);
+- *balanced tree* (heap): \(O(\log n)\): total \(O(Tn\log n)\);
+- *timing wheel*: a circular array of buckets, one per time unit up to the maximum delay; inserting at \(t+d\) is indexing bucket \((t+d)\bmod W\): \(O(1)\), total \(O(Tn)\). Events beyond the wheel go to an overflow list.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\foreach \i in {0,...,7} {\draw[kbcyan] (\i*45:1.2) -- (\i*45+45:1.2); \node at (\i*45+22.5:1.45) {\i};}
+\draw[-{Stealth}, kbamber, line width=1pt] (0,0) -- (22.5:1.0); \node at (0,-0.3) {now};
+\node[draw] (e) at (3,0.6) {$(s,1)$}; \draw[-{Stealth}] (e) -- (112:1.2);
+\end{tikzpicture}
+A timing wheel: the pointer advances one bucket per time unit; an event with delay 2 goes two buckets ahead.
+
+* Intuition
+Simulate only what changes. Most of a circuit is quiet most of the time, so following the events is far cheaper than recomputing everything.
+
+* Pitfall
+Event-driven simulation with real delays shows [[id:glitches][glitches]] that zero-delay functional simulation hides — and conversely a zero-delay simulation that passes says nothing about timing.

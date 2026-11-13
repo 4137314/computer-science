@@ -1,0 +1,32 @@
+:PROPERTIES:
+:ID:       comparable-comparator
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     definition
+:REQUIRES: equals-hashcode java-generics
+:SEE:      stl-algorithms function-objects abstract-class-interface
+:ALIASES:  Comparable, compareTo, Comparator, compare, natural ordering, total order, sorting
+:END:
+#+title: Comparable and Comparator
+#+summary: A class implements =Comparable<T>= to give its natural order (=a.compareTo(b)= negative, zero or positive); a separate =Comparator<T>= object gives any other order; both must define a total order, ideally consistent with =equals=.
+
+* Definition
+- =interface Comparable<T> { int compareTo(T o); }=: implemented by the class itself (=String=, =Integer=, dates). Sorting, =TreeSet= and =TreeMap= use it by default; sorting objects that do not implement it throws =ClassCastException= at run time.
+- =interface Comparator<T> { int compare(T a, T b); }=: a separate object, so a class can have several orders, and classes one cannot modify can be ordered. Passed to =Collections.sort(list, c)=, =list.sort(c)=, =new TreeSet<>(c)=.
+Requirements: =sgn(a.compareTo(b)) == -sgn(b.compareTo(a))=, transitivity, and preferably =a.compareTo(b) == 0= iff =a.equals(b)=.
+
+* Example
+#+begin_src java
+  public class Student implements Comparable<Student> {
+      String name; int grade;
+      public int compareTo(Student o) { return name.compareTo(o.name); }   // natural: by name
+  }
+  students.sort(Comparator.comparingInt((Student s) -> s.grade).reversed()
+                          .thenComparing(s -> s.name));                  // by grade, then name
+#+end_src
+
+* Intuition
+=Comparable= is how an object compares itself; a =Comparator= is a referee brought from outside.
+
+* Pitfall
+=return a.grade - b.grade;= overflows for large values of opposite sign; =Integer.compare(a.grade, b.grade)= is safe. A =TreeSet= with an order inconsistent with =equals= drops elements that compare as zero.

@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       function-objects
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     definition
+:REQUIRES: operator-overloading
+:SEE:      lambda-expressions stl-algorithms comparable-comparator
+:ALIASES:  function pointer, functor, function object, operator(), std::function, callback
+:END:
+#+title: Function pointers and function objects
+#+summary: A function pointer stores the address of a function and calls it later; a function object (functor) is an instance of a class with =operator()=, which can carry state; both let an algorithm take behaviour as a parameter.
+
+* Definition
+- *Function pointer*: =double (*f)(double) = &sqrt; f(2.0);=. A type alias makes it readable: =using Fun = double(*)(double);=.
+- *Function object*: an object of a class that defines =operator()=, so =obj(x)= is a call. Unlike a function pointer it can keep state (parameters, counters) and can be inlined by the compiler.
+- =std::function<R(Args...)>= (header =<functional>=) wraps any callable with that signature: function pointer, functor, [[id:lambda-expressions][lambda]].
+
+* Example
+#+begin_src c++
+  double integrate(double (*f)(double), double a, double b, int n) {
+    double h = (b - a) / n, s = 0;
+    for (int k = 0; k < n; ++k) s += f(a + (k + 0.5) * h) * h;   // midpoint rule
+    return s;
+  }
+  struct Poly {                                 // a functor with state
+    double c0, c1;
+    double operator()(double x) const { return c0 + c1 * x; }
+  };
+  std::sort(v.begin(), v.end(), std::greater<int>());   // functor from the library
+#+end_src
+
+* Intuition
+Passing a function is passing a decision: the algorithm knows how to iterate, the caller knows what to do at each step.
+
+* Pitfall
+A plain function pointer cannot capture context; to pass "multiply by \(k\)" with a run-time \(k\) one needs a functor or a capturing lambda.

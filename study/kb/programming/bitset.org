@@ -1,0 +1,35 @@
+:PROPERTIES:
+:ID:       bitset
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     example
+:REQUIRES: cpp-templates operator-overloading
+:SEE:      template-metaprogramming low-power-encoding
+:ALIASES:  std::bitset, bit array, bit manipulation, shift, mask
+:END:
+#+title: std::bitset
+#+summary: =std::bitset<N>= is a fixed-size array of \(N\) bits packed into machine words, with the bitwise operators =& | ^ ~ << >>=, indexing, =set/reset/flip=, =count= and conversions to and from strings and integers; \(N\) is a template parameter, so the size is fixed at compile time.
+
+* Definition
+=#include <bitset>=; =std::bitset<64> b;= is 64 zero bits. Operations:
+- bitwise =&=, =|=, =^=, =~= and shifts =<<=, =>>= (with their compound forms), as for integers;
+- =b[i]= reads or writes bit \(i\) (bit 0 is the least significant, printed last);
+- =set(i)=, =reset(i)=, =flip(i)= and their no-argument versions on all bits; =count()=, =any()=, =none()=, =size()=;
+- =bitset<64>(std::string("1010"))=, =to_string()=, =to_ulong()=, =to_ullong()= (which throw =overflow_error= if the value does not fit).
+
+* Example
+#+begin_src c++
+  std::bitset<64> b(std::string("101010101010111010101"));
+  b <<= 4;                       // shift left, zeros enter on the right
+  auto pairs = b & (b << 3);     // bits that are 1 together with the bit 3 below them
+  b &= (~b << 15);               // masks built from b itself
+  b.flip();  b.reset(42);
+  if (!b[42]) b[41] = 0;
+  std::cout << b << " " << b.count() << "\n";
+#+end_src
+
+* Intuition
+A =bitset= is a register: the same operations a circuit does on a word, with names and bounds checks.
+
+* Pitfall
+=std::vector<bool>= is the dynamic counterpart, but it is a template specialisation that packs bits too, so =v[i]= returns a proxy, not a =bool&=.

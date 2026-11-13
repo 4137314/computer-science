@@ -1,0 +1,49 @@
+:PROPERTIES:
+:ID:       inheritance
+:DOMAIN:   programming
+:AREA:     oop
+:KIND:     definition
+:REQUIRES: object-oriented-programming uml-generalization
+:SEE:      polymorphism method-overloading cpp-inheritance-visibility stack-and-queue java-object-class
+:ALIASES:  extends, subclass, superclass, derived class, base class, overriding, super, constructor chaining, final
+:END:
+#+title: Inheritance and overriding
+#+summary: A subclass is defined as an extension of a superclass: it inherits all its fields and methods, can add new ones and can override inherited methods; constructors are not inherited but chained, the superclass part being built first.
+
+* Definition
+=class D extends B= (Java) or =class D : public B= (C++) makes =D= a subclass of =B=:
+- =D= inherits every field and method of =B= (private members exist in =D= but are not accessible by name);
+- =D= can *add* fields and methods;
+- =D= can *override* a method of =B=: same name and same parameter types, new body. =super.m()= (Java) or =B::m()= (C++) calls the overridden version.
+
+Java allows single inheritance only (one superclass), and every class without =extends= extends =Object=. C++ allows multiple inheritance.
+
+* Constructors
+Constructors are not inherited. The constructor of =D= first builds the =B= part: Java calls =super(...)= as its first statement (implicitly =super()=), C++ uses the initialiser list =D(int x) : B(x) {}=. If =B= has no no-argument constructor, the explicit call is mandatory, or the code does not compile. Destruction (C++) runs in reverse order: =~D= then =~B=.
+
+* Example
+#+begin_src java
+  class Stack {
+      protected int[] data = new int[16]; protected int size;
+      public void push(int x) { data[size++] = x; }
+      public int pop() { return data[--size]; }        // last in, first out
+  }
+  class Queue extends Stack {
+      private int head;
+      @Override public int pop() { return data[head++]; }   // first in, first out
+  }
+#+end_src
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\draw[kbcyan, line width=1pt] (0,0) rectangle (3,1.2); \node[anchor=west] at (0.1,0.6) {B part: data, size};
+\draw[kbamber, line width=1pt] (0,-0.8) rectangle (3,0); \node[anchor=west] at (0.1,-0.4) {D part: head};
+\draw[decorate, decoration={brace, amplitude=5pt}] (3.2,1.2) -- (3.2,-0.8) node[midway, right=6pt] {a D object};
+\end{tikzpicture}
+A subclass object contains a complete superclass object, built first.
+
+* Intuition
+Inheritance is "the same as B, except…". It is cheap to write and expensive to undo: every subclass depends on the internals the superclass leaves visible.
+
+* Pitfall
+Overriding requires the same signature: a method with the same name and different parameter types is an [[id:method-overloading][overload]], a new method that the dynamic binding never selects. Java's =@Override= makes the compiler check it. The queue above also inherits an operation that breaks its contract, which is the problem [[id:liskov-substitution][substitutability]] warns about.

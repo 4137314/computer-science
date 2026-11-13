@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       java-iterator
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     definition
+:REQUIRES: java-collections
+:SEE:      stl-iterators
+:ALIASES:  Iterator, Iterable, for-each, hasNext, next, ConcurrentModificationException, enhanced for
+:END:
+#+title: Iterators and for-each in Java
+#+summary: Every =Collection<E>= gives an =Iterator<E>= with =hasNext()=, =next()= and =remove()=; any =Iterable= can be scanned with the for-each loop, which is compiled into an iterator; the iterator is the only safe way to remove elements while scanning.
+
+* Definition
+#+begin_src java
+  public interface Iterator<E> { boolean hasNext(); E next(); default void remove() { ... } }
+  public interface Iterable<T> { Iterator<T> iterator(); }
+#+end_src
+=for (E x : c) body= is translated to
+#+begin_src java
+  for (Iterator<E> it = c.iterator(); it.hasNext(); ) { E x = it.next(); body }
+#+end_src
+and works for arrays and for every class implementing =Iterable=, including your own.
+
+* Example: removing while scanning
+#+begin_src java
+  for (Iterator<String> it = words.iterator(); it.hasNext(); )
+      if (it.next().isEmpty()) it.remove();       // correct
+  words.removeIf(String::isEmpty);                // the same, since Java 8
+#+end_src
+The code is polymorphic: it works for any =Collection<String>=.
+
+* Intuition
+An iterator is a cursor that knows the structure it walks; for-each hides it when you only need to read.
+
+* Pitfall
+Calling =words.remove(w)= inside a for-each over =words= changes the collection behind the iterator's back: the next =next()= throws =ConcurrentModificationException=.

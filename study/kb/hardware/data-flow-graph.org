@@ -1,0 +1,41 @@
+:PROPERTIES:
+:ID:       data-flow-graph
+:DOMAIN:   hardware
+:AREA:     high-level-synthesis
+:KIND:     definition
+:REQUIRES: digital-design-flow
+:SEE:      asap-alap-scheduling datapath-control
+:ALIASES:  data-flow graph, DFG, sequencing graph, high-level synthesis, behavioural synthesis, datapath, control unit, architectural synthesis
+:END:
+#+title: Data-flow graphs and architectural synthesis
+#+summary: High-level synthesis turns an algorithm into a datapath plus a controller: the computation becomes a sequencing graph (operations as vertices, data dependences as edges), then scheduling assigns each operation a clock cycle and binding assigns it a functional unit and its values registers.
+
+* Definition
+A system at the architectural level is a *datapath* (functional units, registers, multiplexers, buses) driven by a *control unit* (an FSM) through control signals, which reads back status signals (comparisons, flags).
+
+A *sequencing graph* \(G=(V,E)\): one vertex per operation (with its type: multiply, add, compare), an edge \(u\to v\) when \(v\) uses the result of \(u\), plus a source and a sink no-op. It is a DAG for the body of a loop.
+
+Architectural synthesis answers:
+1. *scheduling*: in which cycle does each operation start? (latency)
+2. *allocation*: how many units of each type?
+3. *binding*: which unit executes each operation, which register holds each value? (area)
+
+* Example
+The inner loop of a differential-equation solver,
+\[ x_1=x+dx,\quad u_1=u-3x\,u\,dx-3y\,dx,\quad y_1=y+u\,dx, \]
+has 6 multiplications, 2 subtractions, 2 additions and a comparison \(x_1<a\). Its graph has depth 4 (\(3\cdot x\), then \(\cdot u\), then \(\cdot dx\), then the subtractions).
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, o/.style={draw, circle, minimum size=0.5cm, inner sep=0}, ->, >={Stealth}]
+\node[o, draw=kbcyan] (m1) at (0,0) {$\times$}; \node[o, draw=kbcyan] (m2) at (1.2,0) {$\times$}; \node[o, draw=kbcyan] (m3) at (2.4,0) {$\times$}; \node[o, draw=kbcyan] (m4) at (3.6,0) {$\times$}; \node[o, draw=kbamber] (a1) at (4.8,0) {$+$};
+\node[o, draw=kbcyan] (m5) at (0.6,-1) {$\times$}; \node[o, draw=kbcyan] (m6) at (2.4,-1) {$\times$}; \node[o, draw=kbamber] (a2) at (4.8,-1) {$<$};
+\node[o, draw=kbmagenta] (s1) at (0.6,-2) {$-$}; \node[o, draw=kbmagenta] (s2) at (0.6,-3) {$-$};
+\draw (m1) -- (m5); \draw (m2) -- (m5); \draw (m5) -- (s1); \draw (m3) -- (m6); \draw (m6) -- (s1); \draw (s1) -- (s2); \draw (m4) -- (a2); \draw (a1) -- (a2);
+\end{tikzpicture}
+Multiplications (cyan) form the long chains; the subtractions wait for them.
+
+* Intuition
+The graph shows what could run in parallel; scheduling decides what does, given how much hardware is available.
+
+* Pitfall
+The graph exposes only the parallelism of the source as written; rewriting the algorithm ([[id:tree-height-reduction][tree height reduction]], loop unrolling) often matters more than the scheduler.

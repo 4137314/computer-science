@@ -1,0 +1,40 @@
+:PROPERTIES:
+:ID:       uml-association
+:DOMAIN:   programming
+:AREA:     uml
+:KIND:     definition
+:REQUIRES: uml-class-diagram
+:SEE:      aggregation-composition uml-generalization java-collections
+:ALIASES:  association, link, role, multiplicity, cardinality, association class, navigability
+:END:
+#+title: Association, links and multiplicity
+#+summary: An association between \(C_1\) and \(C_2\) is a relation \(A\subseteq \mathrm{ext}(C_1)\times\mathrm{ext}(C_2)\); its instances are links (pairs of objects), its ends carry roles and multiplicities, and it can have attributes of its own.
+
+* Definition
+Attributes model properties local to one class; associations model properties that involve several classes. An association \(A\) between classes \(C_1\) and \(C_2\) is a mathematical relation between their sets of instances,
+\[ A \subseteq \mathrm{ext}(C_1)\times\mathrm{ext}(C_2), \]
+and a *link* is one of its pairs \((o_1,o_2)\). Each end of the association can carry
+- a *role*: the name of the part played by that class (=employee= in =works-in= between Person and Company); roles are needed when both ends are the same class (parent-child);
+- a *multiplicity* \(m..n\): every object of the other end takes part in between \(m\) and \(n\) links (=0..1=, =1=, =0..*=, =1..*=);
+- *navigability*: an arrow saying which end can reach the other, which becomes a pointer or reference field in code.
+
+An *association attribute* belongs to the link, not to either object: the grade of an exam is a property of the pair (student, course).
+
+* Picture
+\begin{tikzpicture}[font=\small, cls/.style={draw, rectangle split, rectangle split parts=2, align=left, minimum width=2.8cm}]
+\node[cls, draw=kbcyan] (s) at (0,0) {\textbf{Student}\nodepart{two}Name: string\\Number: int};
+\node[cls, draw=kbcyan] (c) at (6,0) {\textbf{Course}\nodepart{two}Name: string\\Subject: string};
+\draw (s) -- node[above]{exam} node[pos=0.12, below, font=\scriptsize]{0..*} node[pos=0.88, below, font=\scriptsize]{0..*} (c);
+\node[draw=kbamber, rectangle split, rectangle split parts=2, align=left] (e) at (3,-1.8) {\textbf{Exam}\nodepart{two}Grade: int};
+\draw[dashed, kbamber] (e) -- (3,0);
+\end{tikzpicture}
+The grade is an attribute of the association: every link (student, course) has its own grade.
+
+* From diagram to code
+A navigable end with multiplicity =0..1= becomes a pointer (C++) or a possibly-null reference (Java); =1= becomes a member or a non-null reference; =0..*= becomes a container (=std::vector=, =List<T>=). An association attribute becomes a class of its own (=Exam=) holding the two ends.
+
+* Intuition
+The multiplicities are the invariants the code must maintain. Writing them down first tells you which fields may be null and which collections may be empty.
+
+* Pitfall
+A link is a pair, so the same pair cannot appear twice in an association: a student who takes the same course twice needs a different model (an =Exam= class with a date) rather than two links.

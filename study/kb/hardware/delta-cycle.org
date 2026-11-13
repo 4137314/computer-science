@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       delta-cycle
+:DOMAIN:   hardware
+:AREA:     simulation
+:KIND:     model
+:REQUIRES: event-driven-simulation
+:SEE:      signals-variables vhdl-process
+:ALIASES:  delta delay, delta cycle, simulation cycle, zero delay, event queue
+:END:
+#+title: Delta cycles
+#+summary: Zero-delay assignments are not instantaneous in simulation: each takes one delta cycle, an infinitesimal step at the same simulated time; the simulator alternates "update signals" and "run woken processes" until no event is left at that time, which orders cause and effect without real delay.
+
+* Model
+A simulation cycle at time \(t\):
+1. *update*: apply all transactions scheduled for \((t,\delta)\); a signal whose value changes has an event;
+2. *evaluate*: run every process (and concurrent assignment) sensitive to a signal with an event; their assignments without =after= are scheduled for \((t,\delta+1)\);
+3. if anything is scheduled for \((t,\delta+1)\), repeat at the next delta; otherwise advance to the next time with a scheduled transaction.
+Simulated time is the pair \((t,\delta)\), ordered lexicographically; \(\delta\) steps take no simulated time.
+
+* Derivation
+For =c <= a and b; e <= c or d;= with =a= rising from 0 to 1 at time 10 ns while =b='1':
+- \((10,0)\): =a= changes; =c <= a and b= is evaluated and schedules =c='1' at \((10,1)\);
+- \((10,1)\): =c= changes; =e <= c or d= runs and schedules =e='1' at \((10,2)\);
+- \((10,2)\): =e= changes; nothing is sensitive to it: time advances.
+In a waveform viewer =c= and =e= both change "at 10 ns", but =e= is after =c=.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\draw[-{Stealth}] (0,0) -- (6.2,0) node[right] {$\delta$ at $t=10$ ns};
+\foreach \d/\s in {0/a,1/c,2/e} {\draw (\d*2+0.5,-0.1) -- (\d*2+0.5,0.1); \node[below] at (\d*2+0.5,-0.1) {$\delta=\d$}; \node[draw, kbcyan] at (\d*2+0.5,0.6) {\s\ changes};}
+\draw[-{Stealth}, kbamber] (1.2,0.6) -- (1.8,0.6); \draw[-{Stealth}, kbamber] (3.2,0.6) -- (3.8,0.6);
+\end{tikzpicture}
+
+* Intuition
+Delta cycles are the simulator's way of saying "after, but not later": they keep causality in a world where gates have no delay.
+
+* Pitfall
+A combinational loop with zero delay (=x <= not x;=) never runs out of delta cycles: the simulator stops with an iteration-limit error at a fixed simulated time.

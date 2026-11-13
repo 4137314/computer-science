@@ -1,0 +1,45 @@
+:PROPERTIES:
+:ID:       polymorphism
+:DOMAIN:   programming
+:AREA:     oop
+:KIND:     definition
+:REQUIRES: inheritance
+:SEE:      liskov-substitution virtual-functions java-dynamic-binding casting-instanceof generic-programming
+:ALIASES:  subtype polymorphism, dynamic binding, late binding, static type, dynamic type, upcast
+:END:
+#+title: Polymorphism and dynamic binding
+#+summary: A variable of type T can refer to an object of any subtype of T; a method call on it executes the version of the dynamic (run-time) type of the object, not of the static (declared) type of the variable.
+
+* Definition
+Polymorphism in general is the ability of one piece of code to work on values of different types. In object-oriented languages it is *subtype polymorphism*:
+- a variable, parameter or array element of type \(T\) can hold an object of any subtype of \(T\);
+- its *static type* is \(T\), fixed by the declaration and used by the compiler to check calls;
+- its *dynamic type* is the class of the object it refers to at run time;
+- a call =x.m()= is *dynamically bound* (late binding): the body executed is the one of the dynamic type.
+
+Java binds every instance method dynamically, except =static=, =private=, =final= methods and constructors. C++ binds dynamically only =virtual= methods called through a pointer or a reference (see [[id:virtual-functions][virtual functions]]).
+
+* Example
+#+begin_src java
+  Point p = new NamedPoint(1, 2, "A");   // static type Point, dynamic type NamedPoint
+  p.print();          // NamedPoint.print(): decided at run time
+  p.getName();        // compile error: Point has no getName
+#+end_src
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\node[draw, kbcyan] (v) at (0,0) {Point p};
+\node[draw, kbamber, align=center] (o) at (4,0) {NamedPoint\\object};
+\draw[-{Stealth}] (v) -- node[above, font=\scriptsize]{reference} (o);
+\node[font=\scriptsize, kbguide] at (0,-0.6) {static type: what may be called};
+\node[font=\scriptsize, kbguide] at (4,-0.75) {dynamic type: which body runs};
+\end{tikzpicture}
+
+* Why it matters
+Code written once against a supertype keeps working, unchanged, on subtypes written later: the open/closed principle. Together with inheritance it lets one choose the most suitable view of an object and keep a class open to extension.
+
+* Intuition
+The compiler checks the label on the box; the run time looks inside.
+
+* Pitfall
+Fields are not polymorphic: a field redeclared in a subclass hides the superclass one, and =p.x= reads the field of the static type.

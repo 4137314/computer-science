@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       pla-pal
+:DOMAIN:   hardware
+:AREA:     programmable-logic
+:KIND:     construction
+:REQUIRES: rom-as-logic
+:SEE:      programming-technologies fpga-architecture multilevel-logic-optimization
+:ALIASES:  PLA, PAL, programmable logic array, programmable array logic, AND plane, OR plane, sum of products, CPLD, GAL
+:END:
+#+title: PLA and PAL
+#+summary: Two-level programmable logic: a programmable AND plane forms product terms of the inputs and their complements, an OR plane sums them into the outputs; a PLA programs both planes, a PAL only the AND plane with a fixed number of products per output.
+
+* Construction
+Every input enters the AND plane in true and complemented form. Each AND line computes a product term (a cube); each output is the OR of selected products.
+- *PROM*: AND plane fixed (all \(2^n\) minterms), OR plane programmable — the [[id:rom-as-logic][memory]] case.
+- *PLA*: both planes programmable. Products are shared among outputs, so the number of AND lines is the number of distinct cubes of a minimised multi-output cover. Slower (two programmable planes).
+- *PAL*: AND plane programmable, OR plane fixed — each output ORs a fixed group of, say, 7 products. Faster and cheaper; products cannot be shared. Outputs fed back as inputs implement multilevel functions, at the cost of extra delay through the array; registered outputs make sequential circuits (GAL, 22V10).
+- *CPLD*: several PAL-like blocks connected by a programmable interconnect.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\foreach \i/\n in {0/$x_0$,1/$\bar x_0$,2/$x_1$,3/$\bar x_1$} {\draw (\i*0.6,0) -- (\i*0.6,3); \node at (\i*0.6,3.25) {\n};}
+\foreach \k in {0,1,2} {\draw (-0.3,0.5+\k*0.9) -- (5.2,0.5+\k*0.9); \node[anchor=east] at (-0.3,0.5+\k*0.9) {$P_\k$};}
+\foreach \x/\y in {0/0,3/0,1/1,2/1,0/2,2/2} {\fill[kbcyan] (\x*0.6,0.5+\y*0.9) circle (0.07);}
+\foreach \j in {0,1} {\draw (3.4+\j*1.1,0) -- (3.4+\j*1.1,3); \node at (3.4+\j*1.1,-0.3) {$f_\j$};}
+\foreach \x/\y in {0/0,0/2,1/1,1/2} {\fill[kbamber] (3.4+\x*1.1,0.5+\y*0.9) circle (0.07);}
+\node[kbcyan] at (1,-0.3) {AND plane}; \node[kbamber] at (4,3.3) {OR plane};
+\end{tikzpicture}
+\(P_0=x_0\bar x_1\), \(P_1=\bar x_0x_1\), \(P_2=x_0x_1\); \(f_0=P_0+P_2\), \(f_1=P_1+P_2\): \(P_2\) is shared, which a PLA allows.
+
+* Example
+A full adder: \(s=a\oplus b\oplus c\) needs four products (its four odd minterms), \(c_{out}=ab+ac+bc\) three. A PLA with 7 AND lines and 2 outputs implements it; a PAL needs at least 4 products per output.
+
+* Intuition
+A PLA is a minimised truth table in hardware: only the product terms you need, wired to the outputs that need them.
+
+* Pitfall
+Two-level forms of some functions are huge: the parity of \(n\) bits needs \(2^{n-1}\) products. Such functions belong in multilevel logic.

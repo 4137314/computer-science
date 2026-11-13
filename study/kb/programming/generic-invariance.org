@@ -1,0 +1,40 @@
+:PROPERTIES:
+:ID:       generic-invariance
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     theorem
+:REQUIRES: java-generics liskov-substitution
+:SEE:      casting-instanceof java-collections
+:ALIASES:  invariance, covariance, contravariance, wildcard, bounded wildcard, extends, super, PECS
+:END:
+#+title: Invariance of generics and wildcards
+#+summary: If B is a subtype of A, =G<B>= is not a subtype of =G<A>=, because a =List<A>= view would allow inserting an A into a list of B; wildcards recover flexibility: =G<? extends A>= is read-only covariant, =G<? super A>= write-only contravariant.
+
+* Statement
+For a generic type \(G\) and \(B<:A\), neither \(G\langle B\rangle<:G\langle A\rangle\) nor the converse holds: generics are *invariant*. With wildcards,
+\[ G\langle B\rangle <: G\langle ?\ \text{extends}\ A\rangle, \qquad G\langle A\rangle <: G\langle ?\ \text{super}\ B\rangle, \qquad G\langle T\rangle <: G\langle ?\rangle. \]
+
+* Derivation
+Suppose =List<Integer>= were a subtype of =List<Number>=:
+#+begin_src java
+  List<Integer> ints = new ArrayList<>();
+  List<Number> nums = ints;        // (if it were allowed)
+  nums.add(3.14);                  // a Double in a list of Integer
+  Integer i = ints.get(0);         // ClassCastException
+#+end_src
+Erasure leaves no run-time check (unlike [[id:casting-instanceof][arrays]]), so the compiler must forbid the assignment. With =List<? extends Number>= reading gives a =Number= (safe) and adding is forbidden (the actual element type is unknown); with =List<? super Integer>= adding an =Integer= is safe and reading gives only =Object=.
+
+* Example
+#+begin_src java
+  static double sum(Collection<? extends Number> c) {      // producer: extends
+      double s = 0; for (Number n : c) s += n.doubleValue(); return s;
+  }
+  static void fill(List<? super Integer> l) { l.add(1); }  // consumer: super
+  sum(List.of(1, 2)); sum(List.of(1.5, 2.5));              // both accepted
+#+end_src
+
+* Intuition
+PECS: Producer Extends, Consumer Super. If you only take things out, accept any subtype; if you only put things in, accept any supertype.
+
+* Pitfall
+=List<Object>= is not "a list of anything": it does not accept a =List<String>=. The type that accepts every list is =List<?>=.

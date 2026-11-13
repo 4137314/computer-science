@@ -1,0 +1,29 @@
+:PROPERTIES:
+:ID:       liskov-substitution
+:DOMAIN:   programming
+:AREA:     oop
+:KIND:     theorem
+:REQUIRES: polymorphism
+:SEE:      uml-generalization stack-and-queue abstract-class-interface generic-invariance
+:ALIASES:  Liskov substitution principle, LSP, substitutability, behavioural subtyping
+:END:
+#+title: Liskov substitution principle
+#+summary: If S is a subtype of T, objects of type T may be replaced by objects of type S without altering any desirable property of the program: a subclass may weaken preconditions and strengthen postconditions, never the opposite.
+
+* Statement
+Let \(\phi(x)\) be a property provable for every object \(x\) of type \(T\). Then \(\phi(y)\) must hold for every object \(y\) of a subtype \(S\) of \(T\). In terms of [[id:parnas-principles][contracts]], an overriding method must
+- accept at least what the original accepts (precondition equal or weaker);
+- guarantee at least what the original guarantees (postcondition equal or stronger);
+- preserve the invariants of the supertype.
+
+* Derivation
+A client that holds a reference of static type \(T\) only knows the contract of \(T\). It establishes the precondition of \(T\) and relies on the postcondition of \(T\). If the subtype demanded more, a valid call could fail; if it promised less, a valid conclusion could be false. So both inclusions are needed for every client to stay correct.
+
+* Example
+A =Queue= derived from =Stack= by overriding =pop= to return the oldest element type-checks, but breaks the postcondition "=pop= returns the last element pushed": any code written for stacks (for example, undo) silently misbehaves when given a queue. The derivation is legal Java and wrong design.
+
+* Intuition
+A subtype is a promise to be usable everywhere the supertype is. The compiler checks names and types; only the programmer can check behaviour.
+
+* Pitfall
+The classic counterexample is Square extends Rectangle: =setWidth= on a square must also change the height, so "setting the width leaves the height unchanged", true for rectangles, fails.

@@ -1,0 +1,27 @@
+:PROPERTIES:
+:ID:       low-power-encoding
+:DOMAIN:   hardware
+:AREA:     power
+:KIND:     construction
+:REQUIRES: switching-activity
+:SEE:      finite-state-machine datapath-subsystems clock-gating bitset
+:ALIASES:  bus invert coding, Gray code, state encoding for power, input ordering, sign-magnitude, low power encoding
+:END:
+#+title: Encodings and orderings for low power
+#+summary: The same information can be sent with fewer bit flips: Gray code changes one bit per count step, bus-invert coding sends \(\bar x\) plus an invert line when more than half the bits would flip, FSM states with frequent transitions get adjacent codes, sign-magnitude suits small signed samples, and high-activity signals are connected late in a gate chain.
+
+* Construction
+- *Gray counter*: consecutive values differ in one bit, \(g=b\oplus(b\gg1)\). A binary counter flips about 2 bits per step on average (bit \(i\) toggles every \(2^i\) steps: \(\sum_i 2^{-i}\to2\)), a Gray counter exactly 1.
+- *Bus-invert*: for an \(n\)-bit bus, if the Hamming distance between the new word and the current bus value exceeds \(n/2\), send the complement and set an extra =INV= line. At most \(n/2+1\) lines switch per transfer.
+- *FSM state assignment*: weight each pair of states by the probability of the transition between them; give heavy pairs codes at Hamming distance 1.
+- *Sample representation*: in two's complement a signal oscillating around 0 flips all its sign-extension bits at each zero crossing; sign-magnitude flips only the sign bit.
+- *Input ordering*: in a chain of gates, connect the signal with the highest activity (or the latest one) nearest the output, so its transitions reach fewer internal nodes.
+
+* Example
+Bus of 8 lines at =00000000=, next word =11111110=: 7 lines would switch. Bus-invert sends =00000001= with =INV= = 1: 2 lines switch.
+
+* Intuition
+Power is spent on changes, not on values: choose the representation in which the data you actually send changes least.
+
+* Pitfall
+Encoders and decoders consume power and add delay: bus-invert pays off on long, heavily loaded buses (off-chip), not on short internal ones.

@@ -1,0 +1,34 @@
+:PROPERTIES:
+:ID:       java-packages
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     definition
+:REQUIRES: java-references information-hiding
+:SEE:      java-platform
+:ALIASES:  package, import, compilation unit, classpath, namespace, package-private
+:END:
+#+title: Packages
+#+summary: Every Java class belongs to a package, a named group that is both a namespace (=java.util.List=) and a unit of information hiding (members without modifier are visible only inside it); =import= lets a file use short names, and package names mirror directories.
+
+* Definition
+- A file (compilation unit) starts with =package it.unitn.shapes;= and may contain several classes, at most one =public= (named like the file).
+- A class without a package declaration belongs to the unnamed default package.
+- The fully qualified name is =package.Class=; =import java.util.List;= or =import java.util.*;= allows =List=. =java.lang= is imported automatically (=String=, =Math=, =System=, =Object=).
+- Packages correspond to directories: =it/unitn/shapes/Circle.java=.
+- Package-private visibility (no modifier) makes classes and members usable only within the package: the package is a module whose public classes are its interface.
+
+* Example
+#+begin_src java
+  package it.unitn.shapes;
+  import java.util.ArrayList;
+  public class Drawing {                 // usable from other packages
+      ArrayList<Shape> shapes = new ArrayList<>();   // package-private field
+  }
+  class Helper { }                       // invisible outside it.unitn.shapes
+#+end_src
+
+* Intuition
+Classes hide fields from other classes; packages hide classes from other packages.
+
+* Pitfall
+Subpackages are not nested for visibility: =it.unitn= and =it.unitn.shapes= are unrelated packages, and package-private members of one are not visible in the other.

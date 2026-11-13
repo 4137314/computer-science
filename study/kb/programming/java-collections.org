@@ -1,0 +1,41 @@
+:PROPERTIES:
+:ID:       java-collections
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     definition
+:REQUIRES: java-generics
+:SEE:      java-iterator stl-containers equals-hashcode comparable-comparator uml-association
+:ALIASES:  Collections Framework, Collection, List, Set, Map, Queue, ArrayList, LinkedList, HashSet, TreeSet, HashMap, TreeMap
+:END:
+#+title: The Java Collections Framework
+#+summary: A hierarchy of generic interfaces (=Collection=, =List=, =Set=, =Queue=, =Map=), implementations (=ArrayList=, =LinkedList=, =HashSet=, =TreeSet=, =HashMap=, =TreeMap=) and algorithms (=Collections.sort=, =binarySearch=, …); code is written against the interfaces and the implementation is chosen once, at construction.
+
+* Definition
+Three parts: *interfaces* (abstract data types), *implementations* (concrete data structures), *algorithms* (polymorphic static methods in =Collections=).
+
+| interface | meaning | hash | tree (sorted) | array / list |
+|---+---+---+---+---|
+| =Set<E>= | no duplicates | =HashSet= | =TreeSet= | |
+| =List<E>= | ordered, by index | | | =ArrayList=, =LinkedList= |
+| =Queue<E>=, =Deque<E>= | FIFO, both ends | | =PriorityQueue= (heap) | =ArrayDeque=, =LinkedList= |
+| =Map<K,V>= | keys to values | =HashMap= | =TreeMap= | |
+
+=Collection<E>= offers =add=, =remove=, =contains=, =size=, =isEmpty=, =iterator=, the bulk operations =addAll=, =removeAll=, =retainAll=, =containsAll=, and =toArray=. =Map= is not a =Collection=; its views =keySet()=, =values()=, =entrySet()= are.
+
+* Example
+#+begin_src java
+  List<String> names = new ArrayList<>();      // declare the interface, choose the class
+  Set<String> unique = new TreeSet<>(names);   // sorted, no duplicates
+  Map<String, Integer> count = new HashMap<>();
+  for (String n : names) count.merge(n, 1, Integer::sum);
+  Collections.sort(names);
+#+end_src
+
+* Requirements on elements
+=HashSet= and =HashMap= use =hashCode= and =equals=; =TreeSet= and =TreeMap= use =compareTo= or a =Comparator=. A class stored in them must define these consistently (see [[id:equals-hashcode][equals and hashCode]], [[id:comparable-comparator][ordering]]).
+
+* Intuition
+Program to the interface: =List<String> l = new ArrayList<>()= lets you switch to =LinkedList= by editing one word.
+
+* Pitfall
+Mutating an element in a way that changes its =hashCode= or ordering while it is inside a =HashSet= or =TreeSet= loses it: =contains= looks in the wrong bucket or branch.

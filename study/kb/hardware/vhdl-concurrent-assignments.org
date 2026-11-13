@@ -1,0 +1,50 @@
+:PROPERTIES:
+:ID:       vhdl-concurrent-assignments
+:DOMAIN:   hardware
+:AREA:     vhdl
+:KIND:     definition
+:REQUIRES: vhdl-entity-architecture std-logic
+:SEE:      vhdl-process event-driven-simulation datapath-subsystems
+:ALIASES:  concurrent signal assignment, when else, with select, conditional assignment, selected assignment, multiplexer, priority encoder
+:END:
+#+title: Concurrent assignments: when–else and with–select
+#+summary: Data-flow VHDL describes combinational logic with concurrent assignments: plain equations, conditional =when ... else= (a priority chain of conditions) and selected =with ... select= (a multiplexer on the values of one expression, all choices mutually exclusive and covered).
+
+* Definition
+#+begin_src vhdl
+  -- equation
+  y <= (a and b) or (not c);
+
+  -- conditional: priority, first true condition wins
+  code <= "11" when req(3) = '1' else
+          "10" when req(2) = '1' else
+          "01" when req(1) = '1' else
+          "00";
+
+  -- selected: one expression, exclusive choices
+  with sel select
+    y <= d0 when "00",
+         d1 when "01",
+         d2 when "10",
+         d3 when others;
+#+end_src
+Every concurrent assignment is re-evaluated whenever a signal on its right-hand side changes, like a gate reacting to its inputs.
+
+* Conditional versus selected
+=when ... else= builds a chain of 2-to-1 multiplexers: the first condition has priority, conditions may overlap — natural for a priority encoder. =with ... select= builds one wide multiplexer: choices must be distinct constants and cover every value (=others= for the rest, including =U=, =X=, … of =std_logic=). The choices are values, not conditions.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\draw[kbcyan] (0,0) -- (0,2.2) -- (1,1.8) -- (1,0.4) -- cycle;
+\foreach \i in {0,1,2,3} {\draw (-0.6,0.3+\i*0.53) -- (0,0.3+\i*0.53); \node[anchor=east] at (-0.6,0.3+\i*0.53) {$d_\i$};}
+\draw (1,1.1) -- (1.6,1.1) node[right] {$y$}; \draw (0.5,-0.4) -- (0.5,0.2); \node at (0.5,-0.6) {sel};
+\foreach \k in {0,1,2} {\draw[kbamber] (3+\k*1.1,0.4) -- (3+\k*1.1,1.8) -- (3.6+\k*1.1,1.5) -- (3.6+\k*1.1,0.7) -- cycle;}
+\node at (2.8,-0.4) {with–select}; \node at (4.6,-0.4) {when–else};
+\end{tikzpicture}
+One balanced multiplexer, or a chain where the first condition is closest to the output.
+
+* Intuition
+Equations are wires and gates; =with–select= is a switch with labelled positions; =when–else= is a list of rules read top-down.
+
+* Pitfall
+A conditional assignment that reads its own target (=q <= d when en = '1' else q;=) describes memory: synthesis infers a latch, almost never wanted in combinational logic.

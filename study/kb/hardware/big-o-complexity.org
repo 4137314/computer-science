@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       big-o-complexity
+:DOMAIN:   hardware
+:AREA:     complexity
+:KIND:     definition
+:REQUIRES:
+:SEE:      np-hard-optimization static-timing-analysis event-driven-simulation stl-algorithms template-metaprogramming
+:ALIASES:  big O, asymptotic complexity, time complexity, space complexity, polynomial, exponential, computational complexity
+:END:
+#+title: Computational complexity and big-O
+#+summary: \(f(n)=O(g(n))\) if \(f(n)\le c\,g(n)\) for some \(c>0\) and all \(n\ge n_0\): the growth rate of the number of operations (time) or memory cells (space) as the size \(n\) of the problem grows, ignoring constants; polynomial is tractable, exponential is not.
+
+* Definition
+\[ f(n)=O(g(n)) \iff \exists\, c>0,\ n_0>0:\ f(n)\le c\,g(n)\ \ \forall n\ge n_0 . \]
+Equivalently, when the limit exists, \(\lim_{n\to\infty} f(n)/g(n)=c<\infty\). Two kinds:
+- *time complexity*: elementary steps (additions, comparisons, jumps);
+- *space complexity*: memory locations (bits, words).
+Classes, from slow to fast growth: \(O(1)\), \(O(\log n)\), \(O(n)\), \(O(n\log n)\), \(O(n^2)\), \(O(n^k)\) polynomial, \(O(2^n)\), \(O(n!)\) exponential.
+
+* Derivation
+Count operations through the algorithm. Shifting every component of a circuit by one position is one operation each: \(n\) operations, and doubling \(n\) doubles the time. Comparing every pair of components is \(n(n-1)/2=O(n^2)\): doubling \(n\) quadruples the time, tripling it multiplies by nine. Trying every subset of \(n\) gates is \(2^n\): adding one gate doubles the time. Rules: \(O(f)+O(g)=O(\max(f,g))\) along a sequence, \(O(f)\cdot O(g)=O(fg)\) for nested loops, constants disappear: \(O(3n^2+5n)=O(n^2)\).
+
+* Picture
+\begin{tikzpicture}
+\begin{axis}[width=7.2cm, height=5cm, axis lines=left, xlabel={$n$}, ylabel={operations}, xmin=1, xmax=12, ymin=0, ymax=600, legend pos=north west]
+\addplot+[domain=1:12, samples=40] {x*ln(x)/ln(2)}; \addlegendentry{$n\log n$}
+\addplot+[domain=1:12, samples=40] {x^2}; \addlegendentry{$n^2$}
+\addplot+[domain=1:12, samples=40] {x^3}; \addlegendentry{$n^3$}
+\addplot+[domain=1:9.3, samples=40] {2^x}; \addlegendentry{$2^n$}
+\end{axis}
+\end{tikzpicture}
+For small \(n\) the constants matter; for large \(n\) only the class does.
+
+* Intuition
+Big-O answers "what happens if the circuit is ten times bigger?". Design tools must handle millions of gates, so only near-linear algorithms survive on full chips.
+
+* Pitfall
+\(O\) is an upper bound and hides constants: an \(O(n^2)\) method with a tiny constant can beat an \(O(n\log n)\) one at the sizes that matter. Worst case and average case can differ widely.

@@ -1,0 +1,41 @@
+:PROPERTIES:
+:ID:       cordic
+:DOMAIN:   hardware
+:AREA:     arithmetic
+:KIND:     method
+:REQUIRES: ripple-carry-adder
+:SEE:      array-multiplier serial-arithmetic finite-state-machine
+:ALIASES:  CORDIC, coordinate rotation digital computer, vector rotation, sine cosine, arctangent, shift-add, micro-rotation
+:END:
+#+title: CORDIC
+#+summary: CORDIC rotates a vector by any angle using only shifts, additions and a small table: the angle is decomposed into micro-rotations by \(\pm\arctan2^{-i}\), each of which multiplies by \((1\mp j2^{-i})\), so after \(n\) steps it yields \(\cos\theta\), \(\sin\theta\) (or magnitude and \(\arctan\)) to \(n\) bits, scaled by a constant gain \(K\approx1.6468\).
+
+* Method
+Rotation by \(\theta_i=\arctan2^{-i}\) in direction \(d_i=\pm1\):
+\[ x_{i+1}=x_i-d_i\,2^{-i}y_i,\qquad y_{i+1}=y_i+d_i\,2^{-i}x_i,\qquad z_{i+1}=z_i-d_i\arctan2^{-i}. \]
+- *Rotation mode*: \(d_i=\mathrm{sign}(z_i)\) drives the residual angle \(z\) to 0. Starting from \((1/K,0,\theta)\) gives \((\cos\theta,\sin\theta,0)\).
+- *Vectoring mode*: \(d_i=-\mathrm{sign}(y_i)\) drives \(y\) to 0: \(x_n=K\sqrt{x_0^2+y_0^2}\), \(z_n=z_0+\arctan(y_0/x_0)\).
+The gain \(K=\prod_i\sqrt{1+2^{-2i}}\to1.6468\) is constant, so it is compensated once.
+
+* Derivation
+A true rotation multiplies by \(\cos\theta_i\) and by \(\begin{pmatrix}1&-\tan\theta_i\\ \tan\theta_i&1\end{pmatrix}\). Choosing \(\tan\theta_i=2^{-i}\) turns the matrix product into shifts; dropping the \(\cos\theta_i\) factors leaves the constant gain. Since \(\sum_{k>i}\theta_k\ge\theta_i\), any angle in \([-1.74,1.74]\) rad is reachable, and each step adds about one bit of precision.
+
+* Algorithm
+\begin{algorithmic}[1]
+\Require angle $\theta$, iterations $n$, table $t_i=\arctan2^{-i}$
+\State $x\gets1/K$; $y\gets0$; $z\gets\theta$
+\For{$i=0$ to $n-1$}
+\State $d\gets$ \textbf{if} $z\ge0$ \textbf{then} $1$ \textbf{else} $-1$
+\State $(x,y)\gets(x-d\,2^{-i}y,\ y+d\,2^{-i}x)$; $z\gets z-d\,t_i$
+\EndFor
+\State \Return $(x,y)=(\cos\theta,\sin\theta)$
+\end{algorithmic}
+
+* Hardware
+Iterative: three registers, two shifters (barrel or wired), three adder/subtractors, an angle table, and an FSM counting iterations: \(n\) cycles per result, small area. Unrolled and pipelined: one result per cycle, \(n\) stages with fixed wired shifts.
+
+* Intuition
+Reach any angle by a sequence of ever smaller turns left or right, chosen so that each turn costs a shift and an add.
+
+* Pitfall
+Fixed-point word lengths need guard bits: each iteration rounds, and \(n\) iterations accumulate about \(\log_2 n\) bits of error.

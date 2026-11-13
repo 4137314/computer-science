@@ -1,0 +1,30 @@
+:PROPERTIES:
+:ID:       algebraic-division
+:DOMAIN:   hardware
+:AREA:     logic-synthesis
+:KIND:     method
+:REQUIRES:
+:SEE:      multilevel-logic-optimization boolean-difference
+:ALIASES:  algebraic division, weak division, Boolean division, kernel, co-kernel, divisor, quotient, remainder, factoring
+:END:
+#+title: Algebraic (weak) division
+#+summary: Treating a sum of products as a polynomial, \(f=q\cdot d+r\) with the quotient \(q=f/d\) the largest expression whose product with \(d\) uses only cubes of \(f\); algebraic division ignores Boolean identities such as \(x\bar x=0\), which makes it fast and the basis of extraction, substitution and factoring.
+
+* Method
+In *algebraic* manipulation an expression is a polynomial in literals (\(x\) and \(\bar x\) are different variables), with no \(xx=x\) or \(x\bar x=0\). Weak division of \(f\) by \(d=\sum_i d_i\):
+1. for each cube \(d_i\) of \(d\), \(q_i=\{c/d_i : c\in f,\ d_i\subseteq c\}\) (remove the literals of \(d_i\) from the cubes of \(f\) that contain them);
+2. \(q=\bigcap_i q_i\);
+3. \(r=f-q\,d\) (the cubes of \(f\) not produced by \(q\,d\)).
+*Boolean* division uses identities and don't-cares too; it finds more but is far more expensive.
+
+* Example
+\(f=ac+ad+bc+bd+e\), \(d=a+b\): \(q_a=\{c,d\}\), \(q_b=\{c,d\}\), \(q=c+d\), \(r=e\). So \(f=(a+b)(c+d)+e\): 9 literals become 5.
+
+* Kernels
+A *kernel* of \(f\) is a cube-free quotient \(f/c\) by a cube \(c\) (the co-kernel); two functions sharing a kernel, or a kernel intersection, share a common sub-expression that can be extracted once. \(f=ace+bce+de+g\): \(f/ce=a+b\), \(f/e=ac+bc+d\).
+
+* Intuition
+It is long division of polynomials applied to logic: factor out what the terms have in common, without using the special rules of Boolean algebra.
+
+* Pitfall
+Algebraic division misses Boolean factorisations: \(f=a\bar b+\bar a b+\dots\) does not factor algebraically through \(a\oplus b\), and \((a+b)(a+c)=a+bc\) is invisible to it.

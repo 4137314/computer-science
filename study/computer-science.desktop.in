@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Computer Science
+GenericName=Knowledge base
+Comment=C++, Java and digital design (VHDL, synthesis, timing, power, CPUs), in Emacs
+Keywords=computer;science;informatica;cs;cpp;java;vhdl;kb;knowledge;study;studio;emacs;
+Exec=env CS_ROOT=@ROOT@ @BIN@
+Path=@ROOT@/study/kb
+Icon=emacs
+Terminal=false
+Categories=Education;
+StartupWMClass=emacs

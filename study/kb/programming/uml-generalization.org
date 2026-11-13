@@ -1,0 +1,43 @@
+:PROPERTIES:
+:ID:       uml-generalization
+:DOMAIN:   programming
+:AREA:     uml
+:KIND:     definition
+:REQUIRES: uml-class-diagram
+:SEE:      inheritance abstract-class-interface liskov-substitution
+:ALIASES:  generalization, specialization, is-a, superclass, subclass, disjoint, complete, multiple inheritance
+:END:
+#+title: Generalization (is-a)
+#+summary: A generalization makes every instance of a subclass an instance of its superclass, so the subclass inherits all attributes and associations; a family of subclasses can be disjoint and/or complete.
+
+* Definition
+A generalization relates a superclass to one or more subclasses (hollow triangle on the superclass). Every instance of a subclass is an instance of the superclass: \(\mathrm{ext}(\text{Sub})\subseteq\mathrm{ext}(\text{Super})\).
+
+- *Inheritance principle*: every property (attribute, operation, association) of the superclass is a property of the subclass, and is not repeated in the diagram.
+- *Disjoint* ={disjoint}=: the subclasses share no instance.
+- *Complete* ={complete}=: the union of the subclasses is the whole superclass.
+- One superclass can have several independent generalizations, one per criterion (occupation: student/worker; role: doctor/patient).
+- *Multiple inheritance*: two non-disjoint subclasses can share instances only through an explicit common subclass (=WorkingStudent=), so that every object keeps one most specific class.
+- *Specialization*: a subclass can restrict an inherited attribute (=Age: 0..120= in Person, =Age: 70..120= in Elder).
+
+* Derivation
+From "every Book has a Title" and "every HistoricalBook is a Book" it follows that every HistoricalBook has a Title. Inheritance is the transitivity of inclusion: if \(x\in\mathrm{ext}(\text{Sub})\subseteq\mathrm{ext}(\text{Super})\) and every element of \(\mathrm{ext}(\text{Super})\) has the property, so does \(x\).
+
+* Picture
+\begin{tikzpicture}[font=\small, box/.style={draw, minimum width=2cm, minimum height=0.6cm}]
+\node[box, draw=kbcyan] (p) at (0,0) {Person};
+\node[box] (s) at (-2.2,-1.8) {Student};
+\node[box] (w) at (2.2,-1.8) {Worker};
+\node[box, draw=kbamber] (sw) at (0,-3.4) {WorkingStudent};
+\draw[-{Triangle[open,length=7pt,width=8pt]}] (s) -- (p);
+\draw[-{Triangle[open,length=7pt,width=8pt]}] (w) -- (p);
+\draw[-{Triangle[open,length=7pt,width=8pt]}] (sw) -- (s);
+\draw[-{Triangle[open,length=7pt,width=8pt]}] (sw) -- (w);
+\end{tikzpicture}
+A non-disjoint generalization and the common subclass that holds the shared instances.
+
+* Intuition
+"is-a" must be true of every instance, forever. A square is-a rectangle in geometry, but not in a program where rectangles can be stretched.
+
+* Pitfall
+Use generalization for classification, not for reuse of code: a Stack is not-a List even if it can be built from one (see [[id:liskov-substitution][substitutability]]).

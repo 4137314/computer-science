@@ -1,0 +1,53 @@
+:PROPERTIES:
+:ID:       shallow-deep-copy
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     construction
+:REQUIRES: cpp-special-members aggregation-composition
+:SEE:      move-semantics smart-pointers equals-hashcode
+:ALIASES:  deep copy, shallow copy, rule of three, copy constructor, clone
+:END:
+#+title: Shallow and deep copy, rule of three
+#+summary: The generated copy copies pointers, not what they point to, so two objects end up sharing (and both deleting) one heap object; a class that owns memory must define destructor, copy constructor and copy assignment together.
+
+* Statement
+*Shallow copy*: copy the members' values; for a pointer member, the address. *Deep copy*: copy the pointed object too, so the copy owns its own.
+
+*Rule of three*: if a class needs a user-defined destructor, copy constructor or copy assignment, it needs all three. (Rule of five with the two move operations.)
+
+* Derivation
+Take =class A { int i; B* pb; };= with =pb= owning a heap =B=. The generated copy constructor copies =pb=: after =A a2(a);= both point to one =B=. Changing =a2='s =B= changes =a='s; when both die, =~A= deletes the same =B= twice. Defining the copy to allocate a new =B= restores one =B= per =A=.
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\node[draw] (a) at (0,0) {a.pb}; \node[draw] (a2) at (0,-1) {a2.pb};
+\node[draw, kbmagenta] (b) at (2.4,-0.5) {B};
+\draw[-{Stealth}] (a) -- (b); \draw[-{Stealth}] (a2) -- (b);
+\node[font=\scriptsize, kbguide] at (1.2,-1.6) {shallow: shared};
+\node[draw] (c) at (5,0) {a.pb}; \node[draw] (c2) at (5,-1) {a2.pb};
+\node[draw, kbcyan] (b1) at (7.2,0) {B}; \node[draw, kbcyan] (b2) at (7.2,-1) {B};
+\draw[-{Stealth}] (c) -- (b1); \draw[-{Stealth}] (c2) -- (b2);
+\node[font=\scriptsize, kbguide] at (6.2,-1.6) {deep: one each};
+\end{tikzpicture}
+
+* Construction
+#+begin_src c++
+  A::A(const A& a) : i(a.i), pb(a.pb ? new B(*a.pb) : nullptr) {}
+
+  A& A::operator=(const A& a) {
+    if (this == &a) return *this;          // self-assignment
+    i = a.i;
+    if (!a.pb)      { delete pb; pb = nullptr; }
+    else if (pb)    { *pb = *a.pb; }       // reuse the B we already own
+    else            { pb = new B(*a.pb); }
+    return *this;
+  }
+
+  A::~A() { delete pb; }                   // deleting nullptr is a no-op
+#+end_src
+
+* Intuition
+Copying a house key is not copying the house. If each object is supposed to have its own house, the copy has to build one.
+
+* Pitfall
+Java has the same distinction: assignment copies references, =clone()= is shallow by default, and a deep copy must be written by hand.

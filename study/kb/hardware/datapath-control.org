@@ -1,0 +1,39 @@
+:PROPERTIES:
+:ID:       datapath-control
+:DOMAIN:   hardware
+:AREA:     processors
+:KIND:     model
+:REQUIRES: datapath-subsystems finite-state-machine
+:SEE:      alu-design risc-v-datapath data-flow-graph resource-binding
+:ALIASES:  datapath, control unit, register file, function unit, control word, microprocessor, memory-mapped I/O, bus
+:END:
+#+title: Datapath and control unit
+#+summary: A processor is a datapath — register file, function unit (ALU + shifter), buses, multiplexers, memory interface — steered cycle by cycle by a control word (register addresses, mux selects, operation code, write enables) produced by a control unit that sequences instructions.
+
+* Model
+- *Register file*: \(2^m\) registers, two read ports (=A select=, =B select=) and one write port (=D select=, =write=).
+- *Operand selection*: the B bus takes a register or a constant (=MB=), the D input takes the function unit or memory (=MD=).
+- *Function unit*: [[id:alu-design][ALU]] and [[id:datapath-subsystems][shifter]], with status flags \(V\) (overflow), \(C\) (carry), \(N\) (negative), \(Z\) (zero).
+- *Control word*: the tuple (DA, AA, BA, MB, FS, MD, RW, MW) of fields that fixes one micro-operation, e.g. \(R1\gets R2+R3\).
+- *Control unit*: fetches an instruction from memory, decodes it into one control word (single-cycle) or a sequence of them (multi-cycle, an [[id:finite-state-machine][FSM]]), and updates the program counter (sequential, branch, jump).
+- *Memory-mapped I/O*: peripherals respond to addresses, so load and store instructions talk to devices.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, b/.style={draw, minimum height=0.6cm, align=center}]
+\node[b, draw=kbcyan, minimum width=2.2cm] (rf) at (0,0) {register file};
+\node[b, draw=kbamber] (fu) at (0,-1.5) {ALU / shifter};
+\node[b] (mem) at (3,-1.5) {data memory};
+\node[b, draw=kbmagenta, minimum width=2.2cm] (cu) at (-3.2,-0.75) {control unit};
+\draw[-{Stealth}] (-0.5,-0.3) -- node[left] {A} (-0.5,-1.2); \draw[-{Stealth}] (0.5,-0.3) -- node[right] {B} (0.5,-1.2);
+\draw[-{Stealth}] (0.5,-0.75) -- (mem.north);
+\draw[-{Stealth}] (fu.south) -- (0,-2.2) -- (1.6,-2.2) -- (1.6,0) -- (rf.east);
+\draw[-{Stealth}] (mem.east) -- (3.8,-1.5) -- (3.8,0.6) -- (0,0.6) -- (rf.north);
+\draw[-{Stealth}, kbmagenta, dashed] (cu) -- node[above] {control word} (rf.west);
+\draw[-{Stealth}, kbmagenta, dashed] (fu.west) -- node[below] {flags} (cu);
+\end{tikzpicture}
+
+* Intuition
+The datapath is the kitchen, the control word the recipe line for this minute, the control unit the cook reading the recipe.
+
+* Pitfall
+Every field of the control word must be specified in every cycle, including "don't write": a forgotten write enable silently corrupts a register.

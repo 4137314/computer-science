@@ -1,0 +1,32 @@
+:PROPERTIES:
+:ID:       serial-arithmetic
+:DOMAIN:   hardware
+:AREA:     arithmetic
+:KIND:     construction
+:REQUIRES: ripple-carry-adder sequential-logic
+:SEE:      fir-filter array-multiplier serial-communication
+:ALIASES:  bit-serial arithmetic, serial adder, digit-serial, area-time trade-off
+:END:
+#+title: Bit-serial arithmetic
+#+summary: A serial adder processes one bit per clock, least significant first, with one full adder and a flip-flop holding the carry: \(n\) cycles per \(n\)-bit addition, constant area; serial and digit-serial units trade throughput for area and wiring, and fit serial data streams.
+
+* Construction
+Shift registers present \(a_i\) and \(b_i\) at cycle \(i\); a full adder computes \(s_i\) and \(c_{i+1}\); a D flip-flop stores \(c_{i+1}\) for the next cycle (reset to \(c_0\) at the start of each word). Sum bits are shifted out. Area: one full adder and one flip-flop, independent of \(n\); time: \(n\) cycles, but each cycle is a single full-adder delay, so the clock can be fast.
+
+*Digit-serial*: process \(d\) bits per cycle with a \(d\)-bit adder: \(n/d\) cycles. Serial multipliers combine a serial operand with a parallel one (\(n\) cycles, \(n\) adders).
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\node[draw, kbcyan, minimum width=1cm, minimum height=1cm] (fa) at (0,0) {FA};
+\node[draw, kbamber, minimum width=0.7cm] (ff) at (0,-1.4) {D};
+\draw (-1.4,0.25) node[left] {$a_i$} -- (-0.5,0.25); \draw (-1.4,-0.05) node[left] {$b_i$} -- (-0.5,-0.05);
+\draw (0.5,0.2) -- (1.4,0.2) node[right] {$s_i$};
+\draw (0.5,-0.25) -- (0.9,-0.25) -- (0.9,-1.4) -- (ff.east); \draw (ff.west) -- (-0.9,-1.4) -- (-0.9,-0.35) -- (-0.5,-0.35);
+\node at (-1.25,-0.9) {$c_i$};
+\end{tikzpicture}
+
+* Intuition
+The ripple-carry adder unrolled in time instead of space: the carry waits in a flip-flop instead of travelling along a wire.
+
+* Pitfall
+Serial units need control (word boundaries, carry reset) and conversion to and from parallel form; for short words the overhead eats the area saving.

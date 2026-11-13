@@ -1,0 +1,44 @@
+:PROPERTIES:
+:ID:       alu-design
+:DOMAIN:   hardware
+:AREA:     processors
+:KIND:     construction
+:REQUIRES: ripple-carry-adder datapath-control
+:SEE:      carry-lookahead-adder datapath-subsystems risc-v-datapath
+:ALIASES:  ALU, arithmetic logic unit, B conditioning, flags, overflow, carry flag, zero flag, negative flag, function select
+:END:
+#+title: Arithmetic logic unit
+#+summary: One adder plus "B input conditioning" (pass \(B\), \(\bar B\), 0 or all ones) and the carry-in implements add, subtract, increment, decrement and transfer; a logic unit computes AND, OR, XOR, NOT bitwise; a function-select code chooses the operation, and flags \(N,Z,C,V\) report the result.
+
+* Construction
+Arithmetic: \(G=X+Y+C_{in}\) with \(X=A\) and \(Y\) chosen by \(S_1S_0\):
+
+| \(S_1S_0\) | \(Y\) | \(C_{in}=0\) | \(C_{in}=1\) |
+|---+---+---+---|
+| 00 | all 0 | \(A\) (transfer) | \(A+1\) (increment) |
+| 01 | \(B\) | \(A+B\) | \(A+B+1\) |
+| 10 | \(\bar B\) | \(A+\bar B=A-B-1\) | \(A-B\) (subtract) |
+| 11 | all 1 | \(A-1\) (decrement) | \(A\) (transfer) |
+
+Each bit of the conditioning logic is \(Y_i=B_iS_0+\bar B_iS_1\). Logic: a 4:1 mux per bit selects \(A\wedge B\), \(A\vee B\), \(A\oplus B\), \(\bar A\). A further select chooses arithmetic, logic or shifter output.
+
+Flags: \(N=G_{n-1}\), \(Z=\overline{\bigvee_i G_i}\), \(C=c_n\), \(V=c_n\oplus c_{n-1}\) (signed overflow).
+
+* Example
+#+begin_src vhdl
+  with fs select
+    g <= std_logic_vector(unsigned(a) + unsigned(b))          when "0010",
+         std_logic_vector(unsigned(a) - unsigned(b))          when "0101",
+         a and b                                              when "1000",
+         a or b                                               when "1010",
+         a xor b                                              when "1100",
+         not a                                                when "1110",
+         a                                                    when others;
+  z <= '1' when unsigned(g) = 0 else '0';
+#+end_src
+
+* Intuition
+Subtraction, increment and decrement are all addition with a different second operand and carry-in: one adder, a little input logic, many operations.
+
+* Pitfall
+\(C\) and \(V\) mean different things: \(C\) is the overflow of unsigned arithmetic (and, for subtraction, the inverted borrow), \(V\) the overflow of signed arithmetic. A comparison must use the right one.

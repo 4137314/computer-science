@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       carry-lookahead-adder
+:DOMAIN:   hardware
+:AREA:     arithmetic
+:KIND:     construction
+:REQUIRES: ripple-carry-adder tree-height-reduction
+:SEE:      generalized-bypass alu-design
+:ALIASES:  carry lookahead, CLA, group generate, group propagate, prefix adder, Kogge-Stone, Brent-Kung, carry skip, carry select
+:END:
+#+title: Carry-lookahead and prefix adders
+#+summary: Unrolling \(c_{i+1}=g_i+p_ic_i\) shows that carries are a prefix computation with the associative operator \((g,p)\circ(g',p')=(g+pg',\,pp')\); computing group generates and propagates in a tree gives all carries in \(O(\log n)\) levels instead of \(n\).
+
+* Construction
+Unroll: \(c_2=g_1+p_1g_0+p_1p_0c_0\), and so on. For a group \([i{:}j]\),
+\[ G_{i:j}=g_i+p_iG_{i-1:j},\qquad P_{i:j}=p_iP_{i-1:j},\qquad c_{i+1}=G_{i:0}+P_{i:0}c_0. \]
+The operator \((G,P)\circ(G',P')=(G+PG',\,PP')\) is associative, so all prefixes \(G_{i:0}\) can be computed by a parallel-prefix tree ([[id:tree-height-reduction][tree height reduction]]):
+- *4-bit CLA blocks* with a second level of lookahead: delay \(O(\log_4 n)\) levels;
+- *Kogge–Stone*: \(\log_2 n\) levels, \(n\log_2n\) operators, fan-out 2, many wires;
+- *Brent–Kung*: \(2\log_2 n-1\) levels, about \(2n\) operators.
+Simpler alternatives: *carry-skip* (bypass a block when \(P=1\)) and *carry-select* (precompute both block sums), see [[id:generalized-bypass][bypass and select]].
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\foreach \i in {0,...,7} {\node at (7-\i,0.3) {\i};}
+\foreach \l/\d in {1/1,2/2,3/4} {\foreach \i in {0,...,7} {\pgfmathtruncatemacro{\ok}{\i>=\d} \ifnum\ok=1 \fill[kbcyan] (7-\i,-\l*0.7) circle (0.08); \draw[kbguide] (7-\i,-\l*0.7+0.7) -- (7-\i,-\l*0.7); \draw[kbamber] (7-\i+\d,-\l*0.7+0.7) -- (7-\i,-\l*0.7); \else \draw[kbguide] (7-\i,-\l*0.7+0.7) -- (7-\i,-\l*0.7); \fi}}
+\end{tikzpicture}
+Kogge–Stone for 8 bits: at level \(\ell\) each position combines with the one \(2^{\ell-1}\) to its right; three levels.
+
+* Intuition
+Instead of waiting for the carry to walk across the word, every block asks in parallel "would I produce a carry, and would I pass one on?", and the answers are combined like a tournament bracket.
+
+* Pitfall
+Logarithmic depth is paid in wiring: Kogge–Stone's long wires and fan-out make it large and power hungry, so real designs choose sparse trees or hybrid carry-select schemes.

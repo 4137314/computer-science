@@ -1,0 +1,44 @@
+:PROPERTIES:
+:ID:       operator-overloading
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     method
+:REQUIRES: cpp-special-members method-overloading
+:SEE:      implicit-conversion function-objects stl-containers equals-hashcode
+:ALIASES:  operator overloading, friend, operator+, operator++, prefix, postfix, operator<<, operator<
+:END:
+#+title: Operator overloading in C++
+#+summary: Most C++ operators can be redefined for classes, either as members (the left operand is =*this=) or as free functions (all operands are parameters); ~operator=~ only as a member; prefix =++= returns a reference, postfix =++(int)= a copy of the old value.
+
+* Method
+In =a1 = (a2 + a3) * (++a4);= four operators appear: ~=~, =+=, =*=, =++=. For a class =A=:
+- *member*: =A A::operator+(const A& r) const;= so =a + b= means =a.operator+(b)=;
+- *free function*: =A operator+(const A& l, const A& r);= so =a + b= means =operator+(a, b)=; it needs access to the representation through getters or a =friend= declaration;
+- ~operator=~, =operator[]=, =operator()=, =operator->= can only be members.
+
+Operators that build a new value (=+=, =*=, postfix =++=) return by value; operators that modify their left operand (~=~, ~+=~, prefix =++=) return =A&= to =*this=, so they can be chained.
+
+* Example
+#+begin_src c++
+  class Complex {
+    double re, im;
+  public:
+    Complex(double r = 0, double i = 0) : re(r), im(i) {}
+    Complex& operator+=(const Complex& o) { re += o.re; im += o.im; return *this; }
+    Complex& operator++()    { ++re; return *this; }               // prefix
+    Complex  operator++(int) { Complex old = *this; ++re; return old; }  // postfix
+    friend std::ostream& operator<<(std::ostream& os, const Complex& c) {
+      return os << c.re << "+" << c.im << "i";
+    }
+  };
+  Complex operator+(Complex l, const Complex& r) { return l += r; }  // 2 + c works too
+#+end_src
+
+* When to use
+When the meaning is natural (arithmetic on numbers, =<<= on streams, =[]= on containers), and when generic libraries require it: =std::set= and =std::sort= need =operator<=, =std::find= needs ~operator=~=. Otherwise sparingly.
+
+* Intuition
+An operator is just a function with a short name and a fixed number of operands; the compiler rewrites the expression into calls.
+
+* Pitfall
+=friend= breaks encapsulation and should be rare. Writing =(a++)++= increments a temporary copy, not =a=; =++(++a)= increments =a= twice because prefix returns a reference.

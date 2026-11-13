@@ -1,0 +1,52 @@
+:PROPERTIES:
+:ID:       smart-pointers
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     construction
+:REQUIRES: move-semantics
+:SEE:      aggregation-composition cpp-special-members stl-containers
+:ALIASES:  unique_ptr, shared_ptr, weak_ptr, make_unique, make_shared, use_count, reference counting, ownership
+:END:
+#+title: Smart pointers: unique_ptr, shared_ptr, weak_ptr
+#+summary: Class templates that own a heap object and delete it automatically: =unique_ptr= is the single owner (movable, not copyable), =shared_ptr= counts its owners and frees on the last, =weak_ptr= observes a shared object without owning it and must =lock()= to use it.
+
+* Construction
+- =std::unique_ptr<T>=: exclusive ownership. Copy is deleted, move transfers ownership: =p1 = std::move(p);= leaves =p= empty. =reset(new T)= replaces the object, =reset()= frees it. Zero overhead over a raw pointer.
+- =std::shared_ptr<T>=: shared ownership. A control block keeps the count of owners (=use_count()=); copying increments it, destroying decrements it, the object is deleted when it reaches zero.
+- =std::weak_ptr<T>=: points to an object managed by =shared_ptr= without incrementing the count. =wp.lock()= returns a =shared_ptr= (empty if the object is gone).
+Prefer =std::make_unique<T>(args)= and =std::make_shared<T>(args)= to =new=.
+
+* Example: optional composition
+#+begin_src c++
+  class A {
+    int i = 0;
+    std::unique_ptr<B> upb;                     // 0..1 owned B
+  public:
+    A(int i_, std::string s) : i(i_), upb(std::make_unique<B>(s)) {}
+    A(const A& a) : i(a.i), upb(a.upb ? std::make_unique<B>(*a.upb) : nullptr) {}
+    A& operator=(const A& a) {
+      i = a.i;
+      upb = a.upb ? std::make_unique<B>(*a.upb) : nullptr;
+      return *this;
+    }
+    A(A&&) = default;                            // moves the unique_ptr
+    A& operator=(A&&) = default;
+    ~A() = default;                              // unique_ptr deletes B
+  };
+#+end_src
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\node[draw] (p1) at (0,0) {sp1}; \node[draw] (p2) at (0,-0.9) {sp2}; \node[draw, dashed] (w) at (0,-1.8) {wp};
+\node[draw, kbamber, align=center] (cb) at (2.6,-0.9) {control\\count = 2};
+\node[draw, kbcyan] (o) at (5,-0.9) {T};
+\draw[-{Stealth}] (p1) -- (cb); \draw[-{Stealth}] (p2) -- (cb); \draw[-{Stealth}, dashed] (w) -- (cb);
+\draw[-{Stealth}] (cb) -- (o);
+\end{tikzpicture}
+Two owners and one observer: the weak pointer does not count.
+
+* Intuition
+Ownership becomes part of the type: reading =unique_ptr<B>= in a class tells you it is a composition, =shared_ptr<B>= that the part is shared.
+
+* Pitfall
+Two =shared_ptr= pointing at each other never reach count zero: a cycle leaks. Break it by making one direction a =weak_ptr=.

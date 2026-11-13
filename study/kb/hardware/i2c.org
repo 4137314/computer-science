@@ -1,0 +1,43 @@
+:PROPERTIES:
+:ID:       i2c
+:DOMAIN:   hardware
+:AREA:     interfaces
+:KIND:     construction
+:REQUIRES: serial-communication std-logic finite-state-machine
+:SEE:      spi
+:ALIASES:  I2C, IIC, inter-integrated circuit, SDA, SCL, open drain, pull-up, start condition, stop condition, acknowledge, ACK, repeated start, 7-bit address
+:END:
+#+title: I²C
+#+summary: A two-wire, half-duplex, multi-device bus: SDA (data) and SCL (clock) are open-drain lines with pull-ups, so any device can pull them low; SDA changes only while SCL is low, except for START (SDA falls with SCL high) and STOP (SDA rises with SCL high); each byte is followed by an acknowledge bit driven by the receiver.
+
+* Construction
+Transaction:
+1. *START*: SDA \(1\to0\) while SCL = 1.
+2. *Address*: 7 bits, MSB first, plus R/\(\overline{W}\) (1 = read).
+3. *ACK*: the master releases SDA during the ninth clock; the addressed slave pulls it to 0.
+4. *Data bytes*: 8 bits + ACK each; when reading, the master acknowledges each byte and sends NACK (SDA left high) after the last.
+5. *STOP*: SDA \(0\to1\) while SCL = 1. A *repeated START* instead of STOP keeps the bus to switch direction (write a register address, then read).
+Slaves can hold SCL low to slow the master (clock stretching).
+
+* VHDL: open-drain lines
+#+begin_src vhdl
+  -- drive only 0, release with 'Z'; the external pull-up makes it 'H'
+  sda <= '0' when sda_drive_low = '1' else 'Z';
+  scl <= '0' when scl_drive_low = '1' else 'Z';
+  sda_in <= to_X01(sda);        -- read back the resolved line ('H' -> '1')
+#+end_src
+In a testbench, =sda <= 'H';= models the pull-up; [[id:std-logic][resolution]] gives =0= when a device drives low.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, yscale=0.55]
+\draw[kbcyan] (0,2.2) node[left, black] {SCL} -- (1.2,2.2) -- (1.2,1.4) \foreach \i in {0,...,3} {-- ++(0.5,0) -- ++(0,0.8) -- ++(0.5,0) -- ++(0,-0.8)} -- (5.6,1.4) -- (5.6,2.2) -- (6.5,2.2);
+\draw (0,0.8) node[left] {SDA} -- (0.7,0.8) -- (0.7,0) -- (1.4,0) -- (1.4,0.8) -- (2.4,0.8) -- (2.4,0) -- (6.0,0) -- (6.0,0.8) -- (6.5,0.8);
+\node[kbamber] at (0.7,-0.5) {START}; \node[kbamber] at (6.0,-0.5) {STOP};
+\end{tikzpicture}
+START and STOP are the only SDA edges allowed while SCL is high.
+
+* Intuition
+A party line: everyone listens, anyone can say "no" by pulling the wire down, and the address decides who answers.
+
+* Pitfall
+Driving SDA or SCL high actively (='1'= instead of ='Z'=) fights the device pulling low: a short circuit on real hardware and an =X= in simulation.

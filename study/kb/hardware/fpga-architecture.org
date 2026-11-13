@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       fpga-architecture
+:DOMAIN:   hardware
+:AREA:     programmable-logic
+:KIND:     model
+:REQUIRES: pla-pal programming-technologies
+:SEE:      technology-mapping vhdl-entity-architecture risc-v-datapath digital-design-flow
+:ALIASES:  FPGA, LUT, lookup table, CLB, logic block, switch box, routing, block RAM, BRAM, DSP slice, bitstream
+:END:
+#+title: FPGA architecture
+#+summary: A field-programmable gate array is a grid of configurable logic blocks — lookup tables of 4–6 inputs plus flip-flops — surrounded by programmable routing (switch boxes) and I/O blocks, with hard blocks for memory (BRAM), arithmetic (DSP, carry chains) and clocks; all configured by SRAM cells loaded with a bitstream.
+
+* Model
+- *LUT*: a \(k\)-input lookup table is a \(2^k\)-bit memory read through a multiplexer tree: any function of \(k\) inputs in one block, with the same delay.
+- *Logic block* (CLB, slice): several LUTs, flip-flops at their outputs, multiplexers to combine LUTs into wider functions, a fast carry chain for adders.
+- *Routing*: horizontal and vertical wire segments meeting at programmable switch boxes; connection boxes attach block pins to wires. Routing dominates area and delay.
+- *Hard blocks*: block RAM (synchronous, typically read data available on the clock edge after the address), DSP slices (multiply–accumulate), clock managers, high-speed transceivers.
+- *Configuration*: SRAM bits set every LUT, mux and switch; the bitstream is loaded at power-up.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\foreach \x in {0,1,2} \foreach \y in {0,1,2} {\draw[kbcyan, fill=kbcyan, fill opacity=0.12] (\x*1.6,\y*1.6) rectangle (\x*1.6+0.9,\y*1.6+0.9); \node at (\x*1.6+0.45,\y*1.6+0.45) {CLB};}
+\foreach \x in {0,1,2,3} {\draw[kbguide] (\x*1.6-0.35,-0.4) -- (\x*1.6-0.35,4.5);}
+\foreach \y in {0,1,2,3} {\draw[kbguide] (-0.6,\y*1.6-0.35) -- (4.6,\y*1.6-0.35);}
+\foreach \x in {1,2} \foreach \y in {1,2} {\draw[kbamber, fill=kbamber, fill opacity=0.3] (\x*1.6-0.5,\y*1.6-0.5) rectangle (\x*1.6-0.2,\y*1.6-0.2);}
+\end{tikzpicture}
+Logic blocks in a sea of routing; the switch boxes (amber) sit at the crossings.
+
+* Mapping a design
+Synthesis decomposes the logic into functions of at most \(k\) inputs (LUT mapping), packs LUTs and flip-flops into blocks, places them, routes the nets, and generates the bitstream. A \(k\)-LUT has the same delay whatever function it holds, so FPGA mapping minimises the number of LUT levels.
+
+* Intuition
+An FPGA is a sheet of tiny memories and wires whose connections are themselves memory: hardware you rewrite like software.
+
+* Pitfall
+The flexibility costs roughly an order of magnitude in area, speed and power against an ASIC. Designs that ignore the hard blocks (writing a multiplier in LUTs, a RAM in flip-flops) waste most of the chip.

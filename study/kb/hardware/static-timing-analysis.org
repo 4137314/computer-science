@@ -1,0 +1,48 @@
+:PROPERTIES:
+:ID:       static-timing-analysis
+:DOMAIN:   hardware
+:AREA:     timing
+:KIND:     method
+:REQUIRES: setup-hold-time gate-delay-model big-o-complexity
+:SEE:      false-path tree-height-reduction retiming timing-driven-mapping
+:ALIASES:  STA, arrival time, required time, slack, critical path, topological order, longest path, timing graph
+:END:
+#+title: Static timing analysis
+#+summary: STA checks timing without simulation: on the DAG of the combinational logic between registers it propagates the latest arrival times forward (\(a(v)=\max_{u\to v}a(u)+d_{uv}\)), the required times backward (\(r(u)=\min_{u\to v} r(v)-d_{uv}\)), and reports the slack \(r-a\) of every node; negative slack marks violating paths, in time linear in the circuit size.
+
+* Method
+Separation of concerns: functionality is verified by simulation, timing by STA, independently of input values (*static*). Conditions: synchronous design, combinational logic without loops between registers, known delays.
+
+The circuit becomes a timing graph: nodes are pins, edges carry delays. Sources are primary inputs and register outputs (arrival \(t_{cq}\)), sinks are primary outputs and register inputs (required \(T-t_{su}\)).
+- *Arrival time* (latest): \(a(v)=\max_{(u,v)}\big(a(u)+d(u,v)\big)\), in topological order.
+- *Required time*: \(r(u)=\min_{(u,v)}\big(r(v)-d(u,v)\big)\), in reverse topological order.
+- *Slack*: \(s(v)=r(v)-a(v)\). The critical path is the chain of nodes with minimum slack. For hold, the same with earliest arrival (min) and earliest required times.
+
+* Algorithm
+\begin{algorithmic}[1]
+\Require DAG $G=(V,E)$, delays $d$, clock period $T$
+\State sort $V$ topologically
+\ForAll{$v$ in topological order}
+\State $a(v)\gets$ source arrival if $v$ is a source, else $\max_{(u,v)\in E}\, a(u)+d(u,v)$
+\EndFor
+\ForAll{$v$ in reverse topological order}
+\State $r(v)\gets T-t_{su}$ if $v$ is a sink, else $\min_{(v,w)\in E}\, r(w)-d(v,w)$
+\EndFor
+\State \Return slack $s(v)=r(v)-a(v)$ for all $v$
+\end{algorithmic}
+Each edge is visited twice: \(O(|V|+|E|)\).
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, ->, >={Stealth}, g/.style={draw, circle, minimum size=0.6cm}]
+\node[g] (a) at (0,1) {A}; \node[g] (b) at (0,-0.2) {B}; \node[g] (c) at (2,0.4) {g1}; \node[g] (d) at (4,1) {g2}; \node[g] (y) at (6,0.4) {Y};
+\draw (a) -- node[above] {0} (c); \draw (b) -- node[below] {0} (c); \draw[kbmagenta, line width=1pt] (c) -- node[above] {2} (d); \draw (a) -- node[above] {0} (d);
+\draw[kbmagenta, line width=1pt] (d) -- node[above] {3} (y); \draw (c) -- node[below] {1} (y);
+\node[kbamber] at (2,-0.4) {a=0}; \node[kbamber] at (4,0.3) {a=2}; \node[kbamber] at (6,-0.3) {a=5};
+\end{tikzpicture}
+The critical path (magenta) sets the arrival time 5 at the output.
+
+* Intuition
+STA asks "how late can each signal possibly be?" once per node, not once per input pattern — which is why it scales to chips that simulation could never cover.
+
+* Pitfall
+STA is pessimistic: it counts topological paths that no input can actually sensitise. Those [[id:false-path][false paths]] can make a correct circuit look too slow.

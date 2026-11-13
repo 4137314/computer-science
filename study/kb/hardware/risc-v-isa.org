@@ -1,0 +1,45 @@
+:PROPERTIES:
+:ID:       risc-v-isa
+:DOMAIN:   hardware
+:AREA:     processors
+:KIND:     definition
+:REQUIRES: datapath-control
+:SEE:      risc-v-datapath alu-design
+:ALIASES:  RISC-V, RV32I, instruction set architecture, ISA, instruction format, R-type, I-type, S-type, B-type, U-type, J-type, immediate, opcode, funct3, funct7
+:END:
+#+title: The RISC-V base instruction set (RV32I)
+#+summary: RV32I is a load–store RISC ISA with 32 registers of 32 bits (\(x0\equiv0\)), fixed 32-bit instructions in six formats (R, I, S, B, U, J) that keep the register fields \(rd\), \(rs1\), \(rs2\) in the same positions, and immediates whose bits are scattered so that the sign is always bit 31.
+
+* Definition
+Fields: =opcode= [6:0], =rd= [11:7], =funct3= [14:12], =rs1= [19:15], =rs2= [24:20], =funct7= [31:25].
+
+| format | use | example |
+|---+---+---|
+| R | register–register ALU | =add rd, rs1, rs2= |
+| I | ALU with immediate, loads, =jalr= | =addi rd, rs1, imm=, =lw rd, imm(rs1)= |
+| S | stores | =sw rs2, imm(rs1)= |
+| B | conditional branches | =beq rs1, rs2, label= |
+| U | upper immediate | =lui rd, imm=, =auipc rd, imm= |
+| J | jump and link | =jal rd, label= |
+
+Immediates are 12 bits (I, S, B) or 20 bits (U, J), sign-extended from instruction bit 31. B and J immediates encode even offsets (bit 0 implicit), relative to the PC of the branch. Only loads and stores access memory; =x0= reads as zero and ignores writes, so =addi x0, x0, 0= is the =nop= and =add rd, rs, x0= a move.
+
+* Example
+#+begin_src asm
+  # sum of the n words at address a0, result in a1
+        li    a1, 0
+  loop: beq   a2, zero, done      # a2 = n
+        lw    t0, 0(a0)
+        add   a1, a1, t0
+        addi  a0, a0, 4
+        addi  a2, a2, -1
+        j     loop
+  done:
+#+end_src
+Online compilers and assemblers turn C or assembly into hex words that initialise the instruction memory of a soft-core.
+
+* Intuition
+A small, regular instruction set: the decoder reads registers before it even knows the instruction, because they are always in the same place.
+
+* Pitfall
+The B-type immediate is shuffled (bits 12, 10:5, 4:1, 11) and must be reassembled exactly; a wrong bit order sends branches to plausible but wrong addresses.

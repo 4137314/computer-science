@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       wrapper-autoboxing
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     definition
+:REQUIRES: java-references
+:SEE:      java-generics java-collections implicit-conversion java-enum
+:ALIASES:  wrapper class, Integer, Double, autoboxing, unboxing, boxing
+:END:
+#+title: Wrapper classes and autoboxing
+#+summary: Every primitive type has an immutable wrapper class (=Integer=, =Double=, =Boolean=, …) so that numbers can live where objects are required, such as in collections; since Java 5 the compiler converts between them automatically (autoboxing and unboxing).
+
+* Definition
+| primitive | wrapper |
+|---+---|
+| =int= | =Integer= |
+| =long= | =Long= |
+| =double= | =Double= |
+| =char= | =Character= |
+| =boolean= | =Boolean= |
+
+Wrappers are immutable objects with utility methods (=Integer.parseInt=, =Integer.MAX_VALUE=, =Double.compare=). The compiler inserts the conversions: =Integer x = 5;= becomes =Integer.valueOf(5)= (boxing), =int y = x;= becomes =x.intValue()= (unboxing).
+
+* Example
+#+begin_src java
+  List<Integer> l = new ArrayList<>();
+  l.add(3);                 // boxing
+  int s = 0;
+  for (int v : l) s += v;   // unboxing
+#+end_src
+
+* Intuition
+Generics and collections only speak objects; wrappers are the envelopes numbers travel in, and autoboxing seals and opens them for you.
+
+* Pitfall
+~==~ compares references: =Integer a = 1000, b = 1000; a == b= is false (only values in \([-128,127]\) are cached), and unboxing a =null= =Integer= throws =NullPointerException=.

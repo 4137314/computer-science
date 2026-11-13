@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       timing-driven-mapping
+:DOMAIN:   hardware
+:AREA:     logic-synthesis
+:KIND:     method
+:REQUIRES: technology-mapping gate-delay-model static-timing-analysis
+:SEE:      tree-height-reduction
+:ALIASES:  mapping for delay, delay-optimal covering, load-dependent mapping, area-delay trade-off, Pareto front, slack-based mapping
+:END:
+#+title: Technology mapping for delay
+#+summary: Tree covering minimises arrival time instead of area by replacing the sum with a max: \(a(v)=\min_m\big(d(m)+\max_{u}a(u)\big)\); since a gate's delay depends on the load it drives, which is unknown bottom-up, each node keeps a set of solutions per possible load, or the area–delay Pareto front.
+
+* Method
+Without loads (fixed delay per gate), the recursion is exact and optimal on trees:
+\[ a(v)=\min_{m \text{ at } v}\Big(d(m)+\max_{u\in\mathrm{inputs}(m)} a(u)\Big). \]
+With load-dependent delay \(d(m)=d_0(m)+k(m)\,C_L\), the load seen by \(m\) is the input capacitance of the gate chosen above it, not yet known. Remedy: compute at each node the best solution for each possible load value (a small set of library input capacitances), then choose top-down once the load is fixed.
+
+Keeping several (area, delay) pairs per node — the Pareto front — allows trading: the minimum-delay cover only on critical paths (negative slack), the minimum-area cover elsewhere.
+
+* Example
+A node can be covered with delay 10, area 12, or delay 12, area 9 (same output arrival 12 when the input arrives late), or delay 13, area 11. The second dominates the third; both the first and second are on the Pareto front, and the choice depends on the slack.
+
+* Picture
+\begin{tikzpicture}
+\begin{axis}[width=6.4cm, height=4.4cm, axis lines=left, xlabel={delay}, ylabel={area}, xmin=8, xmax=15, ymin=7, ymax=14]
+\addplot+[only marks, mark=*, kbcyan] coordinates {(10,12) (12,9) (14,8)};
+\addplot+[only marks, mark=x, kbmagenta, mark size=3pt] coordinates {(13,11) (12,12.5)};
+\addplot[kbguide, dashed] coordinates {(10,12) (12,9) (14,8)};
+\end{axis}
+\end{tikzpicture}
+Dots: Pareto-optimal covers; crosses: dominated ones, discarded.
+
+* Intuition
+For speed the cost of a cover is its slowest branch, not the sum of its parts; and how fast a gate is depends on who it drives.
+
+* Pitfall
+Minimising delay everywhere bloats the area for nothing: only paths with negative slack need the fast cover.

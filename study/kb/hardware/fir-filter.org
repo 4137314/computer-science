@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       fir-filter
+:DOMAIN:   hardware
+:AREA:     arithmetic
+:KIND:     construction
+:REQUIRES: retiming array-multiplier
+:SEE:      pipelining carry-save-adder serial-arithmetic dvfs-parallelism
+:ALIASES:  FIR filter, finite impulse response, direct form, transposed form, tapped delay line, multiply-accumulate, MAC, convolution
+:END:
+#+title: FIR filter architectures
+#+summary: \(y[n]=\sum_{k=0}^{N-1}h_k\,x[n-k]\): in direct form a delay line feeds \(N\) multipliers and a chain of adders (critical path one multiplier plus \(N-1\) adders); retiming the delays across the adders gives the transposed form, critical path one multiplier and one adder; a serial version uses one MAC for \(N\) cycles.
+
+* Construction
+- *Direct form*: registers \(x[n],x[n-1],\dots\) (tapped delay line), products \(h_kx[n-k]\), adder chain. Critical path \(T_{mul}+(N-1)T_{add}\).
+- *Direct pipelined*: registers in the adder chain (and matching ones on the delay line) cut the path to \(T_{mul}+T_{add}\), adding latency.
+- *Transposed form*: the input \(x[n]\) is broadcast to all multipliers and the registers sit between the adders: \(z_k[n]=h_kx[n]+z_{k+1}[n-1]\), \(y[n]=z_0[n]\). Critical path \(T_{mul}+T_{add}\) with no extra latency. It is obtained from the direct form by [[id:retiming][retiming]]: reverse the order of additions, move the delays across the adders, remove the addition with 0.
+- *Serial*: one multiply–accumulate unit, a coefficient ROM and a circular buffer: \(N\) cycles per output, minimal area.
+- *Adder tree / CSA*: the \(N\) products summed in carry-save form.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, r/.style={draw, kbamber, minimum width=0.45cm, minimum height=0.45cm}, m/.style={draw, kbcyan, circle, inner sep=1pt}, a/.style={draw, circle, inner sep=1pt}]
+\draw (-0.6,1.2) node[left] {$x[n]$} -- (4.6,1.2);
+\foreach \k/\x in {0/0,1/1.5,2/3,3/4.5} {\node[m] (m\k) at (\x,0.4) {$\times$}; \draw (\x,1.2) -- (m\k); \node at (\x+0.35,0.75) {$h_\k$};}
+\node[r] (r1) at (0.75,-0.4) {T}; \node[r] (r2) at (2.25,-0.4) {T}; \node[r] (r3) at (3.75,-0.4) {T};
+\node[a] (a0) at (0,-0.4) {+}; \node[a] (a1) at (1.5,-0.4) {+}; \node[a] (a2) at (3,-0.4) {+};
+\draw (m0) -- (a0); \draw (m1) -- (a1); \draw (m2) -- (a2); \draw (m3) |- (r3);
+\draw (r3) -- (a2); \draw (a2) -- (r2); \draw (r2) -- (a1); \draw (a1) -- (r1); \draw (r1) -- (a0); \draw[-{Stealth}] (a0) -- (-0.8,-0.4) node[left] {$y[n]$};
+\end{tikzpicture}
+Transposed form: the input is broadcast, the registers sit in the accumulation chain, each adder sees one product and one register.
+
+* Evaluation
+Compare architectures on area (multipliers, adders, registers), throughput (outputs per second = \(1/T\) or \(1/(NT)\)), latency and power (switching in the adder chain, broadcast load on \(x[n]\)). Constant coefficients allow shift-and-add multipliers (canonical signed digits).
+
+* Intuition
+The same equation fits a long fast pipeline or one small unit reused \(N\) times; retiming moves between equivalent shapes for free.
+
+* Pitfall
+In the transposed form the input drives \(N\) multipliers: the fan-out load on \(x[n]\) grows with \(N\) and must be buffered.

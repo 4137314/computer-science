@@ -1,0 +1,34 @@
+:PROPERTIES:
+:ID:       java-enum
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     definition
+:REQUIRES: java-object-class
+:SEE:      finite-state-machine abstract-class-interface
+:ALIASES:  enum, enumerated type, values, ordinal, switch on enum
+:END:
+#+title: Enumerated types
+#+summary: =enum= defines a type whose only values are a fixed list of named constants; in Java an enum is a full class (implicitly =final=, extending =java.lang.Enum=) that can have fields, constructors, methods and implement interfaces.
+
+* Definition
+#+begin_src java
+  public enum Planet {
+      MERCURY(3.303e+23, 2.4397e6), EARTH(5.976e+24, 6.37814e6);
+      private final double mass, radius;           // fields
+      Planet(double mass, double radius) { this.mass = mass; this.radius = radius; }
+      double surfaceGravity() { return 6.67300E-11 * mass / (radius * radius); }
+  }
+  for (Planet p : Planet.values()) System.out.println(p + " " + p.surfaceGravity());
+#+end_src
+- the constants are the only instances; they can be compared with ~==~ and used in =switch=;
+- =toString()= and =name()= give the name, =ordinal()= the position, =values()= the array of constants, =valueOf("EARTH")= the constant from its name;
+- an enum cannot be extended, but can implement interfaces.
+
+* Why
+Instead of =static final int RED = 0, GREEN = 1;=, which accepts any =int=, an enum is checked by the compiler: a method taking a =Colour= cannot receive 7. It groups the constants and makes code more readable.
+
+* Intuition
+An enum is a class whose objects are all created in advance, by name.
+
+* Pitfall
+=ordinal()= depends on the declaration order: storing it (in a file, a database) breaks as soon as a constant is inserted in the middle.

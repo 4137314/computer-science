@@ -1,0 +1,42 @@
+:PROPERTIES:
+:ID:       java-references
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     definition
+:REQUIRES: java-platform call-stack
+:SEE:      parameter-passing pointers-references equals-hashcode wrapper-autoboxing java-packages
+:ALIASES:  reference type, primitive type, new, garbage collection, garbage collector, finalize, static, this, null, array
+:END:
+#+title: Objects, references and garbage collection in Java
+#+summary: Java variables hold either a primitive value (=int=, =double=, =boolean=, …) or a reference to an object on the heap; objects are created only with =new= and never freed explicitly: the garbage collector reclaims those no longer reachable.
+
+* Definition
+- *Primitive types*: =byte short int long float double char boolean=, held by value.
+- *Reference types*: classes, interfaces, arrays. A variable holds a reference (or =null=); assignment copies the reference, not the object.
+- *Creation*: =new C(args)= allocates on the heap and runs a constructor. If no constructor is written, the compiler provides a no-argument one; writing any constructor removes it.
+- *Destruction*: none in the language. The garbage collector frees objects unreachable from the roots (stack variables, static fields). =finalize()= is not a destructor (deprecated); resources are released explicitly with =close()= and try-with-resources.
+- *static*: a field or method of the class, not of the instances (=Math.sqrt=, =System.out=). A static method has no =this= and can call only static members directly.
+- *final*: a variable assigned once; =static final= gives constants.
+- *Arrays* are objects: =int[] a = new int[n];= with =a.length=; copying uses =System.arraycopy= or =Arrays.copyOf=.
+
+* Example
+#+begin_src java
+  Person p = new Person("Ada");
+  Person q = p;             // same object
+  q.setName("Grace");       // p.getName() is "Grace" too
+  p = null; q = null;       // the object is now unreachable: eligible for collection
+#+end_src
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\node[draw, kbcyan] (p) at (0,0) {p}; \node[draw, kbcyan] (q) at (0,-0.9) {q};
+\node[draw, kbamber, align=center] (o) at (3,-0.45) {Person\\name = Grace};
+\draw[-{Stealth}] (p) -- (o); \draw[-{Stealth}] (q) -- (o);
+\node[font=\scriptsize, kbguide] at (0,-1.5) {stack}; \node[font=\scriptsize, kbguide] at (3,-1.5) {heap};
+\end{tikzpicture}
+
+* Intuition
+In Java every object variable is a pointer that you cannot do arithmetic on and never have to free.
+
+* Pitfall
+~==~ on references compares identity, not content: two distinct =String= objects with the same characters are not ~==~; content comparison is =equals= (see [[id:equals-hashcode][equals and hashCode]]).

@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       clock-gating
+:DOMAIN:   hardware
+:AREA:     power
+:KIND:     construction
+:REQUIRES: cmos-power sequential-logic
+:SEE:      low-power-encoding dvfs-parallelism
+:ALIASES:  clock gating, gated clock, integrated clock gating cell, ICG, enable, latch-based gating, operand isolation
+:END:
+#+title: Clock gating and operand isolation
+#+summary: Registers that keep their value still burn power on every clock edge (clock tree, flip-flop internals); clock gating stops the clock of a register bank when its enable is off, using a latch plus AND cell so the gated clock has no glitches; operand isolation similarly freezes the inputs of unit whose result is not used.
+
+* Construction
+A register with enable is normally a multiplexer feeding back \(q\) (=if en = '1' then q <= d;=): the clock still toggles every flip-flop. With gating, \(\mathrm{gclk}=\mathrm{clk}\land \mathrm{en}_L\), where \(\mathrm{en}_L\) is the enable latched while the clock is low: since it can only change while =clk= is 0, the AND output cannot glitch. The mux disappears, and the whole bank and its local clock tree stop switching.
+
+* When to gate
+- the enable is off often (wait states, idle units, FSM states where a register is not loaded);
+- the gated group is large enough (≥ 8–16 flip-flops) to pay for the cell;
+- tools insert it automatically from the enable patterns in the RTL.
+
+* Operand isolation
+A combinational unit (multiplier, ALU) whose output is not used in a cycle still switches when its inputs change. Forcing its inputs constant (AND gates with the select, or registers with enable) when the result is discarded removes that activity.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, yscale=0.5]
+\draw[kbcyan] (0,3) \foreach \x in {0,...,5} {-- ++(0.4,0) -- ++(0,0.8) -- ++(0.4,0) -- ++(0,-0.8)}; \node[left] at (0,3.4) {clk};
+\draw (0,1.6) -- (1.5,1.6) -- (1.5,2.2) -- (3.1,2.2) -- (3.1,1.6) -- (4.8,1.6); \node[left] at (0,1.9) {en};
+\draw[kbamber] (0,0) -- (1.6,0) -- (1.6,0.8) -- (2.0,0.8) -- (2.0,0) -- (2.4,0) -- (2.4,0.8) -- (2.8,0.8) -- (2.8,0) -- (4.8,0); \node[left] at (0,0.4) {gclk};
+\end{tikzpicture}
+Clock pulses reach the registers only while the enable is on.
+
+* Intuition
+Do not wind a clock nobody is looking at.
+
+* Pitfall
+A plain AND of clock and an unlatched enable glitches whenever the enable changes while the clock is high, producing spurious edges. Gating also adds skew that timing analysis must account for.

@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       std-logic
+:DOMAIN:   hardware
+:AREA:     vhdl
+:KIND:     definition
+:REQUIRES: vhdl-entity-architecture
+:SEE:      i2c vhdl-concurrent-assignments
+:ALIASES:  std_logic, std_ulogic, std_logic_vector, nine-valued logic, resolution function, high impedance, Z, X, U, numeric_std, unsigned, signed
+:END:
+#+title: std_logic: nine-valued logic and resolution
+#+summary: =std_logic= has nine values — =U= uninitialised, =X= unknown, =0=, =1=, =Z= high impedance, =W= weak unknown, =L= weak 0, =H= weak 1, =-= don't care — and a resolution function that computes the value of a signal driven by several sources, which models buses and tri-state outputs.
+
+* Definition
+| value | meaning |
+|---+---|
+| =U= | uninitialised (never assigned) |
+| =X= | forcing unknown (e.g. 0 and 1 driven together) |
+| =0=, =1= | forcing low, high |
+| =Z= | high impedance (driver off) |
+| =W= | weak unknown |
+| =L=, =H= | weak 0, weak 1 (pull-down, pull-up) |
+| =-= | don't care (for synthesis) |
+
+=std_ulogic= is the unresolved base type; =std_logic= is its resolved subtype. With several drivers the *resolution function* combines them: a strong value beats a weak one or =Z=, two different strong values give =X=, =Z= with =H= gives =H=. So =std_logic= models a wire with a pull-up and open-drain devices (\(\to\) =H= unless someone pulls =0=).
+
+Vectors: =std_logic_vector(7 downto 0)=. Arithmetic uses =ieee.numeric_std=: =unsigned= and =signed= vectors with =+=, =-=, =*=, comparisons, and conversions =to_integer=, =to_unsigned(n, width)=.
+
+* Example: tri-state driver
+#+begin_src vhdl
+  bus_line <= data_out when enable = '1' else 'Z';   -- releases the line when disabled
+  data_in  <= bus_line;                              -- inout port read back
+#+end_src
+
+* Intuition
+Real wires are not Boolean: they can float, fight or be pulled weakly. Nine values let simulation show those situations instead of hiding them.
+
+* Pitfall
+=U= and =X= in simulation are messages: =U= means a missing reset or initialisation, =X= a conflict between drivers. Silencing them with initial values in the declaration hides bugs that the hardware will have.

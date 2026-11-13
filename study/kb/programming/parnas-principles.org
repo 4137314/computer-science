@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       parnas-principles
+:DOMAIN:   programming
+:AREA:     oop
+:KIND:     definition
+:REQUIRES:
+:SEE:      information-hiding exception-handling call-stack
+:ALIASES:  Parnas, design by contract, contract, precondition, postcondition, specification
+:END:
+#+title: Parnas principles and contracts
+#+summary: The client of a function must be given everything needed to use it and nothing more; the implementer must be given everything needed to implement it and nothing more: a specification is a contract of preconditions and postconditions.
+
+* Statement
+D. L. Parnas's two rules for specifying a module or a function:
+1. the *client* must receive all the information needed to use the function correctly, and nothing more;
+2. the *implementer* must receive all the information needed to implement it, and nothing more.
+
+The specification is a contract:
+- *precondition*: what the caller guarantees on entry (=pop()= on a non-empty stack);
+- *postcondition*: what the function guarantees on exit (the size decreases by one, the top element is returned);
+- *invariant*: what holds for the object between any two calls (\(0\le\text{size}\le\text{capacity}\)).
+
+* Derivation
+Each side hides its part from the other. The client depends only on the contract, so the implementation can change. The implementer depends only on the contract, so it need not handle calls outside the precondition. A violated precondition is the caller's bug; a violated postcondition is the implementer's bug.
+
+* Checking contracts
+Java =assert cond : message;= checks a condition at run time when assertions are enabled (=java -ea=). Violations that the caller can provoke with legal input belong in [[id:exception-handling][exceptions]] instead (=IllegalArgumentException=, =EmptyStackException=).
+
+* Intuition
+A good signature plus a one-line contract is all a colleague should need. If they have to read the body, the contract is incomplete.
+
+* Pitfall
+Global variables break both rules: a function that reads a global depends on information not in its interface, and every caller can be affected by a change no one sees.

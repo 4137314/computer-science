@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       tree-height-reduction
+:DOMAIN:   hardware
+:AREA:     logic-synthesis
+:KIND:     method
+:REQUIRES: static-timing-analysis multilevel-logic-optimization
+:SEE:      generalized-bypass carry-save-adder carry-lookahead-adder timing-driven-mapping
+:ALIASES:  tree height reduction, balancing, associativity, commutativity, distributivity, restructuring for delay, late-arriving signal
+:END:
+#+title: Tree height reduction
+#+summary: Associativity and commutativity rebalance a chain of \(n\) identical operations into a tree of depth \(\lceil\log_2 n\rceil\), and late-arriving inputs are moved close to the output; distributivity can reduce height further at the cost of more operators.
+
+* Method
+- *Associativity + commutativity*: \(((a+b)+c)+d\), height 3, becomes \((a+b)+(c+d)\), height 2. In general a chain of \(n\) operands becomes a balanced tree of height \(\lceil\log_2 n\rceil\).
+- *Arrival-time aware*: with different arrival times, combine the earliest operands first (Huffman-like); the latest signal enters the last operator, nearest to the output.
+- *Distributivity*: \(a(bcd+e)\), height 4 with 2-input operators, becomes \(abcd+ae\), height 3, with one more multiplication. It trades area for height; general rule: expand when the critical input is buried inside a factor.
+
+* Derivation
+A binary operator tree of height \(h\) has at most \(2^h\) leaves, so \(n\) operands need \(h\ge\lceil\log_2 n\rceil\), and the balanced tree reaches the bound. With delay \(d\) per operator, the chain costs \((n-1)d\), the tree \(\lceil\log_2 n\rceil d\).
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, o/.style={draw, circle, inner sep=1pt}]
+\node[o] (p1) at (0,0) {+}; \node[o] (p2) at (0.5,0.7) {+}; \node[o] (p3) at (1,1.4) {+};
+\node at (-0.4,-0.6) {a}; \node at (0.4,-0.6) {b}; \node at (1.0,0.1) {c}; \node at (1.5,0.8) {d};
+\draw (p1) -- (-0.4,-0.45); \draw (p1) -- (0.4,-0.45); \draw (p1) -- (p2); \draw (p2) -- (1.0,0.25); \draw (p2) -- (p3); \draw (p3) -- (1.5,0.95);
+\node[o, draw=kbcyan] (q1) at (3.4,0.4) {+}; \node[o, draw=kbcyan] (q2) at (4.6,0.4) {+}; \node[o, draw=kbcyan] (q3) at (4,1.2) {+};
+\foreach \x/\l in {3.1/a,3.7/b,4.3/c,4.9/d} \node at (\x,-0.2) {\l};
+\draw (q1) -- (3.1,-0.05); \draw (q1) -- (3.7,-0.05); \draw (q2) -- (4.3,-0.05); \draw (q2) -- (4.9,-0.05); \draw (q1) -- (q3); \draw (q2) -- (q3);
+\end{tikzpicture}
+Height 3 versus height 2 with the same three adders.
+
+* Intuition
+Do independent work in parallel; if you have to wait for a late signal, prepare everything else meanwhile.
+
+* Pitfall
+For floating-point arithmetic associativity does not hold exactly: rebalancing changes rounding. Hardware tools apply it only to integer and Boolean operators.

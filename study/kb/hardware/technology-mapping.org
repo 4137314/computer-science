@@ -1,0 +1,50 @@
+:PROPERTIES:
+:ID:       technology-mapping
+:DOMAIN:   hardware
+:AREA:     logic-synthesis
+:KIND:     method
+:REQUIRES: multilevel-logic-optimization big-o-complexity
+:SEE:      timing-driven-mapping np-hard-optimization fpga-architecture gate-delay-model
+:ALIASES:  technology mapping, library binding, subject graph, pattern graph, tree covering, dynamic programming, NAND2-INV decomposition, cell library
+:END:
+#+title: Technology mapping by tree covering
+#+summary: The optimised network is decomposed into a subject graph of NAND2 and inverters, every library cell is described by pattern graphs in the same base, and the subject graph is covered by patterns at minimum cost; on trees, dynamic programming from the leaves gives the optimal cover in linear time.
+
+* Method
+1. *Subject graph*: decompose every node into 2-input NANDs and inverters (a canonical but not unique base).
+2. *Pattern graphs*: each library gate (INV, NAND2, NAND3, AND2, AOI21, …) with its area, expressed as one or more NAND2/INV trees.
+3. *Partition*: split the subject DAG into trees at multi-fanout nodes.
+4. *Cover* each tree: every node must be the output of exactly one chosen match, whose inputs are outputs of other matches or leaves.
+
+Dynamic programming on a tree: for each node \(v\) in post-order,
+\[ \mathrm{cost}(v)=\min_{\text{match } m \text{ at } v}\Big(\mathrm{area}(m)+\sum_{u\in\mathrm{inputs}(m)}\mathrm{cost}(u)\Big), \]
+with \(\mathrm{cost}=0\) at the leaves. Optimal cover of the tree; \(O(n\cdot p)\) for \(n\) nodes and \(p\) pattern nodes.
+
+* Algorithm
+\begin{algorithmic}[1]
+\Require subject tree with root $t$, patterns $P$
+\ForAll{nodes $v$ in post-order}
+\State $best(v)\gets\infty$
+\ForAll{patterns $m\in P$ matching at $v$}
+\State $c\gets \mathrm{area}(m)+\sum_{u\in\mathrm{inputs}(m)} best(u)$
+\If{$c<best(v)$} \State $best(v)\gets c$; $choice(v)\gets m$ \EndIf
+\EndFor
+\EndFor
+\State \Return cover read from $choice$, starting at $t$
+\end{algorithmic}
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, n/.style={draw, circle, minimum size=0.45cm, inner sep=0}]
+\node[n] (r) at (0,0) {N}; \node[n] (i) at (-1,-0.9) {I}; \node[n] (m) at (1,-0.9) {N};
+\node[n] (j) at (-1,-1.8) {N}; \node at (0.6,-1.8) {c}; \node at (1.4,-1.8) {d}; \node at (-1.4,-2.6) {a}; \node at (-0.6,-2.6) {b};
+\draw (r) -- (i); \draw (r) -- (m); \draw (i) -- (j); \draw (m) -- (0.6,-1.65); \draw (m) -- (1.4,-1.65); \draw (j) -- (-1.4,-2.45); \draw (j) -- (-0.6,-2.45);
+\draw[kbcyan, rounded corners, line width=1pt] (-1.5,-2.15) rectangle (-0.5,-0.55); \node[kbcyan] at (-2.1,-1.35) {AND2};
+\draw[kbamber, rounded corners, line width=1pt] (-0.4,0.35) rectangle (1.45,-1.25); \node[kbamber] at (2.1,-0.3) {NAND2+?};
+\end{tikzpicture}
+Each candidate cover is a set of patterns tiling the tree; dynamic programming keeps the cheapest per node.
+
+* Intuition
+Mapping is tiling a floor with the tiles the library sells, paying for each tile, and computing the cheapest tiling bottom-up.
+
+* Pitfall
+Cutting the DAG into trees loses optimality at the cuts (patterns cannot span a multi-fanout point), and the result depends on the NAND2 decomposition chosen in step 1.

@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       glitches
+:DOMAIN:   hardware
+:AREA:     power
+:KIND:     definition
+:REQUIRES: switching-activity gate-delay-model
+:SEE:      event-driven-simulation tree-height-reduction cmos-power
+:ALIASES:  glitch, hazard, spurious transition, static hazard, dynamic hazard, path balancing
+:END:
+#+title: Glitches
+#+summary: When the inputs of a gate arrive at different times, its output can make spurious transitions before settling; glitches waste dynamic power (up to a large fraction in arithmetic circuits) and can corrupt asynchronous signals; balancing path delays, adding redundant terms and registering signals reduce them.
+
+* Definition
+A *glitch* is a transition of a node that is not needed by its final value in the cycle. A *static hazard* is a glitch on an output that should stay constant (\(1\to0\to1\)); a *dynamic hazard* is multiple transitions on an output that changes once. Cause: different delays on reconverging paths.
+
+* Example
+\(f=ab+\bar a c\) with \(b=c=1\): \(f=1\) whatever \(a\). When \(a\) falls, the term \(ab\) turns off immediately while \(\bar a c\) turns on only after the inverter delay: \(f\) dips to 0 for one inverter delay. The redundant consensus term \(bc\) holds \(f=1\) and removes the hazard.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, yscale=0.5]
+\draw (0,4) node[left] {$a$} -- (2,4) -- (2,3.2) -- (6,3.2);
+\draw (0,2.4) node[left] {$\bar a$} -- (2.6,2.4) -- (2.6,1.6) -- (6,1.6); \draw (0,1.6) -- (2.6,1.6); \draw (0,2.4) -- (0,2.4);
+\draw[kbmagenta, line width=1pt] (0,0.8) node[left, black] {$f$} -- (2.1,0.8) -- (2.1,0) -- (2.7,0) -- (2.7,0.8) -- (6,0.8);
+\end{tikzpicture}
+The output dips while \(\bar a\) is still catching up.
+
+* Coping with glitches
+- balance path delays (logic restructuring, [[id:tree-height-reduction][balanced trees]], delay insertion);
+- add redundant (consensus) terms for static hazards;
+- register intermediate results: a synchronous design samples after settling, so glitches cost power but not correctness;
+- never use combinational outputs as clocks or asynchronous resets.
+
+* Intuition
+Signals racing along paths of different length disagree for a moment; the gate reports the disagreement, and every report costs energy.
+
+* Pitfall
+Zero-delay simulation and probability-based estimates see no glitches at all; power estimation needs timing-aware simulation.

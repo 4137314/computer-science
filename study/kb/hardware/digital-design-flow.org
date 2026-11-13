@@ -1,0 +1,48 @@
+:PROPERTIES:
+:ID:       digital-design-flow
+:DOMAIN:   hardware
+:AREA:     complexity
+:KIND:     model
+:REQUIRES:
+:SEE:      vhdl-entity-architecture fpga-architecture static-timing-analysis cmos-power data-flow-graph np-hard-optimization
+:ALIASES:  design flow, abstraction levels, RTL, register transfer level, synthesis, place and route, ASIC, FPGA, area delay power
+:END:
+#+title: Digital design flow and abstraction levels
+#+summary: A digital system is designed top-down through levels of abstraction — system, architecture (register transfer), logic, circuit, layout — each refined into the next by synthesis tools and checked by simulation and timing analysis, while trading off area, delay and power.
+
+* Model
+Levels, with their basic objects:
+
+| level | objects | tools |
+|---+---+---|
+| system / behaviour | algorithms, data-flow graphs | high-level synthesis |
+| architecture (RTL) | registers, ALUs, multiplexers, FSMs | HDL (VHDL), simulation |
+| logic | gates, flip-flops | logic synthesis, technology mapping |
+| circuit | transistors | circuit simulation |
+| layout | polygons, cells, wires | place and route |
+
+A typical flow: specification → HDL description at RTL → functional simulation → logic synthesis (optimisation + mapping to a library or to FPGA LUTs) → static timing analysis → place and route → timing and power sign-off → fabrication or bitstream.
+
+* What to optimize
+- *area*: cost (silicon or FPGA resources);
+- *delay*: clock period \(T\), latency (cycles × \(T\)), throughput;
+- *power*: dynamic and static, decisive for battery-powered and dense chips.
+They conflict: a faster circuit is bigger, a lower-power circuit is slower. Design is choosing a point on the Pareto front.
+
+* Picture
+\begin{tikzpicture}[font=\small, node distance=0.35cm, box/.style={draw, minimum width=3.4cm, minimum height=0.55cm}]
+\node[box, draw=kbcyan] (a) {specification};
+\node[box, below=of a] (b) {RTL in VHDL};
+\node[box, below=of b] (c) {logic synthesis};
+\node[box, below=of c] (d) {technology mapping};
+\node[box, below=of d, draw=kbamber] (e) {place and route};
+\foreach \x/\y in {a/b,b/c,c/d,d/e} \draw[-{Stealth}] (\x) -- (\y);
+\draw[-{Stealth}, kbguide, dashed] (b.east) -- ++(1.2,0) node[right]{simulation};
+\draw[-{Stealth}, kbguide, dashed] (d.east) -- ++(1.2,0) node[right]{timing analysis};
+\end{tikzpicture}
+
+* Intuition
+Every level hides the details of the one below. Designers think in registers and operations; tools turn them into gates and wires.
+
+* Pitfall
+Decisions at higher levels have larger effect: no gate-level optimisation recovers an architecture that does too much work per cycle.

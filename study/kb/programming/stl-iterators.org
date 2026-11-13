@@ -1,0 +1,41 @@
+:PROPERTIES:
+:ID:       stl-iterators
+:DOMAIN:   programming
+:AREA:     generic-programming
+:KIND:     definition
+:REQUIRES: stl-containers
+:SEE:      stl-algorithms java-iterator pointers-references
+:ALIASES:  iterator, begin, end, const_iterator, reverse_iterator, range-for, half-open range, iterator invalidation
+:END:
+#+title: Iterators
+#+summary: An iterator is an object that behaves like a pointer into a container (=*it=, =++it=, ~==~); =begin()= and =end()= give the half-open range \([\text{first},\text{last})\), and iterator categories (input, forward, bidirectional, random access) say which operations are allowed.
+
+* Definition
+Iterators form a hierarchy of concepts, each adding operations:
+- *input/output*: read or write once, =++=;
+- *forward*: several passes;
+- *bidirectional*: also =--= (=list=, =set=, =map=);
+- *random access*: =it + n=, =it[n]=, =<= in \(O(1)\) (=vector=, =deque=, raw pointers).
+They reproduce part of pointer behaviour through overloaded operators, but they are not pointers. Each container provides =iterator=, =const_iterator= (=cbegin=), =reverse_iterator= (=rbegin=, =crend=).
+
+* Example
+#+begin_src c++
+  std::list<int> l = {3, 1, 4};
+  for (std::list<int>::iterator it = l.begin(); it != l.end(); ++it) *it *= 2;
+  for (int x : l) std::cout << x;      // range-for: the same loop, written by the compiler
+#+end_src
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\foreach \i/\v in {0/3,1/1,2/4} {\draw (\i,0) rectangle (\i+1,0.7); \node at (\i+0.5,0.35) {\v};}
+\draw[dashed, kbguide] (3,0) rectangle (4,0.7);
+\draw[-{Stealth}, kbcyan] (0.5,-0.7) node[below]{begin()} -- (0.5,-0.05);
+\draw[-{Stealth}, kbamber] (3.5,-0.7) node[below]{end()} -- (3.5,-0.05);
+\end{tikzpicture}
+=end()= points one past the last element: the range is half open, and an empty range has =begin() == end()=.
+
+* Intuition
+Iterators are the glue of the STL: algorithms speak iterators, containers produce them, so \(m\) algorithms and \(n\) containers need \(m+n\) pieces of code, not \(m\times n\).
+
+* Pitfall
+Changing a container can invalidate its iterators: =push_back= on a =vector= may reallocate and leave every iterator dangling; erasing inside a loop must use the iterator returned by =erase=.

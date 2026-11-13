@@ -1,0 +1,39 @@
+:PROPERTIES:
+:ID:       multilevel-logic-optimization
+:DOMAIN:   hardware
+:AREA:     logic-synthesis
+:KIND:     method
+:REQUIRES: algebraic-division boolean-difference
+:SEE:      technology-mapping pla-pal np-hard-optimization tree-height-reduction
+:ALIASES:  multi-level logic, logic network, decomposition, extraction, substitution, factoring, elimination, simplification, literal count
+:END:
+#+title: Multi-level logic optimization
+#+summary: A Boolean network is a DAG of nodes, each a sum of products of its fan-ins; it is optimised for area (number of literals) by structural operations — decomposition, extraction, substitution, factoring, elimination — and by node simplification with don't-cares, applied iteratively by heuristic scripts.
+
+* Method
+Representation: a DAG; each internal node \(v\) has a local function \(f_v\) in sum-of-products form of its fan-ins. Cost: the total number of literals in factored form, a proxy for the area after mapping.
+
+Operations:
+- *decomposition*: split a node into simpler ones, \(f=abc+abd+\bar a\bar c\bar d\to f=xy+\bar x\bar y\) with \(x=ab\), \(y=c+d\);
+- *extraction*: find a common sub-expression (a kernel) of several nodes and make it a node: \(f=(a+b)cd+e\), \(g=(a+b)\bar e\to\) \(x=a+b\), \(f=xcd+e\), \(g=x\bar e\);
+- *substitution*: re-express a node with an existing node as divisor: \(f=a+bc\), \(g=a+b\to f=g(a+c)\);
+- *factoring*: write a node in factored form: \(ac+ad+bc+bd\to(a+b)(c+d)\);
+- *elimination* (collapsing): substitute a node into its fan-outs and delete it, when it saves little or blocks other moves;
+- *simplification*: minimise each node with two-level methods using don't-cares from the network ([[id:boolean-difference][observability]], satisfiability).
+A script alternates them (eliminate, simplify, extract, resubstitute) until no gain.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, n/.style={draw, circle, minimum size=0.55cm}]
+\node[n] (a) at (0,1.2) {a}; \node[n] (b) at (0,0.4) {b}; \node[n] (c) at (0,-0.4) {c}; \node[n] (e) at (0,-1.2) {e};
+\node[n, draw=kbamber] (x) at (1.6,0.8) {x}; \node[n, draw=kbcyan] (f) at (3.2,0.4) {f}; \node[n, draw=kbcyan] (g) at (3.2,-0.8) {g};
+\draw[-{Stealth}] (a) -- (x); \draw[-{Stealth}] (b) -- (x); \draw[-{Stealth}] (x) -- (f); \draw[-{Stealth}] (x) -- (g);
+\draw[-{Stealth}] (c) -- (f); \draw[-{Stealth}] (e) -- (f); \draw[-{Stealth}] (e) -- (g);
+\node[kbamber] at (1.6,1.35) {$x=a+b$};
+\end{tikzpicture}
+The extracted node \(x\) is computed once and used by both outputs.
+
+* Intuition
+Two-level logic writes every output from scratch; multi-level logic shares partial results, like a program with variables instead of one huge expression per output.
+
+* Pitfall
+Optimising literals tends to deepen the network, which costs delay. The area-optimised network is the starting point for [[id:tree-height-reduction][delay-oriented restructuring]] and timing-driven mapping.

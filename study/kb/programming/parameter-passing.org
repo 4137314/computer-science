@@ -1,0 +1,35 @@
+:PROPERTIES:
+:ID:       parameter-passing
+:DOMAIN:   programming
+:AREA:     memory
+:KIND:     definition
+:REQUIRES: call-stack
+:SEE:      pointers-references java-references cpp-special-members
+:ALIASES:  pass by value, pass by reference, pass by address, call by value, const reference
+:END:
+#+title: Parameter passing
+#+summary: By value the callee gets a copy and cannot change the caller's variable; by address (pointer) or by reference it reaches the caller's variable; Java passes everything by value, but the value of an object variable is a reference.
+
+* Definition
+- *By value*: the actual parameter is copied into the frame of the callee. Changes stay local.
+- *By address* (C, C++): the caller passes =&x=; the callee works on =*p=.
+- *By reference* (C++ =T&=): the parameter is another name for the caller's variable. =const T&= avoids the copy of a large object without allowing changes.
+- *Java*: always by value. For primitives the value is the number; for objects it is the reference, so the callee can change the object but not make the caller's variable point to another one.
+
+* Example
+#+begin_src c++
+  void byValue(int x)      { x = 1; }      // caller unchanged
+  void byAddress(int* p)   { *p = 1; }     // caller changed
+  void byReference(int& r) { r = 1; }      // caller changed
+  void read(const std::vector<int>& v);    // no copy, no change
+#+end_src
+#+begin_src java
+  static void f(StringBuilder s) { s.append("!"); s = new StringBuilder(); }
+  // the caller sees the "!", but still holds the old object
+#+end_src
+
+* Intuition
+Ask what is copied: the value, or a way to reach it. A copied address still leads to the same house.
+
+* Pitfall
+In C++ passing an object by value calls its copy constructor: for a class that owns memory without a [[id:shallow-deep-copy][deep copy]], the copy shares the memory and the destructor of the copy frees it under the caller's feet.

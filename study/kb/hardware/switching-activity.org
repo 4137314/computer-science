@@ -1,0 +1,43 @@
+:PROPERTIES:
+:ID:       switching-activity
+:DOMAIN:   hardware
+:AREA:     power
+:KIND:     method
+:REQUIRES: cmos-power
+:SEE:      glitches low-power-encoding boolean-difference
+:ALIASES:  switching activity, signal probability, transition probability, activity factor, spatial correlation, temporal correlation, reconvergent fanout
+:END:
+#+title: Signal and transition probabilities
+#+summary: If a node is 1 with probability \(p\) and successive cycles are independent, its \(0\to1\) transition probability is \(\alpha=(1-p)\,p\); output probabilities follow from input ones gate by gate (\(p_{AND}=p_Ap_B\), \(p_{OR}=1-(1-p_A)(1-p_B)\)) as long as the inputs are independent, which reconvergent fanout breaks.
+
+* Method
+Static probability \(p=P(x=1)\). With temporal independence,
+\[ \alpha_{0\to1}=P(x_{t-1}=0)\,P(x_t=1)=(1-p)\,p,\]
+maximal (\(1/4\)) at \(p=1/2\). For independent inputs \(A\), \(B\):
+
+| gate | \(p_{out}\) | \(\alpha_{0\to1}\) |
+|---+---+---|
+| AND | \(p_Ap_B\) | \((1-p_Ap_B)\,p_Ap_B\) |
+| OR | \(1-(1-p_A)(1-p_B)\) | \((1-p_A)(1-p_B)\big(1-(1-p_A)(1-p_B)\big)\) |
+| NAND | \(1-p_Ap_B\) | \(p_Ap_B(1-p_Ap_B)\) |
+| XOR | \(p_A+p_B-2p_Ap_B\) | \((1-p_{out})\,p_{out}\) |
+
+With \(p_A=p_B=\tfrac12\): NAND has \(p=\tfrac34\), \(\alpha=\tfrac3{16}\); AND \(p=\tfrac14\), \(\alpha=\tfrac3{16}\); XOR \(p=\tfrac12\), \(\alpha=\tfrac14\).
+
+* Correlations
+- *Spatial*: reconvergent fanout makes gate inputs dependent. For \(y=x\cdot\bar x\) the formula gives \(p(1-p)\), but \(y\equiv0\). Exact computation conditions on the reconvergent signals (via [[id:boolean-difference][cofactors]]) or uses BDDs.
+- *Temporal*: real signals are correlated in time (counters, slowly varying data), so \(\alpha\neq p(1-p)\); one uses transition probabilities \(p_{01}\) directly.
+
+* Picture
+\begin{tikzpicture}
+\begin{axis}[width=6.4cm, height=4.2cm, axis lines=left, xlabel={$p$}, ylabel={$\alpha_{0\to1}$}, xmin=0, xmax=1, ymin=0, ymax=0.3]
+\addplot+[domain=0:1, samples=50] {x*(1-x)};
+\end{axis}
+\end{tikzpicture}
+Activity is highest for signals that are 1 half of the time.
+
+* Intuition
+A node that is almost always 0 or almost always 1 rarely switches; balanced, random signals switch the most.
+
+* Pitfall
+Propagating probabilities gate by gate ignores glitches: the zero-delay estimate underestimates the real activity of deep, unbalanced logic.

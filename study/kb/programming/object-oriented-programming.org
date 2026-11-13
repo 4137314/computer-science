@@ -1,0 +1,45 @@
+:PROPERTIES:
+:ID:       object-oriented-programming
+:DOMAIN:   programming
+:AREA:     oop
+:KIND:     definition
+:REQUIRES:
+:SEE:      uml-class-diagram information-hiding inheritance polymorphism generic-programming
+:ALIASES:  OOP, object orientation, class, object, encapsulation, programming in the large
+:END:
+#+title: Object-oriented programming
+#+summary: A program is a set of objects, each joining data (state) and the functions that act on it (behaviour) behind an interface; classes describe objects, inheritance and polymorphism let new classes extend old code without changing it.
+
+* Definition
+Object-oriented programming organises a program around *objects*: values with an identity, a state (attributes, fields) and a behaviour (methods). A *class* describes a family of objects and is at the same time a module and a type. Its defining traits:
+- explicit connection between functions and data;
+- encapsulation (see [[id:information-hiding][information hiding]]): the state is reached only through the methods;
+- [[id:inheritance][inheritance]]: a class defined as an extension of another;
+- [[id:polymorphism][polymorphism]] with dynamic binding: code written for a base type runs on every subtype;
+- emphasis on the representation of the domain rather than on the sequence of operations.
+
+* Why: programming in the large
+Programming in the small is about functions and algorithms. Programming in the large is about many people and long lives: division of the work, maintainability, robustness. The software quality factors that object orientation acts on are
+- external: extensibility (adding behaviour with local changes) and reusability;
+- internal: structure, modularity, readability.
+Function-oriented design methods (functional, control-flow, data-flow diagrams) gave way to object-oriented ones (Booch, OOSE, OMT), merged into [[id:uml-class-diagram][UML]].
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\draw[kbcyan, line width=1pt] (0,0) circle (1.6);
+\draw[kbamber, line width=1pt, fill=kbamber, fill opacity=0.12] (0,0) circle (0.8);
+\node at (0,0) {state};
+\foreach \a/\m in {90/push, 210/pop, 330/top} {\node[kbcyan] at (\a:1.2) {\m()};}
+\draw[-{Stealth}] (3.4,0.5) -- node[above, font=\scriptsize]{messages} (1.7,0.5);
+\node at (4.1,0.5) {client};
+\end{tikzpicture}
+The state sits inside, reachable only through the methods on the boundary.
+
+* C++ and Java
+C++ adds classes to C and keeps value semantics, pointers, manual memory and multiple inheritance; its design rules are zero-overhead abstraction, a direct map to hardware and stability. Java removes pointers and manual memory, adds a garbage collector and a single-rooted class hierarchy (=Object=), and replaces multiple inheritance of classes with interfaces.
+
+* Intuition
+An object is a small machine with buttons. Users press buttons; only the machine knows what is inside. Changing the inside without changing the buttons breaks nobody.
+
+* Pitfall
+Classes are not automatically objects-oriented design: a class with public fields and getters/setters for everything is a C struct with extra steps.

@@ -1,0 +1,40 @@
+:PROPERTIES:
+:ID:       uart
+:DOMAIN:   hardware
+:AREA:     interfaces
+:KIND:     construction
+:REQUIRES: serial-communication finite-state-machine
+:SEE:      spi setup-hold-time
+:ALIASES:  UART, RS232, asynchronous serial, start bit, stop bit, parity, baud, oversampling, 8N1
+:END:
+#+title: UART (RS-232)
+#+summary: An idle-high line; each character is a start bit (0), 5–8 data bits LSB first, an optional parity bit and 1–2 stop bits (1); the receiver detects the falling edge of the start bit with a clock 16 times the bit rate, waits half a bit to reach the centre, then samples every 16 ticks.
+
+* Construction
+Frame (8N1): =idle 1 | start 0 | d0 d1 … d7 | stop 1=. Parity: even or odd over the data bits. RS-232 levels are inverted and larger (logic 1 = −3 to −15 V), handled by a line driver; the logic sees TTL levels.
+
+*Transmitter*: a baud-rate tick (clock divided by \(f_{clk}/\text{baud}\)) shifts a 10-bit register loaded with =1 & data & 0=.
+
+*Receiver* FSM with an oversampling tick at \(16\times\) baud:
+1. =IDLE=: wait for RX = 0;
+2. =START=: count 8 ticks (half a bit); if RX is still 0 it is a real start bit, otherwise a glitch, back to idle;
+3. =DATA=: every 16 ticks sample RX into the shift register, 8 times;
+4. =STOP=: after 16 ticks RX must be 1 (otherwise framing error); signal =rx_done=.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, yscale=0.6]
+\draw[kbcyan, line width=1pt] (0,1) -- (1,1) -- (1,0) -- (2,0) -- (2,1) -- (3,1) -- (3,0) -- (5,0) -- (5,1) -- (7,1) -- (7,0) -- (8,0) -- (8,1) -- (10,1);
+\foreach \x/\l in {1.5/S,2.5/d0,3.5/d1,4.5/d2,5.5/d3,6.5/d4,7.5/d5} \node at (\x,1.5) {\l};
+\node at (9.2,1.5) {\dots stop};
+\foreach \x in {2.5,3.5,4.5,5.5,6.5,7.5} \draw[kbamber, dashed] (\x,-0.3) -- (\x,1.2);
+\end{tikzpicture}
+Samples (dashed) fall in the middle of each bit, half a bit after the start edge plus whole bits.
+
+* Derivation
+Clocks differ: the sampling point drifts by the relative error \(\epsilon\) per bit. After 9.5 bits (to the middle of the stop bit) the drift must stay below half a bit: \(9.5\,\epsilon<0.5\), so \(\epsilon<5\%\) in total between the two sides, about \(\pm2.5\%\) each, minus the \(1/16\) bit uncertainty of detecting the start edge.
+
+* Intuition
+No shared clock, so every character carries its own "ready, set": the start bit restarts the receiver's stopwatch.
+
+* Pitfall
+The RX input is asynchronous to the receiver's clock: it must pass through a two-flip-flop synchroniser before the FSM tests it.

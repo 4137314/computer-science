@@ -1,0 +1,46 @@
+:PROPERTIES:
+:ID:       resource-binding
+:DOMAIN:   hardware
+:AREA:     high-level-synthesis
+:KIND:     method
+:REQUIRES: list-scheduling
+:SEE:      datapath-control
+:ALIASES:  binding, resource sharing, register allocation, compatibility graph, conflict graph, interval graph, left-edge algorithm, clique partitioning, graph colouring
+:END:
+#+title: Resource sharing and binding
+#+summary: After scheduling, operations of the same type that never run in the same cycle can share a unit, and values whose lifetimes do not overlap can share a register; minimum sharing is colouring the conflict graph (or partitioning the compatibility graph into cliques), solved exactly for register lifetimes by the left-edge algorithm on interval graphs.
+
+* Method
+- *Compatibility graph*: one vertex per operation, an edge between two operations of the same type that do not overlap in time. A *clique* is a set of operations that can share one unit. Minimum units = minimum clique partition.
+- *Conflict graph*: the complement; minimum units = chromatic number (graph colouring).
+- *Registers*: a value lives from the cycle it is produced to its last use; two values conflict if their lifetimes overlap. Conflict graphs of intervals are *interval graphs*, colourable optimally in polynomial time by the left-edge algorithm: sort intervals by start; repeatedly fill one register with non-overlapping intervals taken left to right.
+- Sharing adds multiplexers at the unit inputs and register inputs: their area and delay limit how much sharing pays.
+
+* Algorithm
+\begin{algorithmic}[1]
+\Require lifetimes $[s_i,e_i)$
+\State sort the intervals by $s_i$; $r\gets0$
+\While{intervals remain}
+\State $r\gets r+1$; $last\gets -\infty$
+\ForAll{remaining intervals $i$ in order}
+\If{$s_i\ge last$} \State assign $i$ to register $r$; $last\gets e_i$; remove $i$ \EndIf
+\EndFor
+\EndWhile
+\State \Return $r$ registers \Comment{equals the maximum overlap}
+\end{algorithmic}
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\foreach \c in {0,...,5} {\draw[kbguide] (\c,0.2) -- (\c,-2.3); \node at (\c,0.4) {\c};}
+\draw[kbcyan, line width=3pt] (0,-0.3) -- (2,-0.3); \draw[kbcyan, line width=3pt] (2,-0.3) -- (4,-0.3);
+\draw[kbamber, line width=3pt] (1,-1.0) -- (3,-1.0); \draw[kbamber, line width=3pt] (3,-1.0) -- (5,-1.0);
+\draw[kbmagenta, line width=3pt] (1,-1.7) -- (2,-1.7);
+\node[anchor=east] at (-0.2,-0.3) {R1}; \node[anchor=east] at (-0.2,-1.0) {R2}; \node[anchor=east] at (-0.2,-1.7) {R3};
+\end{tikzpicture}
+Five values, at most three alive at once: three registers.
+
+* Intuition
+Sharing is time-slicing hardware: the same multiplier is the "first multiplication" in cycle 1 and the "fourth" in cycle 3.
+
+* Pitfall
+Binding interacts with scheduling and with wiring: a sharing that minimises units can maximise multiplexers and long wires, so the best area is not always the fewest units.

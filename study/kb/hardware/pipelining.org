@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       pipelining
+:DOMAIN:   hardware
+:AREA:     timing
+:KIND:     construction
+:REQUIRES: retiming setup-hold-time
+:SEE:      fir-filter dvfs-parallelism risc-v-datapath carry-save-adder
+:ALIASES:  pipeline, pipeline stage, throughput, latency, initiation interval, pipeline register
+:END:
+#+title: Pipelining
+#+summary: Inserting \(k-1\) register stages into a feed-forward circuit of delay \(D\) splits it into \(k\) stages of about \(D/k\): the clock period, and hence the throughput, improves almost \(k\) times, while the latency grows to \(k\) cycles and every stage adds register overhead.
+
+* Construction
+For a feed-forward path (no loops), add registers on a *cut* that separates inputs from outputs, crossing every path once; then [[id:retiming][retime]] to balance the stages. With logic delay \(D\) and register overhead \(t_{reg}=t_{cq}+t_{su}\):
+\[ T_k = \frac{D}{k} + t_{reg},\qquad \text{throughput}=\frac{1}{T_k},\qquad \text{latency}=k\,T_k = D + k\,t_{reg}. \]
+
+* Derivation
+Without pipelining one result leaves every \(D+t_{reg}\). With \(k\) balanced stages a new input enters every \(T_k\), and \(k\) operations are in flight at once. The speed-up of throughput is \((D+t_{reg})/(D/k+t_{reg})\to (D+t_{reg})/t_{reg}\) as \(k\to\infty\): register overhead caps the gain, and latency only grows.
+
+* Picture
+\begin{tikzpicture}
+\begin{axis}[width=6.8cm, height=4.6cm, axis lines=left, xlabel={stages $k$}, ylabel={relative value}, xmin=1, xmax=16, ymin=0, ymax=6, legend pos=north west]
+\addplot+[domain=1:16, samples=16] {(10+1)/(10/x+1)}; \addlegendentry{throughput}
+\addplot+[domain=1:16, samples=16] {(10+x)/(10+1)}; \addlegendentry{latency}
+\end{axis}
+\end{tikzpicture}
+\(D=10\,t_{reg}\): throughput saturates near 11, latency keeps growing.
+
+* Intuition
+An assembly line: each worker does a slice of the job. Cars come out more often; each car still spends as long as before in the factory, a bit longer.
+
+* Pitfall
+Loops cannot be pipelined this way: a result needed in the next cycle (an accumulator, a branch decision) cannot wait \(k\) cycles. Processor pipelines must handle such dependences (hazards) explicitly.

@@ -1,0 +1,32 @@
+:PROPERTIES:
+:ID:       serial-communication
+:DOMAIN:   hardware
+:AREA:     interfaces
+:KIND:     definition
+:REQUIRES:
+:SEE:      uart spi i2c serial-arithmetic
+:ALIASES:  serial communication, parallel communication, synchronous serial, asynchronous serial, baud rate, full duplex, half duplex, I2S
+:END:
+#+title: Serial communication
+#+summary: Sending bits one after another on few wires saves pins and avoids skew between parallel lines; synchronous links (SPI, I²C, I²S) share a clock wire, asynchronous ones (UART) agree on a bit rate and resynchronise on every character with a start bit.
+
+* Definition
+- *Parallel*: \(n\) data lines plus control; fast over short distances, but pins, cable and skew grow with \(n\).
+- *Serial*: one or two data lines. *Synchronous*: the transmitter's clock is sent along (SCK, SCL): the receiver samples on its edges. *Asynchronous*: no clock; each side has its own, at a nominal rate; framing bits realign the receiver.
+- *Duplex*: simplex (one direction), half duplex (both, alternately, e.g. I²C), full duplex (both at once, e.g. SPI, UART with TX and RX).
+- *Topology*: point to point (UART), master with several slaves selected by wires (SPI) or by addresses on a shared bus (I²C).
+
+| | UART | SPI | I²C | I²S |
+|---+---+---+---+---|
+| wires | TX, RX | SCK, MOSI, MISO, SS | SCL, SDA | SCK, WS, SD |
+| clock | none (agreed rate) | master | master | master |
+| addressing | none | one select line per slave | 7-bit address | none |
+| typical speed | 9.6–921.6 kbit/s | tens of Mbit/s | 100 kbit/s–3.4 Mbit/s | audio rates |
+
+I²S carries stereo audio: the word-select line WS says whether the current word is the left or the right channel.
+
+* Intuition
+Serial links trade wires for time. With fast transistors and expensive pins, time is the cheaper resource.
+
+* Pitfall
+Two clock domains meet at every receiver: signals coming from outside must be synchronised (two flip-flops) before the receiver's FSM uses them, or metastability will eventually strike.

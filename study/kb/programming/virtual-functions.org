@@ -1,0 +1,39 @@
+:PROPERTIES:
+:ID:       virtual-functions
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     construction
+:REQUIRES: polymorphism cpp-inheritance-visibility
+:SEE:      abstract-class-interface java-dynamic-binding function-objects
+:ALIASES:  virtual, vtable, virtual table, early binding, late binding, pure virtual, override, virtual destructor
+:END:
+#+title: Virtual functions and the virtual table
+#+summary: In C++ a method is dynamically bound only if declared =virtual= and called through a pointer or reference; the compiler implements it with a per-class table of function pointers, and every polymorphic base class needs a virtual destructor.
+
+* Definition
+- *Early binding*: the compiler resolves the call from the static type. Default in C++.
+- *Late binding*: the call is resolved at run time from the dynamic type. Requested with =virtual= in the base class, and effective only through =B*= or =B&=.
+- =override= (C++11) asks the compiler to check that the method really overrides a virtual one.
+- *Pure virtual*: =virtual void f() = 0;=. A class with at least one is abstract and has no instances.
+
+* Construction
+Every class with virtual methods gets a *vtable*: an array with one function pointer per virtual method. Every object of such a class stores a hidden pointer =vptr= to its class's vtable. A call =p->f()= becomes =(*(p->vptr[k]))(p)= with \(k\) the slot of =f=, fixed at compile time: one indirect load and one indirect call.
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\node[draw, kbcyan, align=left] (o) at (0,0) {Wizard object\\vptr\\name};
+\node[draw, kbamber, align=left] (t) at (3.6,0) {Wizard vtable\\0: Wizard::act\\1: Wizard::\textasciitilde Wizard};
+\draw[-{Stealth}] (0.4,0) -- (t.west);
+\node[draw] (p) at (-3,0) {Character* c};
+\draw[-{Stealth}] (p) -- (o);
+\end{tikzpicture}
+=c->act()= reads the vptr, takes slot 0, calls it.
+
+* Virtual destructor
+=delete c= with =c= of type =Character*= calls the destructor of the static type unless =~Character= is virtual: the =Wizard= part is never destroyed. Rule: a class meant to be used polymorphically declares =virtual ~B() = default;=.
+
+* Intuition
+=virtual= is the price tag of polymorphism: C++ makes you ask for it, because its rule is that you do not pay for what you do not use.
+
+* Pitfall
+Inside constructors and destructors virtual calls are not dynamic: during =B()= the object is still a =B=, so =B::f= runs even if the object being built is a =D=.

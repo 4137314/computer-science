@@ -1,0 +1,57 @@
+:PROPERTIES:
+:ID:       stack-and-queue
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     example
+:REQUIRES: inheritance java-references
+:SEE:      liskov-substitution information-hiding java-collections java-generics
+:ALIASES:  stack, queue, LIFO, FIFO, Pila, Coda, circular buffer, abstract data type
+:END:
+#+title: Stack and queue as classes
+#+summary: A stack (last in, first out) and a queue (first in, first out) are abstract data types defined by their operations; implemented as classes over an array that grows when full, they show encapsulation, constructors, deep copy and, deriving the queue from the stack, both the power and the danger of inheritance.
+
+* Example
+#+begin_src java
+  public class Stack {
+      protected int[] data;
+      protected int size = 0;
+      public Stack() { this(10); }
+      public Stack(int capacity) { data = new int[capacity]; }
+      public Stack(Stack other) { data = other.data.clone(); size = other.size; }  // deep copy
+      public void push(int x) {
+          if (size == data.length) data = java.util.Arrays.copyOf(data, 2 * data.length);
+          data[size++] = x;
+      }
+      public int pop() {
+          if (size == 0) throw new IllegalStateException("empty stack");
+          return data[--size];
+      }
+      public boolean isEmpty() { return size == 0; }
+  }
+
+  public class Queue extends Stack {     // reuse of push, isEmpty and the storage
+      private int head = 0;
+      @Override public int pop() {
+          if (head == size) throw new IllegalStateException("empty queue");
+          return data[head++];
+      }
+      @Override public boolean isEmpty() { return head == size; }
+  }
+#+end_src
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\foreach \i/\v in {0/a,1/b,2/c} {\draw (\i*0.8,0) rectangle (\i*0.8+0.8,0.6); \node at (\i*0.8+0.4,0.3) {\v};}
+\draw[-{Stealth}, kbcyan] (2.0,1.1) -- (2.0,0.65); \node[kbcyan, font=\scriptsize] at (2.0,1.3) {push, pop (stack)};
+\draw[-{Stealth}, kbamber] (0.4,0.65) -- (0.4,1.1); \node[kbamber, font=\scriptsize] at (0.4,1.3) {pop (queue)};
+\end{tikzpicture}
+The stack takes from the top; the queue from the head, where the oldest element is.
+
+* The C++ version
+The same class in C++ owns its array through a pointer, so it needs a destructor (=delete[] data=), a copy constructor and an assignment operator that copy the array: the [[id:shallow-deep-copy][rule of three]]. In Java, =clone()= on the array plays the role of the deep copy and the garbage collector of the destructor.
+
+* Intuition
+Two ten-line classes contain most of object orientation: hidden representation, invariants, construction, copying, reuse by extension.
+
+* Pitfall
+The queue never reclaims the slots before =head=, and a =Queue= passed where a =Stack= is expected changes the meaning of =pop=: inheritance used for code reuse, not for an is-a relation (see [[id:liskov-substitution][Liskov]]). Composition (a queue that contains an array or a list) is the better design.

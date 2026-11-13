@@ -1,0 +1,50 @@
+:PROPERTIES:
+:ID:       vhdl-testbench
+:DOMAIN:   hardware
+:AREA:     vhdl
+:KIND:     method
+:REQUIRES: vhdl-process
+:SEE:      event-driven-simulation vhdl-structural
+:ALIASES:  testbench, test bench, stimulus, assert, report, wait for, clock generation, device under test, DUT, GHDL
+:END:
+#+title: Testbenches
+#+summary: A testbench is an entity without ports that instantiates the design under test, drives its inputs from processes with =wait for= delays, generates the clock, and checks the outputs with =assert ... report ... severity=; it uses non-synthesisable VHDL and exists only for simulation.
+
+* Method
+#+begin_src vhdl
+  entity tb_adder is end entity;                 -- no ports
+
+  architecture sim of tb_adder is
+    signal a, b, s : std_logic_vector(7 downto 0);
+    signal clk : std_logic := '0';
+  begin
+    dut : entity work.adder generic map (N => 8)
+      port map (a => a, b => b, cin => '0', s => s, cout => open);
+
+    clk <= not clk after 5 ns;                   -- 100 MHz clock
+
+    stim : process
+    begin
+      for i in 0 to 255 loop
+        a <= std_logic_vector(to_unsigned(i, 8));
+        b <= std_logic_vector(to_unsigned(3, 8));
+        wait for 10 ns;                          -- let the signals settle
+        assert to_integer(unsigned(s)) = (i + 3) mod 256
+          report "wrong sum for i = " & integer'image(i) severity error;
+      end loop;
+      report "done"; wait;                       -- suspend for ever
+    end process;
+  end architecture;
+#+end_src
+Run with GHDL: =ghdl -a adder.vhd tb_adder.vhd; ghdl -e tb_adder; ghdl -r tb_adder --wave=tb.ghw --stop-time=3us=, then inspect with GTKWave.
+
+* Practices
+- self-checking: compare with a reference model in the testbench, not by eye;
+- cover corner cases (0, maximum, overflow, reset in the middle of an operation);
+- apply inputs away from the active clock edge and sample outputs before the next one.
+
+* Intuition
+The design is the chip; the testbench is the laboratory bench around it — signal generators, a clock, and an oscilloscope that complains.
+
+* Pitfall
+A process without sensitivity list and without =wait= loops for ever at time zero and hangs the simulator; the final =wait;= is mandatory.

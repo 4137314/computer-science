@@ -1,0 +1,40 @@
+:PROPERTIES:
+:ID:       cpp-templates
+:DOMAIN:   programming
+:AREA:     generic-programming
+:KIND:     construction
+:REQUIRES: generic-programming
+:SEE:      stl-containers template-metaprogramming bitset
+:ALIASES:  template, function template, class template, instantiation, template argument deduction, specialization, typename
+:END:
+#+title: C++ templates
+#+summary: =template <typename T>= introduces a function or class written for an unknown type; each use with concrete arguments instantiates a separate copy at compile time, arguments of function templates are deduced from the call, and specialisations replace the generic code for chosen arguments.
+
+* Construction
+#+begin_src c++
+  template <typename T>
+  T max(T a, T b) { return a > b ? a : b; }
+
+  template <typename F, typename S>
+  class Pair {
+    F first; S second;
+  public:
+    Pair(const F& f, const S& s) : first(f), second(s) {}
+    F get_first() const { return first; }
+    S get_second() const { return second; }
+  };
+  Pair<std::string, int> p("Enrico", 15);
+#+end_src
+- *Instantiation*: =max(2, 3)= creates =max<int>=; =Pair<string,int>= creates a class. Uninstantiated members are not even compiled (laziness).
+- *Deduction*: the compiler infers =T= from the arguments; =max(3, 2.3)= fails because =T= cannot be both =int= and =double=; =max<double>(3, 2.3)= or a second parameter =template <class T1, class T2>= fixes it.
+- *Specialisation*: =template <> struct factorial<0> { ... };= gives a separate definition for one argument; the library specialises =vector<bool>=.
+- *Non-type parameters*: =template <unsigned N> class bitset;=, values known at compile time.
+
+* Where to put the code
+A template is a recipe, not code: its full definition must be visible where it is instantiated, so templates live entirely in headers (including the definitions of the member functions).
+
+* Intuition
+A template is a macro with types and rules: the compiler stamps out a fresh, fully typed copy for every set of arguments you use.
+
+* Pitfall
+Errors appear at instantiation, deep in the template, with long messages; C++20 concepts state the requirements up front and give short errors.

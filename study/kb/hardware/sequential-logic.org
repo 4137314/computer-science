@@ -1,0 +1,61 @@
+:PROPERTIES:
+:ID:       sequential-logic
+:DOMAIN:   hardware
+:AREA:     vhdl
+:KIND:     construction
+:REQUIRES: vhdl-process
+:SEE:      setup-hold-time finite-state-machine datapath-subsystems signals-variables clock-gating
+:ALIASES:  flip-flop, register, D flip-flop, latch, rising_edge, synchronous reset, asynchronous reset, enable, clocked process, counter
+:END:
+#+title: Flip-flops and registers in VHDL
+#+summary: A clocked process that assigns signals only inside =if rising_edge(clk)= describes edge-triggered D flip-flops; a reset tested before the edge is asynchronous, one tested inside it synchronous; an enable is an =if= inside the edge; a latch, by contrast, is level-sensitive and arises from incomplete combinational code.
+
+* Construction
+#+begin_src vhdl
+  -- register with asynchronous reset and enable
+  reg : process (clk, rst)
+  begin
+    if rst = '1' then
+      q <= (others => '0');
+    elsif rising_edge(clk) then
+      if en = '1' then
+        q <= d;
+      end if;              -- no else: keep the value, that is what a register does
+    end if;
+  end process;
+
+  -- counter modulo 10 with synchronous reset
+  cnt : process (clk)
+  begin
+    if rising_edge(clk) then
+      if rst = '1' or count = 9 then count <= 0;
+      else                           count <= count + 1;
+      end if;
+    end if;
+  end process;
+#+end_src
+- The sensitivity list of a clocked process holds only =clk= and asynchronous inputs (=rst=).
+- Every signal assigned under =rising_edge= becomes a flip-flop; logic before the assignment becomes combinational logic at its D input.
+- *Asynchronous* reset acts immediately; *synchronous* reset only at an edge (it is part of the D logic).
+
+* Flip-flop versus latch
+| | D latch | D flip-flop |
+|---+---+---|
+| transparent | while the enable is high | never |
+| captures | at the falling edge of the enable | at the clock edge |
+| timing | harder to analyse | [[id:setup-hold-time][setup and hold]] around one edge |
+Synchronous design uses flip-flops only, all on one clock.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, yscale=0.5]
+\draw (0,4) node[left] {clk}; \draw[kbcyan] (0,3.6) \foreach \x in {0,1,2,3,4} {-- ++(0.5,0) -- ++(0,0.8) -- ++(0.5,0) -- ++(0,-0.8)};
+\draw (0,2.2) node[left] {d}; \draw (0,1.8) -- (0.8,1.8) -- (0.8,2.6) -- (2.3,2.6) -- (2.3,1.8) -- (5,1.8);
+\draw (0,0.4) node[left] {q}; \draw[kbamber] (0,0) -- (1,0) -- (1,0.8) -- (3,0.8) -- (3,0) -- (5,0);
+\end{tikzpicture}
+=q= copies =d= only at the rising edges.
+
+* Intuition
+A register is a camera: it takes a picture of its input at each clock edge and shows it until the next one.
+
+* Pitfall
+Using a signal derived from logic as a clock (=rising_edge(a and b)=) creates gated clocks with skew and glitches; use an enable on the real clock instead (or proper [[id:clock-gating][clock gating]] cells).

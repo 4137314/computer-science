@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       dvfs-parallelism
+:DOMAIN:   hardware
+:AREA:     power
+:KIND:     method
+:REQUIRES: cmos-power pipelining
+:SEE:      clock-gating
+:ALIASES:  DVFS, dynamic voltage and frequency scaling, multiple supply voltages, voltage islands, parallel architecture, low-power datapath, level shifter
+:END:
+#+title: Voltage scaling, DVFS and parallel datapaths
+#+summary: Lowering \(V_{DD}\) cuts energy quadratically but slows the gates; parallel or pipelined datapaths recover the throughput at the lower voltage, so a duplicated unit at half frequency and reduced voltage can do the same work for roughly 40% of the power; DVFS adapts voltage and frequency to the current load.
+
+* Method
+Gate delay grows as the supply approaches the threshold, roughly \(d\propto V_{DD}/(V_{DD}-V_T)^2\). Strategies:
+- *Multiple supplies*: critical paths at high \(V_{DD}\), the rest at low \(V_{DD}\) (voltage islands, level shifters between them).
+- *DVFS*: when the workload is light, lower \(f\) and then \(V_{DD}\) to the minimum that meets the new period. Since \(P\propto V^2f\), power falls roughly with the cube of the scaling factor, energy per operation with the square.
+- *Parallelism*: two copies of a unit, each at \(f/2\), deliver the same throughput; with twice the time per operation each copy can run at a lower voltage.
+- *Pipelining*: shorter stages tolerate slower gates at the same frequency, so \(V_{DD}\) can drop.
+
+* Derivation
+Reference: one unit, capacitance \(C\), voltage \(V\), frequency \(f\): \(P_{ref}=CV^2f\). Parallel version: two units plus a multiplexer, capacitance \(\approx2.2C\), frequency \(f/2\), and the doubled delay budget allows \(V'\approx0.6V\):
+\[ P_{par}=2.2C\,(0.6V)^2\,\frac f2\approx0.4\,P_{ref}. \]
+Area roughly doubles: power is traded for silicon.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\draw (0,0.6) rectangle (0.3,1.4); \draw (0,-0.6) rectangle (0.3,0.2);
+\draw[kbcyan] (0.8,0.6) rectangle (2,1.4); \node at (1.4,1) {unit A}; \draw[kbcyan] (0.8,-0.6) rectangle (2,0.2); \node at (1.4,-0.2) {unit B};
+\draw (0.3,1) -- (0.8,1); \draw (0.3,-0.2) -- (0.8,-0.2);
+\draw[kbamber] (2.5,-0.5) -- (2.5,1.3) -- (3.0,1.0) -- (3.0,-0.2) -- cycle; \draw (2,1) -- (2.5,1); \draw (2,-0.2) -- (2.5,-0.2); \draw (3,0.4) -- (3.5,0.4);
+\node at (1.4,-1.0) {each at $f/2$, low $V_{DD}$};
+\end{tikzpicture}
+
+* Intuition
+Two slow, relaxed workers use less energy than one fast, stressed worker, because speed costs voltage and voltage costs its square.
+
+* Pitfall
+Below a certain voltage leakage dominates and the slower circuit leaks for longer: energy per operation has a minimum, and scaling further makes things worse.

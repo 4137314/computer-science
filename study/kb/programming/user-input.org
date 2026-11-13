@@ -1,0 +1,45 @@
+:PROPERTIES:
+:ID:       user-input
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     example
+:REQUIRES: java-exceptions
+:SEE:      event-handling wrapper-autoboxing
+:ALIASES:  Scanner, System.in, input validation, hasNextInt, nextInt, TextInputDialog, parseInt
+:END:
+#+title: Reading and validating user input
+#+summary: From the console a =Scanner= on =System.in= reads tokens, and =hasNextInt()= checks the type before =nextInt()= consumes it; in a GUI the text of a field or dialog is parsed with =Integer.parseInt=, catching =NumberFormatException=; in both cases invalid input is rejected and asked again.
+
+* Example: console
+#+begin_src java
+  Scanner in = new Scanner(System.in);
+  System.out.println("Name: ");
+  String name = in.next();
+  int age = 0; boolean ok = false;
+  while (!ok) {
+      System.out.println("Age: ");
+      if (in.hasNextInt()) { age = in.nextInt(); ok = true; }
+      else { System.out.println("The age must be an integer!"); in.next(); }  // discard the token
+  }
+  in.close();
+#+end_src
+
+* Example: JavaFX
+#+begin_src java
+  TextInputDialog d = new TextInputDialog();
+  d.setHeaderText("Age");
+  d.showAndWait().ifPresent(text -> {
+      try {
+          int age = Integer.parseInt(text.trim());
+          label.setText("Age: " + age);
+      } catch (NumberFormatException e) {
+          new Alert(Alert.AlertType.ERROR, "Not an integer: " + text).showAndWait();
+      }
+  });
+#+end_src
+
+* Intuition
+Input is untrusted data: check it, convert it, and decide what happens when it is wrong, before using it.
+
+* Pitfall
+Without the =in.next()= that discards the bad token, =hasNextInt()= keeps looking at the same token and the loop never ends.

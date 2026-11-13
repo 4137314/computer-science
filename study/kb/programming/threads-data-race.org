@@ -1,0 +1,45 @@
+:PROPERTIES:
+:ID:       threads-data-race
+:DOMAIN:   programming
+:AREA:     concurrency
+:KIND:     definition
+:REQUIRES: call-stack
+:SEE:      mutual-exclusion lambda-expressions event-handling
+:ALIASES:  thread, std::thread, join, data race, race condition, preemption, interleaving, concurrency
+:END:
+#+title: Threads and data races
+#+summary: Threads are flows of execution of one process that share its heap and globals but each have their own stack; because the scheduler can preempt a thread between any two machine instructions, unsynchronised read–modify–write on shared data gives results that depend on the interleaving: a data race.
+
+* Definition
+=std::thread t(f, args...);= starts =f(args...)= concurrently; =t.join()= waits for it to end (a joinable thread destroyed without =join= or =detach= terminates the program). Threads share memory, so they communicate cheaply, and interfere easily.
+
+A *data race* occurs when two threads access the same memory location concurrently, at least one access is a write, and nothing orders them. In C++ a data race is undefined behaviour.
+
+* Derivation
+=++counter= is three steps: load, add, store. Two threads, each incrementing once, starting from 0:
+
+| thread A | thread B | counter |
+|---+---+---|
+| load 0 | | 0 |
+| | load 0 | 0 |
+| add, store 1 | | 1 |
+| | add, store 1 | 1 |
+
+One increment is lost. With \(n\) increments per thread the final value can be anything between \(2\) and \(2n\).
+
+* Example
+#+begin_src c++
+  int counter = 0;
+  void work() { for (int k = 0; k < 1000000; ++k) ++counter; }
+  int main() {
+    std::thread a(work), b(work);
+    a.join(); b.join();
+    std::cout << counter;          // rarely 2000000
+  }
+#+end_src
+
+* Intuition
+Preemption can happen anywhere, so any sequence of steps that must not be split has to be protected explicitly (see [[id:mutual-exclusion][mutual exclusion]]).
+
+* Pitfall
+A race may never show up in testing, and appear only under load or on another machine. Absence of wrong output is not evidence of correctness.

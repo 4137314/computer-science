@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       asap-alap-scheduling
+:DOMAIN:   hardware
+:AREA:     high-level-synthesis
+:KIND:     method
+:REQUIRES: data-flow-graph
+:SEE:      list-scheduling static-timing-analysis
+:ALIASES:  ASAP, ALAP, as soon as possible, as late as possible, mobility, slack, unconstrained scheduling, critical path
+:END:
+#+title: ASAP and ALAP scheduling, mobility
+#+summary: Without resource limits, ASAP starts each operation as soon as its predecessors finish, giving the minimum latency \(\lambda\); ALAP starts it as late as possible within \(\lambda\); the mobility \(t^L_i-t^S_i\) of an operation says how much freedom it has, and zero-mobility operations form the critical path.
+
+* Method
+With \(d_i\) the execution delay (cycles) of operation \(v_i\):
+- *ASAP*: \(t^S_{source}=1\); \(t^S_i=\max_{j\to i}\big(t^S_j+d_j\big)\), in topological order. The latency is \(\lambda=t^S_{sink}-1\).
+- *ALAP* for a bound \(\bar\lambda\ge\lambda\): \(t^L_{sink}=\bar\lambda+1\); \(t^L_i=\min_{i\to k}\,t^L_k-d_i\), in reverse topological order (select a vertex whose successors are all scheduled).
+- *Mobility*: \(\mu_i=t^L_i-t^S_i\ge0\). With \(\bar\lambda=\lambda\), operations with \(\mu_i=0\) are critical.
+These are the arrival and required times of [[id:static-timing-analysis][timing analysis]], counted in cycles.
+
+* Example
+For the solver graph with all delays 1: ASAP puts the four independent multiplications in cycle 1, latency 4. ALAP with \(\bar\lambda=4\) moves the =x+dx= addition and the comparison to cycles 3 and 4, and the =u·dx= multiplication for =y1= to cycle 3. Their mobility (2, 2, 2) is the room a resource-constrained scheduler can use.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\foreach \c in {1,2,3,4} {\draw[kbguide] (-0.3,-\c*0.6+0.3) -- (4.6,-\c*0.6+0.3); \node[anchor=east] at (-0.3,-\c*0.6) {cycle \c};}
+\foreach \x in {0,0.9,1.8,2.7} {\node[draw, kbcyan, circle, inner sep=1pt] at (\x,-0.6) {$\times$};}
+\node[draw, kbamber, circle, inner sep=1pt] at (3.6,-0.6) {$+$};
+\draw[kbamber, -{Stealth}, dashed] (3.6,-0.8) -- (3.6,-1.7); \node[draw, kbamber, circle, dashed, inner sep=1pt] at (3.6,-1.8) {$+$};
+\node[kbamber] at (4.3,-1.25) {$\mu=2$};
+\end{tikzpicture}
+The addition can move from its ASAP cycle to its ALAP cycle without increasing the latency.
+
+* Intuition
+ASAP and ALAP are the two extremes; everything a real scheduler does happens between them.
+
+* Pitfall
+ASAP is optimal for latency only with unlimited resources: it puts all multiplications in the first cycle, which may need far more multipliers than the design can afford.

@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       pointers-references
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     definition
+:REQUIRES: call-stack
+:SEE:      parameter-passing smart-pointers value-categories java-references
+:ALIASES:  pointer, reference, new, delete, dangling pointer, memory leak, nullptr, address-of, dereference
+:END:
+#+title: Pointers, references and dynamic memory in C++
+#+summary: A pointer is a variable holding an address, which can be null and re-seated; a reference is an alias bound once to an existing object; =new= allocates on the heap and returns a pointer, and every =new= needs exactly one =delete=.
+
+* Definition
+- =T* p = &x;= stores the address of =x=; =*p= is the object, =p->m= is =(*p).m=. A pointer can be =nullptr=, can be changed to point elsewhere, and supports arithmetic inside arrays.
+- =T& r = x;= makes =r= another name for =x=. It must be initialised, cannot be null, cannot be re-bound.
+- =new T(args)= builds a =T= on the heap and returns its address; =delete p= runs the destructor and frees the memory. Arrays use =new T[n]= and =delete[] p=.
+
+* Example
+#+begin_src c++
+  int x = 3;
+  int* p = &x;  *p = 4;          // x == 4
+  int& r = x;   r = 5;           // x == 5
+  B* pb = new B("s");            // heap object, owned by whoever holds pb
+  delete pb;  pb = nullptr;      // free once, then forget the address
+#+end_src
+
+* Errors of manual memory
+- *leak*: losing the last pointer to a heap object without =delete=;
+- *dangling pointer*: using a pointer after =delete=, or after the frame of the pointed local died;
+- *double delete*: deleting the same object twice, typically after a [[id:shallow-deep-copy][shallow copy]].
+The remedy of modern C++ is to let objects own resources: RAII, [[id:smart-pointers][smart pointers]], containers.
+
+* Intuition
+A pointer is a note with an address on it; a reference is a second name on the same door. =new= rents a room; =delete= returns the key, and nobody tells you if you keep using it.
+
+* Pitfall
+=int& x = 6;= does not compile (a non-const lvalue reference cannot bind a temporary), but =const int& x = 6;= does: the temporary's lifetime is extended to that of the reference (see [[id:value-categories][value categories]]).

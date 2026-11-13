@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       java-object-class
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     definition
+:REQUIRES: inheritance java-references
+:SEE:      equals-hashcode java-dynamic-binding wrapper-autoboxing
+:ALIASES:  Object, toString, getClass, clone, final class, final method, root of the hierarchy
+:END:
+#+title: The class Object and final
+#+summary: Every Java class descends from =java.lang.Object=, which gives all objects =equals=, =hashCode=, =toString=, =getClass= and =clone=; =final= on a class forbids subclasses and on a method forbids overriding, which also allows static binding.
+
+* Definition
+A class without =extends= extends =Object=, so the hierarchy is a single tree rooted at =Object= and any object can be stored in a variable of type =Object=. Methods of =Object=:
+- =boolean equals(Object o)=: identity by default;
+- =int hashCode()=: consistent with =equals= (see [[id:equals-hashcode][the contract]]);
+- =String toString()=: class name and hash by default; called by string concatenation and =println=;
+- =Class<?> getClass()=: the dynamic type;
+- =protected Object clone()=: a shallow copy, for classes that implement =Cloneable=.
+
+=final class String=: no subclass can exist (security, immutability). =final void m()=: cannot be overridden; a method in a subclass with the same signature is an error, while a private method with the same name in a subclass is simply a new method.
+
+* Example
+#+begin_src java
+  public class Point {
+      private final int x, y;
+      public Point(int x, int y) { this.x = x; this.y = y; }
+      @Override public String toString() { return "(" + x + ", " + y + ")"; }
+  }
+  System.out.println(new Point(1, 2));   // (1, 2), via the dynamically bound toString
+#+end_src
+
+* Intuition
+=Object= is the minimum every object can do; overriding its methods is how a class says what equality, hashing and printing mean for it.
+
+* Pitfall
+=Object[]= can hold anything, but nothing can be done with the elements without a cast; generic collections replaced that style (see [[id:java-generics][generics]]).

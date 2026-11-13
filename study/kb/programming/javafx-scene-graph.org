@@ -1,0 +1,47 @@
+:PROPERTIES:
+:ID:       javafx-scene-graph
+:DOMAIN:   programming
+:AREA:     gui
+:KIND:     model
+:REQUIRES: inheritance java-platform
+:SEE:      event-handling javafx-layout abstract-class-interface
+:ALIASES:  JavaFX, Stage, Scene, Node, Parent, Shape, Control, Application, scene graph, GUI
+:END:
+#+title: JavaFX: stage, scene and the node tree
+#+summary: A JavaFX application extends =Application= and builds, in =start(Stage)=, a tree of =Node= objects: the window is the =Stage=, which shows one =Scene=, whose root is a =Parent= (a node with children); leaves are shapes, images, text and controls.
+
+* Model
+- =Stage=: the window (title, size, position: =setX=, =setY=). The primary stage is passed to =start=.
+- =Scene=: the content of a stage; it has one root.
+- =Node=: anything that can be drawn. Every node has one parent; subclasses:
+  - =Parent=: a node with children — =Group= (no layout), =Region= (an area with size, background, layout: the [[id:javafx-layout][panes]] and the =Control= widgets =Button=, =Label=, =TextField=, …), =WebView=;
+  - =Shape=: =Line=, =Polyline=, =Polygon=, =Rectangle=, =Circle=, =Ellipse=, =Arc=, =QuadCurve=, =CubicCurve=, =Text=, =SVGPath=;
+  - =Canvas=, =ImageView=, =MediaView=.
+JavaFX replaced Swing, which had replaced AWT; it is used mostly for desktop applications.
+
+* Example
+#+begin_src java
+  public class Hello extends Application {
+      @Override public void start(Stage stage) {
+          Button btn = new Button("Say hello");
+          btn.setOnAction(e -> System.out.println("Hello"));
+          StackPane root = new StackPane(btn, new Circle(40, Color.CYAN));
+          stage.setScene(new Scene(root, 300, 200));
+          stage.setTitle("Hello");
+          stage.show();
+      }
+      public static void main(String[] args) { launch(args); }
+  }
+#+end_src
+
+* Picture
+\begin{tikzpicture}[font=\small, level distance=1cm, sibling distance=2.3cm, every node/.style={draw}]
+\node[kbcyan] {Stage} child {node[kbcyan] {Scene} child {node[kbamber] {StackPane (Parent)} child {node {Button}} child {node {Circle}}}};
+\end{tikzpicture}
+Window, content, container, leaves.
+
+* Intuition
+A GUI is a tree of boxes; the library draws the tree and routes the user's actions to its nodes.
+
+* Pitfall
+Class names collide with other libraries (=javafx.scene.shape.Rectangle= vs =java.awt.Rectangle=): check the imports. The JavaFX process stays alive while a window is open; =Platform.exit()= ends it.

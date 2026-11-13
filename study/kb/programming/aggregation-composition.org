@@ -1,0 +1,53 @@
+:PROPERTIES:
+:ID:       aggregation-composition
+:DOMAIN:   programming
+:AREA:     uml
+:KIND:     definition
+:REQUIRES: uml-association
+:SEE:      shallow-deep-copy smart-pointers cpp-special-members
+:ALIASES:  composition, aggregation, part-of, whole-part, optional composition, ownership
+:END:
+#+title: Aggregation and composition
+#+summary: Both are whole–part associations; in composition (filled diamond) the whole owns the part, which lives and dies with it and belongs to one whole only, while in aggregation (hollow diamond) the part has a life of its own and can be shared.
+
+* Definition
+- *Aggregation* (hollow diamond on the whole): a car and its tyres. The part exists before and after the whole and can move to another whole.
+- *Composition* (filled diamond): an engine and its pistons. A part belongs to exactly one whole at a time, and destroying the whole destroys its parts.
+- *Optional composition* =A 0..1 ◆ B=: an =A= owns zero or one =B=.
+
+In C++ the difference decides who calls =delete=: in composition the whole is responsible for the memory of its parts; in aggregation it only points to them.
+
+* Picture
+\begin{tikzpicture}[font=\small, box/.style={draw, minimum width=2cm, minimum height=0.7cm}]
+\node[box, draw=kbcyan] (e) at (0,0) {Engine};
+\node[box] (p) at (4,0) {Piston};
+\node[draw, diamond, fill=kbcyan, inner sep=1.6pt, anchor=west] (d1) at (e.east) {};
+\draw (p.west) -- (d1.east);
+\node[box, draw=kbamber] (c) at (0,-1.6) {Car};
+\node[box] (t) at (4,-1.6) {Tyre};
+\node[draw, diamond, inner sep=1.6pt, anchor=west] (d2) at (c.east) {};
+\draw (t.west) -- (d2.east);
+\node[font=\scriptsize, kbguide] at (2,0.35) {composition};
+\node[font=\scriptsize, kbguide] at (2,-1.25) {aggregation};
+\end{tikzpicture}
+
+* Implementing optional composition in C++
+#+begin_src c++
+  class A {
+    int i;
+    B* pb;               // owned: A must new it, copy it and delete it
+  public:
+    A() : i(0), pb(nullptr) {}
+    A(int i_, std::string s) : i(i_), pb(new B(s)) {}
+    A(const A& a);       // deep copy (see below)
+    A& operator=(const A& a);
+    ~A() { delete pb; }
+  };
+#+end_src
+A plain member =B b;= would force cardinality exactly one; the pointer allows zero. The pointer makes =A= responsible for the [[id:shallow-deep-copy][copy semantics]], or, better, a =std::unique_ptr<B>= (see [[id:smart-pointers][smart pointers]]) makes the ownership explicit.
+
+* Intuition
+Ask "who destroys it?". If the answer is "the whole, and nobody else", it is composition.
+
+* Pitfall
+With an aggregation the whole must not delete its parts; with a composition it must not share them. Mixing the two produces double deletes or leaks.

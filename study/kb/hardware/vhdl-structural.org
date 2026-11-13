@@ -1,0 +1,53 @@
+:PROPERTIES:
+:ID:       vhdl-structural
+:DOMAIN:   hardware
+:AREA:     vhdl
+:KIND:     construction
+:REQUIRES: vhdl-entity-architecture
+:SEE:      ripple-carry-adder vhdl-testbench
+:ALIASES:  structural VHDL, component, instance, port map, generic, generic map, for generate, hierarchy, netlist
+:END:
+#+title: Structural VHDL: components, port maps, generics
+#+summary: A structural architecture instantiates components and connects their ports to signals with =port map= (by position or by name); =generic= parameters such as a width are fixed per instance with =generic map=, and =for ... generate= replicates instances.
+
+* Construction
+A full adder from two half adders, then an \(N\)-bit [[id:ripple-carry-adder][ripple-carry adder]]:
+#+begin_src vhdl
+  entity full_adder is
+    port ( a, b, cin : in std_logic; s, cout : out std_logic );
+  end entity;
+  architecture dataflow of full_adder is
+  begin
+    s    <= a xor b xor cin;
+    cout <= (a and b) or (a and cin) or (b and cin);
+  end architecture;
+
+  entity adder is
+    generic ( N : positive := 8 );
+    port ( a, b : in std_logic_vector(N-1 downto 0); cin : in std_logic;
+           s : out std_logic_vector(N-1 downto 0); cout : out std_logic );
+  end entity;
+  architecture structural of adder is
+    signal c : std_logic_vector(N downto 0);
+  begin
+    c(0) <= cin;
+    chain : for i in 0 to N-1 generate
+      fa : entity work.full_adder
+        port map ( a => a(i), b => b(i), cin => c(i),     -- formal => actual
+                   s => s(i), cout => c(i+1) );
+    end generate;
+    cout <= c(N);
+  end architecture;
+
+  -- an instance with a different width
+  u1 : entity work.adder generic map ( N => 16 ) port map ( x, y, '0', z, open );
+#+end_src
+- *Formal* parameters are the ports of the component, *actual* ones the signals of the enclosing architecture. Named association (=a => x=) is robust to reordering; positional association is shorter. =open= leaves an output unconnected.
+- A =component= declaration (older style) or direct =entity work.name= instantiation.
+- Each instance has a label (=fa=, =u1=).
+
+* Intuition
+Structural VHDL is a schematic written as text: boxes with names, wires with names, and a list of which pin goes to which wire.
+
+* Pitfall
+An output port cannot be read inside the architecture in VHDL-93 (=cout <= ...= then =x <= cout=): use an internal signal (=c(N)=) and assign the port from it.

@@ -1,0 +1,21 @@
+# Course material (third-party PDFs, not versioned)
+assets/
+
+# Build products
+*.o
+*.class
+*.cf
+*.vcd
+*.ghw
+build/
+
+# Nix
+result
+.direnv/
+
+# Editors and system
+.vscode/
+.idea/
+*.swp
+.DS_Store
+.claude/settings.local.json

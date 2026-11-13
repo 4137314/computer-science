@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       np-hard-optimization
+:DOMAIN:   hardware
+:AREA:     complexity
+:KIND:     definition
+:REQUIRES: big-o-complexity
+:SEE:      technology-mapping list-scheduling multilevel-logic-optimization digital-design-flow
+:ALIASES:  NP-hard, NP-complete, combinatorial optimization, heuristic, exhaustive search, P vs NP
+:END:
+#+title: Hard optimization problems and heuristics
+#+summary: Most design-automation problems — minimum logic cover, placement, state encoding, scheduling under resource constraints — ask for the cheapest legal configuration among exponentially many; they are NP-hard, so tools use exact algorithms only on small or special instances and heuristics elsewhere.
+
+* Definition
+An *optimization problem* asks for a legal configuration of a finite number of elements with minimum (or maximum) cost:
+- an expression: the smallest equivalent sum of products;
+- gates connected by wires: a placement minimising total wire length;
+- a finite-state machine: a binary state encoding with the fastest next-state logic;
+- a data-flow graph: a schedule with minimum latency for a given number of units.
+With finitely many configurations, trying all of them solves the problem, but their number is exponential in the size.
+
+*P* is the class of decision problems solvable in polynomial time; *NP* those whose solutions can be checked in polynomial time. A problem is *NP-hard* if every NP problem reduces to it in polynomial time; no polynomial algorithm is known for any of them.
+
+* Derivation
+Encoding \(s\) states with \(\lceil\log_2 s\rceil\) bits admits \(2^{b}!/(2^{b}-s)!\) assignments: for 8 states in 3 bits, \(8!=40320\); for 16 states in 4 bits, \(16!\approx2\times10^{13}\). Exhaustive search is hopeless already at modest sizes, so one accepts good, not optimal, solutions.
+
+* Strategies
+- exact algorithms on restricted cases: [[id:technology-mapping][tree covering]] by dynamic programming is optimal and linear on trees;
+- greedy heuristics with priorities: [[id:list-scheduling][list scheduling]];
+- local improvement: iterative rewriting of [[id:multilevel-logic-optimization][logic networks]], simulated annealing for placement;
+- decomposition: split the problem (tree partition of a DAG) and solve each part well.
+
+* Intuition
+When perfection costs exponential time, engineering is the art of being good enough quickly.
+
+* Pitfall
+NP-hard is about the worst case: many practical instances are easy. And a heuristic's result has no guarantee: compare against bounds before trusting it.

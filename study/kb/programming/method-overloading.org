@@ -1,0 +1,39 @@
+:PROPERTIES:
+:ID:       method-overloading
+:DOMAIN:   programming
+:AREA:     oop
+:KIND:     definition
+:REQUIRES: object-oriented-programming
+:SEE:      inheritance java-dynamic-binding operator-overloading
+:ALIASES:  overloading, overload resolution, signature, ad hoc polymorphism
+:END:
+#+title: Overloading
+#+summary: Several functions in the same scope may share a name if their parameter lists differ; the compiler picks one at compile time from the static types of the arguments, while the return type alone never distinguishes two overloads.
+
+* Definition
+The *signature* of a method is its name plus the number, order and types of its parameters. Two methods with the same name and different signatures are *overloaded*; the compiler resolves each call to the most specific applicable one using the static (declared) types of the arguments.
+
+| | overloading | overriding |
+|---+---+---|
+| where | same class (or inherited) | subclass |
+| signature | different | identical |
+| chosen | at compile time | at run time |
+| on | static types of the arguments | dynamic type of the receiver |
+
+* Example
+#+begin_src java
+  class Printer {
+      void print(int x)    { System.out.println("int " + x); }
+      void print(double x) { System.out.println("double " + x); }
+      void print(Object o) { System.out.println("object " + o); }
+  }
+  Object s = "hi";
+  new Printer().print(s);   // "object hi": the static type of s is Object
+  new Printer().print(3);   // "int 3": exact match beats widening to double
+#+end_src
+
+* Intuition
+Overloading is a convenience of naming, decided by the compiler; nothing about it is dynamic.
+
+* Pitfall
+=int f()= and =double f()= cannot coexist: the return type is not part of the signature. Combining overloading with overriding is the classic trap: the overload is fixed at compile time, then the override is chosen at run time among the methods with that exact signature (see [[id:java-dynamic-binding][the binding rule]]).

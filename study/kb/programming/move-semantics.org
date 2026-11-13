@@ -1,0 +1,45 @@
+:PROPERTIES:
+:ID:       move-semantics
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     construction
+:REQUIRES: value-categories shallow-deep-copy
+:SEE:      smart-pointers stl-containers
+:ALIASES:  move constructor, move assignment, std::move, rule of five, ownership transfer
+:END:
+#+title: Move semantics and the rule of five
+#+summary: A move constructor =A(A&&)= and a move assignment transfer the resources of a dying object instead of copying them, leaving the source empty but valid; a resource-owning class defines destructor, copy constructor, copy assignment, move constructor and move assignment.
+
+* Construction
+For =class A { int i; B* pb; };= with =pb= owned:
+#+begin_src c++
+  A::A(A&& a) noexcept : i(a.i), pb(a.pb) {   // take the pointer
+    a.i = 0; a.pb = nullptr;                  // leave the source empty
+  }
+  A& A::operator=(A&& a) noexcept {
+    if (this != &a) { delete pb; i = a.i; pb = a.pb; a.i = 0; a.pb = nullptr; }
+    return *this;
+  }
+#+end_src
+The cost of a move is a few pointer assignments, independent of the size of what =B= holds.
+
+* Rule of five
+A class that manages a resource defines (or ~= default~ / ~= delete~ explicitly) all of: destructor, copy constructor, copy assignment, move constructor, move assignment. With members that already manage themselves (=std::unique_ptr=, =std::vector=) the defaults are correct and nothing needs writing: the rule of zero.
+
+* When moves happen
+The compiler picks the =&&= overload when the argument is an rvalue: returning a local by value, passing a temporary, =v.push_back(A(3))=, or an explicit =std::move(x)=, which only casts =x= to an rvalue and moves nothing by itself.
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\node[draw] (s) at (0,0) {source.pb}; \node[draw] (d) at (0,-1.1) {dest.pb};
+\node[draw, kbcyan] (b) at (3,-0.55) {B};
+\draw[-{Stealth}, dashed, kbguide] (s) -- (b);
+\draw[-{Stealth}, kbamber, line width=1pt] (d) -- (b);
+\node[font=\scriptsize, kbguide] at (0,0.5) {nullptr after the move};
+\end{tikzpicture}
+
+* Intuition
+Copying a moving box means buying the same furniture again; moving means handing over the box.
+
+* Pitfall
+A moved-from object is valid but unspecified: it may be destroyed or assigned, not read. Move operations should be =noexcept=, or =std::vector= will copy instead of moving when it grows.

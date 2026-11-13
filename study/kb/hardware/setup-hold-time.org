@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       setup-hold-time
+:DOMAIN:   hardware
+:AREA:     timing
+:KIND:     inequality
+:REQUIRES: sequential-logic
+:SEE:      static-timing-analysis gate-delay-model pipelining retiming
+:ALIASES:  setup time, hold time, clock-to-q, setup violation, hold violation, clock period, maximum frequency, clock skew, metastability
+:END:
+#+title: Setup and hold constraints
+#+summary: Data must be stable at a flip-flop's input from \(t_{su}\) before to \(t_h\) after the clock edge; between two registers this gives \(T\ge t_{cq}+t_{logic,max}+t_{su}\) (setup, fixes the clock period) and \(t_{cq}+t_{logic,min}\ge t_h\) (hold, independent of the clock).
+
+* Statement
+For a path from register \(R_1\) through combinational logic to register \(R_2\), with clock-to-output delay \(t_{cq}\), longest and shortest logic delays \(t_{max}\), \(t_{min}\), and skew \(t_{sk}\) (clock arriving later at \(R_2\)):
+\[ T \;\ge\; t_{cq} + t_{max} + t_{su} - t_{sk}, \qquad t_{cq} + t_{min} \;\ge\; t_h + t_{sk}. \]
+The maximum clock frequency is \(f_{max}=1/T_{min}\), set by the slowest register-to-register path.
+
+* Derivation
+A value launched by \(R_1\) at edge \(k\) leaves at \(t_{cq}\), crosses the logic in at most \(t_{max}\) and must arrive \(t_{su}\) before edge \(k+1\) at \(R_2\), which comes at \(T+t_{sk}\): \(t_{cq}+t_{max}+t_{su}\le T+t_{sk}\). The same edge \(k\) also makes \(R_2\) capture the *old* value; the new one, arriving at the earliest after \(t_{cq}+t_{min}\), must not corrupt it before \(t_h\) after the edge at \(R_2\): \(t_{cq}+t_{min}\ge t_{sk}+t_h\). \(T\) cancels from the second inequality.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, yscale=0.6]
+\draw[kbcyan] (0,2) -- (1.5,2) -- (1.5,2.8) -- (3.5,2.8) -- (3.5,2) -- (5.5,2) -- (5.5,2.8) -- (6.5,2.8); \node[left] at (0,2.4) {clk};
+\draw (0,0.4) -- (3.6,0.4) -- (3.8,0) -- (6.5,0); \draw (0,0) -- (3.6,0) -- (3.8,0.4) -- (6.5,0.4); \node[left] at (0,0.2) {d};
+\fill[kbamber, opacity=0.3] (4.7,-0.2) rectangle (5.5,1.0); \fill[kbmagenta, opacity=0.3] (5.5,-0.2) rectangle (6.0,1.0);
+\node at (5.1,1.3) {$t_{su}$}; \node at (5.75,1.3) {$t_h$};
+\end{tikzpicture}
+The data must not change inside the window around the capturing edge.
+
+* Fixing violations
+- *Setup*: shorten the critical path (logic restructuring, faster gates, [[id:retiming][retiming]], [[id:pipelining][pipelining]]) or lengthen the period.
+- *Hold*: add delay (buffers) on the short path; lowering the frequency does not help.
+
+* Intuition
+Setup is a race the data must win against the next edge; hold is a race the data must not win against the current one.
+
+* Pitfall
+A violated constraint leaves the flip-flop possibly metastable: its output can hover between 0 and 1 for an unbounded time. Asynchronous inputs, which can violate any constraint, need a two-flip-flop synchroniser.

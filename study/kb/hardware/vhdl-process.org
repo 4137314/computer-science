@@ -1,0 +1,40 @@
+:PROPERTIES:
+:ID:       vhdl-process
+:DOMAIN:   hardware
+:AREA:     vhdl
+:KIND:     definition
+:REQUIRES: vhdl-concurrent-assignments
+:SEE:      signals-variables delta-cycle sequential-logic vhdl-testbench
+:ALIASES:  process, sensitivity list, sequential statements, if, case, latch inference, combinational process, default assignment
+:END:
+#+title: Processes and sequential statements
+#+summary: A =process= is one concurrent statement whose body runs sequentially (=if=, =case=, =for=, variables) each time a signal in its sensitivity list changes; to describe combinational logic the list must contain every signal read and every output must be assigned on every path, otherwise a latch is inferred.
+
+* Definition
+#+begin_src vhdl
+  prio : process (req)                 -- sensitivity list
+  begin
+    code  <= "00";                     -- default values: assigned on every path
+    valid <= '0';
+    for i in 0 to 3 loop               -- later iterations override earlier ones
+      if req(i) = '1' then
+        code  <= std_logic_vector(to_unsigned(i, 2));
+        valid <= '1';
+      end if;
+    end loop;
+  end process;
+#+end_src
+- The process wakes up when a signal in its sensitivity list has an event, runs to the end (or to a =wait=), then suspends. A process with =wait= statements has no sensitivity list.
+- Signal assignments inside a process are *scheduled*: they take effect when the process suspends (see [[id:signals-variables][signals and variables]]). The last assignment to a signal wins.
+- Sequential statements: =if/elsif/else=, =case ... when= (all choices covered), =for= and =while= loops (unrolled by synthesis), variable assignment ~:=~.
+
+* Rules for combinational processes
+1. every signal read is in the sensitivity list (or =process (all)= in VHDL-2008);
+2. every output is assigned on every path — simplest with default assignments at the top.
+Breaking rule 2 means the output keeps its old value on some path: a latch. Breaking rule 1 makes simulation differ from the synthesised hardware.
+
+* Intuition
+A process is a black box with one rule inside: when an input changes, recompute everything from scratch. If on some path you do not say what an output is, the hardware has to remember it.
+
+* Pitfall
+A =for= loop does not iterate in time: it describes replicated hardware, all of it present at once.

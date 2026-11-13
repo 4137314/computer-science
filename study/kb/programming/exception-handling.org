@@ -1,0 +1,43 @@
+:PROPERTIES:
+:ID:       exception-handling
+:DOMAIN:   programming
+:AREA:     oop
+:KIND:     method
+:REQUIRES: call-stack
+:SEE:      java-exceptions parnas-principles cpp-special-members mutual-exclusion
+:ALIASES:  exception, try, catch, throw, stack unwinding, error handling, propagation
+:END:
+#+title: Exceptions
+#+summary: An exception is an object describing an abnormal event; =throw= interrupts the normal flow, the run time unwinds the stack of calls until a =try= block with a matching =catch= is found, separating error handling from the normal code and letting the caller, not the callee, decide what to do.
+
+* Method
+Traditional error handling has known limits: terminating in the callee (a decision that belongs to the caller), conventional return values (confusing when an error has the type of a result, impossible for constructors, no information about the cause), a global error handler (centralised, unreadable). Exceptions:
+- *separate* the handling from the application code;
+- *propagate* errors in a controlled way along the dynamic chain of calls;
+- *group or distinguish* errors through a class hierarchy (catching a base class catches all its subclasses).
+
+* Mechanism
+#+begin_src c++
+  double safe_div(double a, double b) {
+    if (b == 0) throw std::invalid_argument("division by zero");   // <stdexcept>
+    return a / b;
+  }
+  try {
+    std::cout << safe_div(1, 0);
+  } catch (const std::invalid_argument& e) {      // catch by reference
+    std::cerr << e.what();
+  }
+#+end_src
+When an exception is thrown, the current block stops; the frames of the call stack are popped one by one (*unwinding*), running the destructors of their local objects in C++, until a matching =catch= is found. If none exists, the program terminates.
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\foreach \i/\f in {0/main (try),1/f,2/g,3/safe\_div} {\draw (0,\i*0.6) rectangle (2.6,\i*0.6+0.55); \node at (1.3,\i*0.6+0.27) {\f};}
+\draw[-{Stealth}, kbmagenta, line width=1pt] (2.9,2.1) -- (2.9,0.3) node[right, font=\scriptsize]{unwinding to catch};
+\end{tikzpicture}
+
+* Intuition
+An exception is a return that skips every caller that does not know what to do with the problem, landing on the first one that does.
+
+* Pitfall
+Exceptions are for exceptional events, not for normal control flow. In C++, code that acquires resources without RAII leaks them when an exception skips the release.

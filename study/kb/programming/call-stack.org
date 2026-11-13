@@ -1,0 +1,44 @@
+:PROPERTIES:
+:ID:       call-stack
+:DOMAIN:   programming
+:AREA:     memory
+:KIND:     model
+:REQUIRES:
+:SEE:      parameter-passing pointers-references java-references
+:ALIASES:  stack, heap, activation record, stack frame, memory model, recursion, static memory
+:END:
+#+title: Memory model: static area, stack and heap
+#+summary: A running program has a static area (globals, code), a stack of activation records (one per active call: parameters, locals, return address) that grows and shrinks with calls, and a heap for objects allocated on demand that outlive the call that created them.
+
+* Model
+- *Static area*: code, global and =static= variables; fixed size, lives for the whole run.
+- *Stack*: every call pushes an activation record (frame) with parameters, local variables and the return address; the return pops it. Allocation is a pointer increment, lifetime is the call.
+- *Heap*: memory requested at run time (=new= in C++ and Java, =malloc= in C). Lifetime is decided by the program (=delete=) or by a garbage collector (Java).
+
+Recursion works because every call has its own frame: \(n\) nested calls of =fact= keep \(n\) copies of =n= on the stack.
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\draw (0,0) rectangle (2.6,4.6);
+\fill[kbcyan, opacity=0.15] (0,3.8) rectangle (2.6,4.6); \node at (1.3,4.2) {static};
+\fill[kbamber, opacity=0.15] (0,0) rectangle (2.6,1.8); \node at (1.3,0.3) {stack};
+\draw (0,0.6) -- (2.6,0.6) (0,1.2) -- (2.6,1.2) (0,1.8) -- (2.6,1.8);
+\node[font=\scriptsize] at (1.3,0.9) {fact(2)}; \node[font=\scriptsize] at (1.3,1.5) {fact(1)};
+\draw[-{Stealth}, kbamber] (2.9,1.0) -- (2.9,2.0) node[right, font=\scriptsize]{grows};
+\fill[kbmagenta, opacity=0.15] (0,2.8) rectangle (2.6,3.8); \node at (1.3,3.3) {heap};
+\draw[-{Stealth}, kbmagenta] (2.9,3.3) -- (2.9,2.6) node[right, font=\scriptsize]{grows};
+\end{tikzpicture}
+Stack and heap grow towards each other in the free space between them.
+
+* Example
+#+begin_src c++
+  int fact(int n) { return n <= 1 ? 1 : n * fact(n - 1); }   // one frame per call
+  int* make() { int* p = new int(42); return p; }              // *p survives the call
+  int* bad()  { int x = 42; return &x; }                       // dangling: x died with the frame
+#+end_src
+
+* Intuition
+The stack is a pile of notepads, one per unfinished call; the heap is a warehouse where you keep what must outlive the notepad.
+
+* Pitfall
+Deep recursion overflows the stack (=StackOverflowError= in Java, a crash in C++). A pointer or reference to a local variable outlives its frame and points to garbage.

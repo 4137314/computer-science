@@ -1,0 +1,42 @@
+:PROPERTIES:
+:ID:       datapath-subsystems
+:DOMAIN:   hardware
+:AREA:     arithmetic
+:KIND:     construction
+:REQUIRES: sequential-logic
+:SEE:      alu-design low-power-encoding vhdl-concurrent-assignments
+:ALIASES:  counter, ring counter, Johnson counter, barrel shifter, zero detector, one detector, thermometer code, comparator, shifter
+:END:
+#+title: Datapath subsystems: detectors, shifters, counters
+#+summary: Small blocks recur in every datapath: zero/one detectors (wide AND/OR trees), shifters (a barrel shifter shifts by any amount in \(\log_2n\) multiplexer levels), thermometer encoders, and counters — binary, ring (one-hot) and Johnson (twisted ring), which trade flip-flops for decoding simplicity and speed.
+
+* Construction
+- *Zero / one detector*: \(Z=\overline{x_{n-1}+\dots+x_0}\), \(O=x_{n-1}\cdots x_0\): a tree of \(\log n\) levels.
+- *Barrel shifter*: stage \(k\) shifts by \(2^k\) or not, controlled by bit \(k\) of the shift amount; \(\log_2 n\) levels of 2:1 muxes, \(n\log_2n\) muxes. Rotations wrap the bits around; arithmetic right shifts replicate the sign.
+- *Thermometer code*: \(k\mapsto\) \(k\) ones followed by zeros (\(0011\,1111\) for 6); used in flash ADCs and priority logic.
+- *Binary counter*: \(\lceil\log_2N\rceil\) flip-flops, an incrementer (ripple carry: slow for wide counters; fast counters use lookahead on the toggle condition \(t_i=\prod_{j<i}q_j\)).
+- *Ring counter*: \(N\) flip-flops in a ring holding a single 1: one-hot states, no decoding, \(N\) states.
+- *Johnson counter*: a ring with the last output inverted: \(N\) flip-flops, \(2N\) states, one bit changes per step, glitch-free decoding of each state with a 2-input gate.
+
+| counter | flip-flops for \(M\) states | decoding | bits switching per step |
+|---+---+---+---|
+| binary | \(\log_2 M\) | \(\log_2 M\)-input gates | ~2 average |
+| ring | \(M\) | none | 2 |
+| Johnson | \(M/2\) | 2-input gates | 1 |
+
+* Example
+#+begin_src vhdl
+  -- Johnson counter, 4 flip-flops, 8 states
+  process (clk) begin
+    if rising_edge(clk) then
+      q <= q(2 downto 0) & not q(3);
+    end if;
+  end process;
+#+end_src
+Sequence: 0000, 0001, 0011, 0111, 1111, 1110, 1100, 1000.
+
+* Intuition
+Choosing a counter is choosing where to pay: in flip-flops (ring), in logic (binary), or in between (Johnson).
+
+* Pitfall
+Ring and Johnson counters must be reset into a legal state: from an illegal pattern (two 1s in a ring) they cycle through illegal states for ever.

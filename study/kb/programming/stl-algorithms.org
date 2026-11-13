@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       stl-algorithms
+:DOMAIN:   programming
+:AREA:     generic-programming
+:KIND:     method
+:REQUIRES: stl-iterators function-objects
+:SEE:      lambda-expressions comparable-comparator big-o-complexity
+:ALIASES:  algorithm, sort, find, find_if, for_each, accumulate, count_if, transform, binary_search, predicate
+:END:
+#+title: STL algorithms
+#+summary: =<algorithm>= and =<numeric>= provide generic functions over iterator ranges — =sort=, =find_if=, =count_if=, =transform=, =accumulate=, =binary_search= — customised by predicates and comparators passed as functions, functors or lambdas.
+
+* Method
+An algorithm takes a range =[first, last)= and, optionally, a callable:
+- non-modifying: =find=, =find_if=, =count=, =count_if=, =for_each=, =equal=, =min_element=;
+- modifying: =copy=, =transform=, =replace_if=, =remove_if= (moves the kept elements forward, then =erase=), =reverse=;
+- sorting and searching: =sort= (random access, \(O(n\log n)\)), =stable_sort=, =partial_sort=, =binary_search=/=lower_bound= on sorted ranges in \(O(\log n)\);
+- numeric: =accumulate=, =inner_product=, =iota=.
+A comparator must be a strict weak ordering: =comp(a, b)= true when \(a\) goes before \(b\).
+
+* Example: a ranking
+#+begin_src c++
+  struct Entry { std::string name; int points; };
+  std::vector<Entry> r = {{"Giovanna", 7}, {"Franco", 9}, {"Carla", 9}};
+  std::stable_sort(r.begin(), r.end(),
+                   [](const Entry& a, const Entry& b) { return a.points > b.points; });
+  auto n = std::count_if(r.begin(), r.end(), [](const Entry& e) { return e.points >= 8; });
+  int total = std::accumulate(r.begin(), r.end(), 0,
+                              [](int s, const Entry& e) { return s + e.points; });
+#+end_src
+=stable_sort= keeps Franco before Carla (equal points, original order).
+
+* Intuition
+Write the loop once, correctly, in the library; say only what differs (the predicate) at the call site.
+
+* Pitfall
+=std::sort= needs random-access iterators, so it does not work on =std::list=, which has its own member =l.sort()=. =remove_if= does not change the size of the container.

@@ -1,0 +1,46 @@
+:PROPERTIES:
+:ID:       signals-variables
+:DOMAIN:   hardware
+:AREA:     vhdl
+:KIND:     theorem
+:REQUIRES: vhdl-process delta-cycle
+:SEE:      sequential-logic event-driven-simulation
+:ALIASES:  signal, variable, signal assignment, variable assignment, <=, :=, scheduled update
+:END:
+#+title: Signals versus variables
+#+summary: A signal assignment =s <= e= schedules a new value that becomes visible only after the process suspends (one delta cycle later); a variable assignment =v := e= takes effect immediately and is local to the process; so inside one process run, reading a signal after assigning it still gives the old value.
+
+* Statement
+| | signal | variable |
+|---+---+---|
+| declared in | architecture (or port) | process, function |
+| visible to | all processes: communication between components | one process only: local storage |
+| assignment | ~<=~, scheduled: event in the queue after a delta cycle or the given delay | ~:=~, immediate |
+| several assignments in one run | last one wins | each one effective at once |
+| hardware | a wire, or a register output | an intermediate value in the logic |
+
+* Derivation
+#+begin_src vhdl
+  process (clk) begin
+    if rising_edge(clk) then
+      b <= a;   -- scheduled
+      c <= b;   -- reads the OLD b
+    end if;
+  end process;
+#+end_src
+Both assignments read the values present when the process woke up, so this is a two-stage shift register: \(b\) takes \(a\), \(c\) takes the previous \(b\). With a variable,
+#+begin_src vhdl
+  process (clk) variable v : std_logic; begin
+    if rising_edge(clk) then
+      v := a;   -- immediate
+      c <= v;   -- reads the NEW v, i.e. a
+    end if;
+  end process;
+#+end_src
+\(c\) takes \(a\) directly: one register, no intermediate one.
+
+* Intuition
+Signals behave like the outputs of flip-flops: all of them change together at the end of the step. Variables behave like scratch paper inside one computation.
+
+* Pitfall
+Assigning a signal and testing it in the same process run (=count <= count + 1; if count = 9 then ...=) tests the old value: the comparison is one cycle late.

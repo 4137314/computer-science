@@ -1,0 +1,44 @@
+:PROPERTIES:
+:ID:       information-hiding
+:DOMAIN:   programming
+:AREA:     oop
+:KIND:     definition
+:REQUIRES: object-oriented-programming
+:SEE:      parnas-principles cpp-inheritance-visibility java-packages
+:ALIASES:  encapsulation, visibility, private, protected, public, package-private, getter, setter, access modifiers
+:END:
+#+title: Information hiding and visibility
+#+summary: Each module hides its design decisions behind an interface; visibility modifiers (private, package, protected, public) state who may use each member, so the representation can change without touching the clients.
+
+* Definition
+A class exposes an *interface* (what it does) and hides its *representation* (how). Visibility of a member of class \(C\):
+
+| modifier | C++ | Java |
+|---+---+---|
+| private | members of \(C\) and its friends | only \(C\) |
+| (none) | — (class default: private) | package-private: classes of the same package |
+| protected | \(C\) and its subclasses | the package of \(C\) and the subclasses of \(C\) |
+| public | everyone | everyone |
+
+Getters and setters give controlled access to the state; they can themselves have reduced visibility (a =protected= getter for a package attribute).
+
+* Example
+#+begin_src java
+  public class Stack {
+      private int[] data = new int[10];   // representation: hidden
+      private int size = 0;
+      public void push(int x) {           // interface: public
+          if (size == data.length) data = java.util.Arrays.copyOf(data, 2 * size);
+          data[size++] = x;
+      }
+      public int pop() { return data[--size]; }
+      public boolean isEmpty() { return size == 0; }
+  }
+#+end_src
+Switching =data= to a linked list changes no client: they only see =push=, =pop=, =isEmpty=.
+
+* Intuition
+The private part is a promise not to depend on it. The smaller the public part, the more freedom to change everything else.
+
+* Pitfall
+=friend= (C++) and =protected= weaken the hiding: a protected field is part of the interface towards every future subclass, and cannot be changed freely any more.

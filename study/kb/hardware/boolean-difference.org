@@ -1,0 +1,31 @@
+:PROPERTIES:
+:ID:       boolean-difference
+:DOMAIN:   hardware
+:AREA:     logic-synthesis
+:KIND:     definition
+:REQUIRES:
+:SEE:      algebraic-division multilevel-logic-optimization switching-activity
+:ALIASES:  Boolean difference, Shannon expansion, cofactor, observability, don't care, sensitivity
+:END:
+#+title: Shannon cofactors and the Boolean difference
+#+summary: Every function splits as \(f=x f_x+\bar x f_{\bar x}\) (Shannon); the Boolean difference \(\partial f/\partial x=f_x\oplus f_{\bar x}\) is 1 exactly for the inputs where changing \(x\) changes \(f\), so its complement gives the observability don't-cares used to simplify nodes.
+
+* Definition
+Cofactors: \(f_x=f|_{x=1}\), \(f_{\bar x}=f|_{x=0}\). Shannon expansion: \(f=x\,f_x+\bar x\,f_{\bar x}\). Boolean difference:
+\[ \frac{\partial f}{\partial x}=f_x\oplus f_{\bar x}. \]
+- \(\partial f/\partial x=1\): \(x\) is observable at the output.
+- \(\partial f/\partial x=0\): the value of \(x\) does not matter, an observability don't-care for \(x\).
+
+* Example
+\(f=xy+z\): \(f_x=y+z\), \(f_{\bar x}=z\), \(\partial f/\partial x=(y+z)\oplus z=y\bar z\). The value of \(x\) matters only when \(y=1,z=0\). In a network, if \(x\) is an internal node, its logic can be changed freely on the inputs where \(y\bar z=0\).
+
+* Uses
+- node simplification in multilevel logic: don't-cares from the rest of the network;
+- testing: a fault on \(x\) is detectable only where \(\partial f/\partial x=1\);
+- power: transitions of \(x\) propagate to \(f\) with probability \(P(\partial f/\partial x=1)\).
+
+* Intuition
+The Boolean difference is the logic version of a derivative: "does the output move if this input moves?".
+
+* Pitfall
+Don't-cares derived for one node change when another node is modified with them: simplifying several nodes at once with their full don't-care sets can break the function. Tools use compatible subsets.

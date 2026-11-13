@@ -1,0 +1,40 @@
+:PROPERTIES:
+:ID:       java-platform
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     model
+:REQUIRES:
+:SEE:      java-references object-oriented-programming javafx-scene-graph
+:ALIASES:  Java, JVM, Java virtual machine, bytecode, javac, JIT, JDK, JRE, OpenJDK, write once run anywhere
+:END:
+#+title: The Java platform
+#+summary: =javac= compiles =.java= sources to bytecode in =.class= files; the Java Virtual Machine loads, verifies and runs that bytecode (interpreting and JIT-compiling it) on any operating system, with a garbage-collected heap and a large standard library.
+
+* Model
+- *Source*: one public class per file =Name.java=; classes grouped in packages.
+- *Compilation*: =javac Name.java= produces =Name.class=, containing bytecode for a stack-based virtual machine, not machine code.
+- *Execution*: =java Name= starts a JVM, which loads the classes on demand, verifies the bytecode, interprets it and compiles the hot parts to native code (just-in-time). Entry point: =public static void main(String[] args)=.
+- *Platform*: JDK (compiler and tools) ⊃ JRE (JVM and libraries). The reference implementation is OpenJDK.
+
+Java is C-like in syntax but removes pointers with arithmetic and manual memory, and adds classes, inheritance, polymorphism and a standard library for I/O, threads, [[id:java-collections][collections]], [[id:java-exceptions][exceptions]] and networking.
+
+* Picture
+\begin{tikzpicture}[font=\small, box/.style={draw, minimum height=0.7cm, align=center}]
+\node[box, draw=kbcyan] (s) at (0,0) {Hello.java};
+\node[box] (c) at (3,0) {javac};
+\node[box, draw=kbamber] (b) at (6,0) {Hello.class\\bytecode};
+\node[box] (j1) at (4.5,-1.6) {JVM Linux};
+\node[box] (j2) at (7.5,-1.6) {JVM Windows};
+\draw[-{Stealth}] (s) -- (c); \draw[-{Stealth}] (c) -- (b);
+\draw[-{Stealth}] (b) -- (j1); \draw[-{Stealth}] (b) -- (j2);
+\end{tikzpicture}
+One compiled artefact, many machines.
+
+* History
+Born at Sun in the early 1990s for consumer electronics, re-targeted in 1994 to the Web (moving code, not only data, between client and server), general purpose from 1996, acquired by Oracle with Sun in 2010. Android uses Java (and Kotlin) on its own, incompatible, virtual machine.
+
+* Intuition
+C++ compiles for the machine; Java compiles for an imaginary machine and ships a program that emulates it everywhere.
+
+* Pitfall
+"Compiles" is not "runs": classes are loaded at run time, so a missing class or a version mismatch shows up as =NoClassDefFoundError= or =UnsupportedClassVersionError= only when the code is executed.

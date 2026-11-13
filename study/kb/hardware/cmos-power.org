@@ -1,0 +1,35 @@
+:PROPERTIES:
+:ID:       cmos-power
+:DOMAIN:   hardware
+:AREA:     power
+:KIND:     model
+:REQUIRES: gate-delay-model
+:SEE:      switching-activity clock-gating dvfs-parallelism low-power-encoding digital-design-flow
+:ALIASES:  dynamic power, static power, leakage, short-circuit power, switching power, activity factor, CV^2f, energy per operation
+:END:
+#+title: Power dissipation in CMOS
+#+summary: \(P=\alpha\,C_L V_{DD}^2 f+I_{sc}V_{DD}+I_{leak}V_{DD}\): dynamic switching power (activity \(\alpha\), switched capacitance, the square of the supply, frequency), short-circuit power during transitions, and static leakage; the quadratic dependence on \(V_{DD}\) makes the supply the strongest lever.
+
+* Model
+- *Switching (dynamic) power*: every \(0\to1\) transition at a node of capacitance \(C_L\) draws \(C_LV_{DD}^2\) from the supply (half stored, half burned in the pull-up; the stored half is burned at the \(1\to0\) transition). With \(\alpha\) = probability of a \(0\to1\) transition per cycle:
+\[ P_{dyn}=\alpha\,C_L\,V_{DD}^2\,f. \]
+- *Short-circuit power*: during a slow input transition both networks conduct briefly; it grows with input slew, typically 10–15% of the dynamic power.
+- *Static power*: subthreshold and gate leakage, \(P_{stat}=I_{leak}V_{DD}\); it flows even when nothing switches and grows exponentially as the threshold voltage drops.
+
+* Derivation
+Charging \(C_L\) from 0 to \(V_{DD}\) moves charge \(Q=C_LV_{DD}\) out of the supply at voltage \(V_{DD}\): energy \(QV_{DD}=C_LV_{DD}^2\). The capacitor ends with \(\tfrac12C_LV_{DD}^2\), so the other half is dissipated in the PMOS. Discharging dissipates the stored half in the NMOS. One full cycle \(0\to1\to0\) costs \(C_LV_{DD}^2\); at \(\alpha f\) such cycles per second, \(P=\alpha C_LV_{DD}^2f\).
+
+* Levers
+| parameter | how to reduce |
+|---+---|
+| \(\alpha\) | [[id:switching-activity][activity]] reduction, [[id:clock-gating][clock gating]], [[id:low-power-encoding][encodings]], [[id:glitches][glitch]] removal |
+| \(C_L\) | smaller gates, shorter wires, fewer nodes |
+| \(V_{DD}\) | [[id:dvfs-parallelism][voltage scaling]], multiple supplies |
+| \(f\) | lower frequency (saves power, not energy per operation) |
+| \(I_{leak}\) | power gating, high-threshold cells |
+
+* Intuition
+Every bit flip pays a toll proportional to the capacitance and to the square of the voltage. Low-power design is flipping fewer bits, smaller wires, at lower voltage.
+
+* Pitfall
+Halving \(f\) halves power but not energy: the task takes twice as long. Energy per operation \(\alpha C_LV_{DD}^2\) only falls by reducing \(\alpha\), \(C_L\) or \(V_{DD}\).

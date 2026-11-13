@@ -1,0 +1,59 @@
+:PROPERTIES:
+:ID:       finite-state-machine
+:DOMAIN:   hardware
+:AREA:     vhdl
+:KIND:     construction
+:REQUIRES: sequential-logic
+:SEE:      java-enum datapath-control uart spi i2c np-hard-optimization low-power-encoding
+:ALIASES:  FSM, finite state machine, Moore machine, Mealy machine, state encoding, one-hot, state diagram, next-state logic, controller
+:END:
+#+title: Finite-state machines
+#+summary: An FSM is \((S,I,O,\delta,\lambda,s_0)\): a state register plus next-state logic \(\delta(s,i)\) and output logic, \(\lambda(s)\) in a Moore machine or \(\lambda(s,i)\) in a Mealy machine; in VHDL it is an enumerated state type, one clocked process for the register and one combinational process for \(\delta\) and \(\lambda\).
+
+* Definition
+- \(S\) finite set of states, \(s_0\) reset state, \(I\) inputs, \(O\) outputs;
+- \(\delta: S\times I\to S\) next-state function;
+- *Moore*: \(\lambda: S\to O\), outputs depend only on the state, change only after a clock edge;
+- *Mealy*: \(\lambda: S\times I\to O\), outputs react to inputs in the same cycle, often with fewer states.
+*State encoding* maps \(S\) to bit vectors: binary (\(\lceil\log_2|S|\rceil\) flip-flops), Gray (one bit changes per transition, low power), one-hot (\(|S|\) flip-flops, simple and fast next-state logic, common on FPGAs).
+
+* Construction
+A sequence detector for =101= (Mealy, overlapping):
+#+begin_src vhdl
+  type state_t is (S0, S1, S10);
+  signal state, next_state : state_t;
+
+  reg : process (clk, rst) begin
+    if rst = '1' then state <= S0;
+    elsif rising_edge(clk) then state <= next_state;
+    end if;
+  end process;
+
+  comb : process (state, x) begin
+    next_state <= state; z <= '0';                  -- defaults
+    case state is
+      when S0  => if x = '1' then next_state <= S1; end if;
+      when S1  => if x = '0' then next_state <= S10; end if;
+      when S10 => if x = '1' then next_state <= S1; z <= '1';
+                  else next_state <= S0; end if;
+    end case;
+  end process;
+#+end_src
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, ->, >={Stealth}, st/.style={draw, circle, minimum size=0.8cm}]
+\node[st, draw=kbcyan] (a) at (0,0) {S0}; \node[st] (b) at (2.6,0) {S1}; \node[st] (c) at (5.2,0) {S10};
+\draw (a) to[bend left] node[above] {1/0} (b);
+\draw (b) to[bend left] node[above] {0/0} (c);
+\draw (c) to[bend left=45] node[below] {1/1} (b);
+\draw (c) to[bend left=60] node[below] {0/0} (a);
+\draw (a) edge[loop left] node {0/0} (a);
+\draw (b) edge[loop above] node {1/0} (b);
+\end{tikzpicture}
+Edges are labelled input/output: a Mealy machine.
+
+* Intuition
+The state is everything the machine needs to remember about the past; the diagram is the whole behaviour on one page.
+
+* Pitfall
+Mealy outputs pass combinationally from inputs to outputs: two Mealy machines connected in a loop can form a combinational cycle. Register the outputs when in doubt.

@@ -1,0 +1,45 @@
+:PROPERTIES:
+:ID:       deadlock-starvation
+:DOMAIN:   programming
+:AREA:     concurrency
+:KIND:     theorem
+:REQUIRES: mutual-exclusion
+:SEE:      threads-data-race
+:ALIASES:  deadlock, starvation, Coffman conditions, circular wait, lock ordering, livelock
+:END:
+#+title: Deadlock and starvation
+#+summary: A set of threads is deadlocked when each waits for a resource held by another; it needs mutual exclusion, hold-and-wait, no preemption and a circular wait at once, so breaking any one (for example, always locking in the same order) prevents it; starvation is a thread that never gets its turn.
+
+* Statement
+Coffman's conditions: a deadlock can occur only if all four hold.
+1. *Mutual exclusion*: a resource is held by one thread at a time.
+2. *Hold and wait*: a thread holds a resource while waiting for another.
+3. *No preemption*: resources are released only voluntarily.
+4. *Circular wait*: there is a cycle \(T_1\to T_2\to\dots\to T_1\) of "waits for a resource held by".
+
+* Derivation
+Order the mutexes globally and make every thread lock in increasing order. A cycle in the waits-for graph would need some thread to hold a higher mutex while waiting for a lower one, which the rule forbids; so condition 4 fails and no deadlock can occur. =std::lock(m1, m2)= achieves the same with a back-off algorithm.
+
+* Picture
+\begin{tikzpicture}[font=\small]
+\node[draw, circle, kbcyan] (a) at (0,0) {A}; \node[draw, circle, kbcyan] (b) at (4,0) {B};
+\node[draw, kbamber] (m1) at (2,1) {m1}; \node[draw, kbamber] (m2) at (2,-1) {m2};
+\draw[-{Stealth}] (m1) -- node[above left, font=\scriptsize]{held by} (a);
+\draw[-{Stealth}, dashed] (a) -- node[below left, font=\scriptsize]{waits} (m2);
+\draw[-{Stealth}] (m2) -- node[below right, font=\scriptsize]{held by} (b);
+\draw[-{Stealth}, dashed] (b) -- node[above right, font=\scriptsize]{waits} (m1);
+\end{tikzpicture}
+
+* Common causes in C++
+- forgetting =unlock= (or an exception skipping it): use =lock_guard=;
+- a function locking a mutex already held by its caller: =recursive_mutex= or restructure;
+- two mutexes locked in different orders by different threads: fixed order or =std::lock=.
+
+* Starvation
+A thread is *starved* when the access policy keeps postponing it indefinitely, though no deadlock exists (readers that keep a writer out). Fair queues and priorities that age prevent it. Semaphores and monitors are other classical primitives; Java gives every object a monitor (=synchronized=).
+
+* Intuition
+Two cars at a narrow bridge, each waiting for the other to back up. Nobody is wrong locally; the cycle is the bug.
+
+* Pitfall
+Deadlocks depend on timing: a program can run correctly a thousand times and hang on the next run.
