@@ -44,7 +44,7 @@ In C++ the difference decides who calls =delete=: in composition the whole is re
     ~A() { delete pb; }
   };
 #+end_src
-A plain member =B b;= would force cardinality exactly one; the pointer allows zero. The pointer makes =A= responsible for the [[id:shallow-deep-copy][copy semantics]], or, better, a =std::unique_ptr<B>= (see [[id:smart-pointers][smart pointers]]) makes the ownership explicit.
+A plain member =B b;= would force [[id:uml-association][cardinality]] exactly one; the pointer allows zero. The pointer makes =A= responsible for the [[id:shallow-deep-copy][copy semantics]], or, better, a =std::unique_ptr<B>= (see [[id:smart-pointers][smart pointers]]) makes the ownership explicit.
 
 * Intuition
 Ask "who destroys it?". If the answer is "the whole, and nobody else", it is composition.

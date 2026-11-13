@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       clock-skew-jitter
+:DOMAIN:   hardware
+:AREA:     timing
+:KIND:     definition
+:REQUIRES: setup-hold-time
+:SEE:      static-timing-analysis clock-gating metastability
+:ALIASES:  clock skew, clock jitter, clock tree, H-tree, positive skew, negative skew, useful skew, clock uncertainty
+:END:
+#+title: Clock skew and jitter
+#+summary: Skew is the difference in arrival time of the same clock edge at two registers, jitter the variation of the period from cycle to cycle; skew in the direction of data flow relaxes setup and tightens hold, jitter always reduces the usable period, so balanced clock trees and an uncertainty margin are built into timing analysis.
+
+* Definition
+For a path from \(R_1\) (clock at \(t_1\)) to \(R_2\) (clock at \(t_2\)), skew \(t_{sk}=t_2-t_1\); jitter \(t_j\) = maximum deviation of an edge from its ideal position. The [[id:setup-hold-time][constraints]] become
+\[ T\ge t_{cq}+t_{max}+t_{su}-t_{sk}+2t_j,\qquad t_{cq}+t_{min}\ge t_h+t_{sk}. \]
+- *positive skew* ([[id:lambda-expressions][capture]] clock later): more time for setup, less margin for hold — too much skew causes hold violations no clock frequency can fix;
+- *negative skew*: the opposite;
+- *useful skew*: skew introduced on purpose to borrow time from a short stage for a long one.
+Clock distribution: H-trees and balanced buffer trees equalise wire lengths; FPGAs provide dedicated global clock networks with low skew.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\draw[kbcyan] (0,1.2) node[left, black] {clk at $R_1$} -- (1,1.2) -- (1,1.7) -- (2.5,1.7) -- (2.5,1.2) -- (4,1.2) -- (4,1.7) -- (5,1.7);
+\draw[kbamber] (0,0) node[left, black] {clk at $R_2$} -- (1.4,0) -- (1.4,0.5) -- (2.9,0.5) -- (2.9,0) -- (4.4,0) -- (4.4,0.5) -- (5,0.5);
+\draw[<->, kbmagenta] (1,-0.35) -- node[below] {$t_{sk}$} (1.4,-0.35);
+\draw[kbguide, dashed] (1,-0.2) -- (1,1.8); \draw[kbguide, dashed] (1.4,-0.2) -- (1.4,0.6);
+\end{tikzpicture}
+
+* Worked example
+\(t_{cq}=0.2\) ns, \(t_{max}=3.5\) ns, \(t_{su}=0.1\) ns, \(t_{min}=0.15\) ns, \(t_h=0.1\) ns, jitter \(t_j=0.05\) ns.
+- Zero skew: \(T\ge0.2+3.5+0.1+0.1=3.9\) ns, \(f_{max}\approx256\) MHz; hold: \(0.2+0.15=0.35\ge0.1\) ✓.
+- Skew \(+0.3\) ns (capture later): \(T\ge3.6\) ns (278 MHz) but hold needs \(0.35\ge0.1+0.3=0.4\) ✗: a hold violation that no clock frequency can fix — add a 0.05 ns+ buffer on the short path.
+
+* Intuition
+Skew moves the finish line of a race; jitter makes it wobble. You can plan around a line that is moved, but you must leave margin for one that wobbles.
+
+* Pitfall
+Gated or derived clocks add skew through their logic; that is why [[id:clock-gating][clock gating]] uses dedicated cells and why generating clocks with ordinary logic is avoided.

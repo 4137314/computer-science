@@ -11,7 +11,7 @@
 #+summary: A field-programmable gate array is a grid of configurable logic blocks — lookup tables of 4–6 inputs plus flip-flops — surrounded by programmable routing (switch boxes) and I/O blocks, with hard blocks for memory (BRAM), arithmetic (DSP, carry chains) and clocks; all configured by SRAM cells loaded with a bitstream.
 
 * Model
-- *LUT*: a \(k\)-input lookup table is a \(2^k\)-bit memory read through a multiplexer tree: any function of \(k\) inputs in one block, with the same delay.
+- *LUT*: a \(k\)-input [[id:rom-as-logic][lookup table]] is a \(2^k\)-bit memory read through a [[id:vhdl-concurrent-assignments][multiplexer]] tree: any function of \(k\) inputs in one block, with the same delay.
 - *Logic block* (CLB, slice): several LUTs, flip-flops at their outputs, multiplexers to combine LUTs into wider functions, a fast carry chain for adders.
 - *Routing*: horizontal and vertical wire segments meeting at programmable switch boxes; connection boxes attach block pins to wires. Routing dominates area and delay.
 - *Hard blocks*: block RAM (synchronous, typically read data available on the clock edge after the address), DSP slices (multiply–accumulate), clock managers, high-speed transceivers.
@@ -28,6 +28,12 @@ Logic blocks in a sea of routing; the switch boxes (amber) sit at the crossings.
 
 * Mapping a design
 Synthesis decomposes the logic into functions of at most \(k\) inputs (LUT mapping), packs LUTs and flip-flops into blocks, places them, routes the nets, and generates the bitstream. A \(k\)-LUT has the same delay whatever function it holds, so FPGA mapping minimises the number of LUT levels.
+
+* Worked example
+A 4-bit equality comparator \(a=b\) has 8 inputs.
+- 6-input LUTs: LUT1 computes \((a_0{=}b_0)(a_1{=}b_1)(a_2{=}b_2)\) from 6 inputs; LUT2 ANDs it with \((a_3{=}b_3)\) (3 inputs): 2 LUTs, 2 levels.
+- 4-input LUTs: LUT1 \(=(a_0{=}b_0)(a_1{=}b_1)\), LUT2 \(=(a_2{=}b_2)(a_3{=}b_3)\), LUT3 ANDs them: 3 LUTs, 2 levels.
+Any function of up to \(k\) inputs costs one LUT, whatever its complexity: mapping counts inputs, not gates.
 
 * Intuition
 An FPGA is a sheet of tiny memories and wires whose connections are themselves memory: hardware you rewrite like software.

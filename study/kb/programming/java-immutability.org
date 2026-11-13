@@ -1,0 +1,43 @@
+:PROPERTIES:
+:ID:       java-immutability
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     definition
+:REQUIRES: java-object-class
+:SEE:      equals-hashcode shallow-deep-copy java-monitors wrapper-autoboxing
+:ALIASES:  immutable class, final field, String immutability, string pool, defensive copy, record, value object
+:END:
+#+title: Immutable objects
+#+summary: An immutable object cannot change after construction: all fields =final= and private, no setters, the class =final=, and defensive copies of mutable inputs and outputs; such objects are thread-safe without locks, safe as map keys and freely shareable — =String=, the wrappers and Java records are the standard examples.
+
+* Definition
+Recipe:
+1. declare the class =final= (no subclass can add mutable state);
+2. make every field =private final=;
+3. provide no method that modifies the state ("wither" methods return a new object instead);
+4. copy mutable arguments in the constructor and mutable fields in getters (defensive copies).
+Java 16 =record Point(int x, int y) {}= generates such a class with constructor, accessors, =equals=, =hashCode= and =toString=.
+
+* Example
+#+begin_src java
+  public final class Period {
+      // LocalDate is immutable itself
+      private final LocalDate start, end;
+      private final List<String> tags;
+      public Period(LocalDate s, LocalDate e, List<String> tags) {
+          if (s.isAfter(e)) throw new IllegalArgumentException("start after end");
+          this.start = s; this.end = e;
+          // defensive, unmodifiable copy
+          this.tags = List.copyOf(tags);
+      }
+      public Period withEnd(LocalDate e) { return new Period(start, e, tags); }
+      public List<String> tags() { return tags; }         // already unmodifiable
+  }
+  String s = "abc"; String t = s.toUpperCase();          // s unchanged: a new String
+#+end_src
+
+* Intuition
+If nothing can change, nothing needs protecting: no race conditions, no hidden aliasing, no stale hash [[id:hashmap-internals][buckets]].
+
+* Pitfall
+=final= on a reference does not make the referenced object immutable: a =final List= can still be modified. Building long strings with =s += x= in a loop creates a new =String= each time (\(O(n^2)\)); use =StringBuilder=.

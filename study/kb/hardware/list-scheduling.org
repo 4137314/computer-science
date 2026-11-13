@@ -31,7 +31,19 @@
 \end{algorithmic}
 
 * Example
-Solver graph, one multiplier and one ALU (delays 1): cycle 1 \(\{\times_1,+\}\), 2 \(\{\times_2,<\}\), 3 \(\{\times_5\}\), … latency 7, against 4 with unlimited units. With two multipliers latency 4 or 5, depending on the priority function.
+[[id:data-flow-graph][Solver graph]], unit delays, priority = least [[id:asap-alap-scheduling][mobility]].
+
+| cycle | 1 multiplier | 1 ALU | 2 multipliers | 1 ALU |
+|-------+--------------+-------+---------------+-------|
+| 1     | v1           | v10   | v1, v2        | v10   |
+| 2     | v2           | v11   | v3, v4        | v11   |
+| 3     | v3           | —     | v5, v6        | v7    |
+| 4     | v4           | v7    | —             | v8    |
+| 5     | v5           | —     | —             | v9    |
+| 6     | v6           | v8    |               |       |
+| 7     | —            | v9    |               |       |
+
+One multiplier: latency 7 (six multiplications in series, then v9). Two multipliers: latency 5, and the single ALU is now the bottleneck (v8 and v9 compete in cycle 4); with two ALUs it drops to the critical-path bound of 4.
 
 * Intuition
 A greedy foreman: each morning, give the free machines to the most urgent jobs that are ready.

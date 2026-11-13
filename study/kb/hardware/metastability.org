@@ -1,0 +1,41 @@
+:PROPERTIES:
+:ID:       metastability
+:DOMAIN:   hardware
+:AREA:     timing
+:KIND:     theorem
+:REQUIRES: setup-hold-time
+:SEE:      uart clock-skew-jitter serial-communication
+:ALIASES:  metastability, synchronizer, two flip-flop synchronizer, MTBF, clock domain crossing, CDC, resolution time
+:END:
+#+title: Metastability and synchronizers
+#+summary: When a flip-flop samples an input that changes inside its setup–hold window it may hang between 0 and 1 for an unbounded time, resolving with probability that decays exponentially, \(P(t_r)\propto e^{-t_r/\tau}\); a chain of two flip-flops gives the first one a whole clock period to resolve, raising the mean time between failures to years.
+
+* Statement
+For data changing at rate \(f_d\), clock \(f_c\), [[id:lambda-expressions][capture]] window \(T_0\) and regeneration time constant \(\tau\) of the latch, the rate of failures (still unresolved after \(t_r\)) is
+\[ \frac{1}{\mathrm{MTBF}}=T_0\,f_c\,f_d\,e^{-t_r/\tau}. \]
+
+* Derivation
+The probability that a data edge falls in the window of a given clock edge is \(T_0f_c\); there are \(f_d\) data edges per second. A [[id:sequential-logic][flip-flop]] caught in the window starts near its balance point, and its bistable feedback amplifies the difference exponentially, \(v(t)=v_0e^{t/\tau}\): it is still undecided after \(t_r\) only if \(|v_0|<V e^{-t_r/\tau}\), a probability proportional to \(e^{-t_r/\tau}\). In a two-flip-flop synchronizer \(t_r\approx T_c-t_{cq}-t_{su}\).
+
+* Example
+\(T_0=20\) ps, \(\tau=10\) ps, \(f_c=100\) MHz, \(f_d=1\) MHz, so \(T_0f_cf_d=2000\) s\(^{-1}\).
+- \(t_r=0.2\) ns (a single flip-flop whose output feeds logic): \(e^{-20}\approx2\times10^{-9}\), \(1/\mathrm{MTBF}\approx4\times10^{-6}\) s\(^{-1}\): MTBF \(\approx 2.4\times10^5\) s, about three days — a certain failure in the field.
+- \(t_r=8\) ns (a second flip-flop, almost a full period to resolve): \(e^{-800}\): MTBF beyond the age of the universe.
+Every extra 100 ps of resolution time multiplies the MTBF by \(e^{10}\approx2\times10^4\).
+
+* Construction
+#+begin_src vhdl
+  sync : process (clk) begin
+    if rising_edge(clk) then
+      rx_meta <= rx_async;   -- may go metastable
+      rx_sync <= rx_meta;    -- has a full period to settle
+    end if;
+  end process;
+#+end_src
+Multi-bit values cannot be synchronised bit by bit (bits may resolve in different cycles): use a handshake, Gray-coded counters or an asynchronous FIFO.
+
+* Intuition
+A ball balanced on a hill eventually rolls to one side; the longer you wait before looking, the less likely it is still on top.
+
+* Pitfall
+[[id:setup-hold-time][Metastability]] cannot be eliminated, only made improbable; and the synchronised signal is valid one or two cycles late, which protocols must accept.

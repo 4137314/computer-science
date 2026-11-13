@@ -11,22 +11,23 @@
 #+summary: The Standard Template Library separates containers (class templates that hold elements), iterators (positions in them) and algorithms (templates over iterators); sequence containers keep insertion order, associative ones keep elements sorted by =operator<=, unordered ones hash them.
 
 * Definition
-| container | structure | access | insert/erase | notes |
-|---+---+---+---+---|
-| =vector<T>= | contiguous array | \(O(1)\) by index | \(O(1)\) amortised at the end | =push_back=, =[]= |
-| =deque<T>= | blocks | \(O(1)\) by index | \(O(1)\) at both ends | =push_front= |
-| =list<T>= | doubly linked list | sequential | \(O(1)\) anywhere, given the position | =splice=, no =[]= |
-| =set<T>=, =multiset<T>= | balanced search tree | \(O(\log n)\) | \(O(\log n)\) | sorted, uses =operator<= |
-| =map<K,V>=, =multimap<K,V>= | balanced tree of pairs | \(O(\log n)\) | \(O(\log n)\) | =map[k]= inserts if missing |
-| =unordered_map<K,V>= | hash table | \(O(1)\) average | \(O(1)\) average | needs =hash= and ~==~ |
+| container     | structure        | access       | insert / erase           |
+|---------------+------------------+--------------+--------------------------|
+| vector<T>     | contiguous array | O(1) index   | O(1) amortised at end    |
+| deque<T>      | blocks of arrays | O(1) index   | O(1) at both ends        |
+| list<T>       | doubly linked    | sequential   | O(1) at a known position |
+| set, multiset | balanced tree    | O(log n)     | O(log n), sorted         |
+| map, multimap | tree of pairs    | O(log n)     | O(log n); m[k] inserts   |
+| unordered_map | hash table       | O(1) average | O(1) average             |
 
-Sequence containers have =front=/=back=, =push_back=, =emplace_back= (build in place). Associative containers have no front and back: one uses =insert=, =find=, =count=, =erase=. =multimap= allows duplicate keys and has no =operator[]=.
+Sequence containers have =front= and =back=, =push_back=, =emplace_back= (build in place). Associative containers have no front and back: one uses =insert=, =find=, =count=, =erase=. =multimap= allows duplicate keys and has no =operator[]=.
 
 * Example
 #+begin_src c++
   std::map<std::string, int> votes;
   for (const auto& name : ballots) ++votes[name];      // missing keys start at 0
-  std::set<Film> archive;                              // needs bool operator<(const Film&) const
+  // needs bool operator<(const Film&) const
+  std::set<Film> archive;
   archive.insert(Film("Tenet", 2020));
   for (auto it = votes.begin(); it != votes.end(); ++it)
     std::cout << it->first << ": " << it->second << "\n";   // in key order

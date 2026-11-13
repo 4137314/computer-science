@@ -33,4 +33,4 @@ Height 3 versus height 2 with the same three adders.
 Do independent work in parallel; if you have to wait for a late signal, prepare everything else meanwhile.
 
 * Pitfall
-For floating-point arithmetic associativity does not hold exactly: rebalancing changes rounding. Hardware tools apply it only to integer and Boolean operators.
+For floating-point arithmetic associativity does not hold exactly: rebalancing changes [[id:fixed-point-arithmetic][rounding]]. Hardware tools apply it only to integer and Boolean operators.

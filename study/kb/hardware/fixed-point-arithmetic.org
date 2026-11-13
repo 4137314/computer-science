@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       fixed-point-arithmetic
+:DOMAIN:   hardware
+:AREA:     arithmetic
+:KIND:     definition
+:REQUIRES: ripple-carry-adder
+:SEE:      cordic fir-filter array-multiplier
+:ALIASES:  fixed point, Q format, Qm.n, quantization, rounding, truncation, saturation, overflow, word length, numeric_std fixed
+:END:
+#+title: Fixed-point arithmetic
+#+summary: Hardware DSP stores real numbers as integers with an implicit binary point: in Qm.n a word of \(m+n+1\) bits represents \(x=\text{integer}\cdot2^{-n}\); addition aligns points, multiplication adds fraction bits (Qa.b × Qc.d → Q(a+c+1).(b+d)), and every step must choose rounding versus truncation and saturation versus wrap-around.
+
+* Definition
+Signed Qm.n: 1 sign bit, \(m\) integer bits, \(n\) fraction bits. Range \([-2^m,\,2^m-2^{-n}]\), resolution \(2^{-n}\).
+- *Addition*: same format in, one extra integer bit out to avoid overflow.
+- *Multiplication*: Q\(a\).\(b\) × Q\(c\).\(d\) = Q\((a+c+1)\).\((b+d)\); the product is then shifted right by the excess fraction bits.
+- *Quantization error*: truncation (drop bits) has bias \(-2^{-n-1}\) on average; rounding to nearest has zero mean and error uniform in \(\pm2^{-n-1}\), variance \(2^{-2n}/12\).
+- *Overflow*: wrap-around (two's complement default) gives huge errors; saturation clips to the extremes.
+
+* Example
+Q1.6 (8 bits): \(0.75=48\cdot2^{-6}\) is =00110000=, \(-0.5\) is =11100000=. Product: \(48\cdot(-32)=-1536\) in Q3.12; shift right by 6: \(-24\) in Q1.6, i.e. \(-24/64=-0.375\) ✓.
+#+begin_src vhdl
+  signal a, b : signed(7 downto 0);              -- Q1.6
+  signal p    : signed(15 downto 0);             -- Q3.12
+  p <= a * b;
+  y <= resize(shift_right(p + 32, 6), 8);         -- round to nearest, back to Q1.6
+#+end_src
+
+* Intuition
+Fixed point is doing all your sums in, say, cents: integers everywhere, and you just remember where the decimal point is.
+
+* Pitfall
+Word lengths grow at every multiplication and accumulation (a FIR with \(N\) taps needs \(\lceil\log_2N\rceil\) guard bits in the accumulator); forgetting them gives silent wrap-around, the worst possible error.

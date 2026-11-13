@@ -16,7 +16,7 @@ A generic type or algorithm has one or more *type parameters*: =Stack<T>=, =swap
 * Four ways to write a generic swap
 1. *Overloading*: one =swap(int&, int&)=, one =swap(double&, double&)=, … — repeated code.
 2. =void*= and sizes (C style): =swap(void* a, void* b, size_t n)= with =memcpy= — no type checking.
-3. *Common base class* with virtual methods: works only for classes in the hierarchy, costs a virtual call.
+3. *Common [[id:inheritance][base class]]* with [[id:virtual-functions][virtual]] methods: works only for classes in the hierarchy, costs a virtual call.
 4. *Template*:
 #+begin_src c++
   template <class T>
@@ -27,15 +27,15 @@ A generic type or algorithm has one or more *type parameters*: =Stack<T>=, =swap
 Type-safe, no repetition, no run-time cost: the compiler generates one function per type used.
 
 * C++ and Java
-| | C++ templates | Java generics |
-|---+---+---|
-| resolved | compile time, one instance per type | compile time, then erased |
-| type arguments | any type, also values (=bitset<64>=) | reference types only |
-| checks | at instantiation | at declaration (bounds) |
-| run-time cost | none, code size grows | casts, one shared code |
+|                | C++ templates                       | Java generics               |
+|----------------+-------------------------------------+-----------------------------|
+| resolved       | compile time, one instance per type | compile time, then erased   |
+| type arguments | any type, also values (bitset<64>)  | reference types only        |
+| checked        | when instantiated                   | at the declaration (bounds) |
+| run-time cost  | none; code size grows               | casts; one shared code      |
 
 * Intuition
-Generic code says what it needs from a type (copyable, comparable, iterable) and nothing else; any type that meets the requirements works.
+Generic code says what it needs from a type (copyable, [[id:comparable-comparator][comparable]], [[id:java-iterator][iterable]]) and nothing else; any type that meets the requirements works.
 
 * Pitfall
 Generic is not the same as polymorphic at run time: =vector<Shape*>= with virtual calls and =vector<T>= with templates solve different problems and are often combined.

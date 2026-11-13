@@ -11,14 +11,14 @@
 #+summary: Lowering \(V_{DD}\) cuts energy quadratically but slows the gates; parallel or pipelined datapaths recover the throughput at the lower voltage, so a duplicated unit at half frequency and reduced voltage can do the same work for roughly 40% of the power; DVFS adapts voltage and frequency to the current load.
 
 * Method
-Gate delay grows as the supply approaches the threshold, roughly \(d\propto V_{DD}/(V_{DD}-V_T)^2\). Strategies:
+[[id:gate-delay-model][Gate delay]] grows as the supply approaches the threshold, roughly \(d\propto V_{DD}/(V_{DD}-V_T)^2\). Strategies:
 - *Multiple supplies*: critical paths at high \(V_{DD}\), the rest at low \(V_{DD}\) (voltage islands, level shifters between them).
-- *DVFS*: when the workload is light, lower \(f\) and then \(V_{DD}\) to the minimum that meets the new period. Since \(P\propto V^2f\), power falls roughly with the cube of the scaling factor, energy per operation with the square.
+- *DVFS*: when the workload is light, lower \(f\) and then \(V_{DD}\) to the minimum that meets the new period. Since \(P\propto V^2f\), power falls roughly with the cube of the scaling factor, [[id:cmos-power][energy per operation]] with the square.
 - *Parallelism*: two copies of a unit, each at \(f/2\), deliver the same throughput; with twice the time per operation each copy can run at a lower voltage.
 - *Pipelining*: shorter stages tolerate slower gates at the same frequency, so \(V_{DD}\) can drop.
 
 * Derivation
-Reference: one unit, capacitance \(C\), voltage \(V\), frequency \(f\): \(P_{ref}=CV^2f\). Parallel version: two units plus a multiplexer, capacitance \(\approx2.2C\), frequency \(f/2\), and the doubled delay budget allows \(V'\approx0.6V\):
+Reference: one unit, capacitance \(C\), voltage \(V\), frequency \(f\): \(P_{ref}=CV^2f\). Parallel version: two units plus a [[id:vhdl-concurrent-assignments][multiplexer]], capacitance \(\approx2.2C\), frequency \(f/2\), and the doubled delay budget allows \(V'\approx0.6V\):
 \[ P_{par}=2.2C\,(0.6V)^2\,\frac f2\approx0.4\,P_{ref}. \]
 Area roughly doubles: power is traded for silicon.
 

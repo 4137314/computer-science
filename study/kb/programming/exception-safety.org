@@ -1,0 +1,41 @@
+:PROPERTIES:
+:ID:       exception-safety
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     definition
+:REQUIRES: exception-handling cpp-special-members
+:SEE:      copy-and-swap smart-pointers mutual-exclusion move-semantics
+:ALIASES:  exception safety, basic guarantee, strong guarantee, nothrow guarantee, noexcept, RAII and exceptions, commit or rollback
+:END:
+#+title: Exception-safety guarantees
+#+summary: A C++ operation that may throw promises one of three levels: the basic guarantee (no leaks, invariants hold, state valid but unspecified), the strong guarantee (commit or rollback: either it succeeds or nothing changed), or the nothrow guarantee (it never throws, =noexcept=); RAII gives the first, copy-and-swap the second.
+
+* Definition
+- *Nothrow* (=noexcept=): the operation cannot fail. Destructors, =swap=, move operations and deallocation should be nothrow, because they are what recovery code calls.
+- *Strong*: if an exception escapes, the program state is exactly as before the call (transactional semantics).
+- *Basic*: if an exception escapes, no resource leaks and every object is in a valid (destructible, assignable) state, possibly changed.
+- *No guarantee*: an exception can leave leaks or broken invariants — a bug.
+
+* Derivation
+Why destructors must not throw: during [[id:exception-handling][stack unwinding]] every local object is destroyed; if a [[id:cpp-special-members][destructor]] [[id:java-exceptions][throws]] while another exception is in flight, two exceptions are active and the program calls =std::terminate=. Since C++11 destructors are implicitly =noexcept=.
+
+Why =std::vector= needs =noexcept= moves: when it grows it must transfer \(n\) elements to new storage. With copies, an exception at element \(k\) leaves the old buffer intact (strong guarantee). With a throwing move, elements \(0..k-1\) would already be moved-from and could not be restored, so the vector copies instead unless the [[id:move-semantics][move constructor]] is =noexcept=.
+
+* Example
+#+begin_src c++
+  // basic only: if new B throws after delete, pb dangles
+  A& A::operator=(const A& a) { delete pb; pb = new B(*a.pb); i = a.i; return *this; }
+
+  // strong: do everything that can throw first, then commit with nothrow operations
+  A& A::operator=(const A& a) {
+    B* tmp = a.pb ? new B(*a.pb) : nullptr;   // may throw: *this untouched
+    delete pb; pb = tmp; i = a.i;              // nothrow commit
+    return *this;
+  }
+#+end_src
+
+* Intuition
+Do the risky work on the side, then swap it in with operations that cannot fail.
+
+* Pitfall
+The strong guarantee is not free: it usually costs an extra copy. Many standard operations offer only the basic one; read the guarantee before relying on rollback.

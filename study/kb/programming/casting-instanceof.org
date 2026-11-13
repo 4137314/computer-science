@@ -11,7 +11,7 @@
 #+summary: Upcasting (to a supertype) is implicit and always safe; downcasting =(Sub) x= is checked at run time and throws =ClassCastException= if the dynamic type is wrong, so it is guarded with =instanceof=; Java arrays are covariant, which is why storing into them is checked at run time too.
 
 * Definition
-- *Upcast*: =Point p = new NamedPoint(...)=, implicit.
+- *[[id:polymorphism][Upcast]]*: =Point p = new NamedPoint(...)=, implicit.
 - *Downcast*: =NamedPoint n = (NamedPoint) p;= compiles if the types are related; at run time the JVM checks the dynamic type of =p=.
 - =x instanceof T= is true if =x= is non-null and its dynamic type is \(T\) or a subtype. Since Java 16: =if (p instanceof NamedPoint n) { n.getName(); }=.
 - *Array covariance*: if =Y= is a subtype of =X=, =Y[]= is a subtype of =X[]=. To stay type safe, every store into an array checks the dynamic element type and may throw =ArrayStoreException=.

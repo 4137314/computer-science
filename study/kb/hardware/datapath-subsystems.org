@@ -4,7 +4,7 @@
 :AREA:     arithmetic
 :KIND:     construction
 :REQUIRES: sequential-logic
-:SEE:      alu-design low-power-encoding vhdl-concurrent-assignments
+:SEE:      alu-design low-power-encoding vhdl-concurrent-assignments datapath-control
 :ALIASES:  counter, ring counter, Johnson counter, barrel shifter, zero detector, one detector, thermometer code, comparator, shifter
 :END:
 #+title: Datapath subsystems: detectors, shifters, counters
@@ -15,14 +15,14 @@
 - *Barrel shifter*: stage \(k\) shifts by \(2^k\) or not, controlled by bit \(k\) of the shift amount; \(\log_2 n\) levels of 2:1 muxes, \(n\log_2n\) muxes. Rotations wrap the bits around; arithmetic right shifts replicate the sign.
 - *Thermometer code*: \(k\mapsto\) \(k\) ones followed by zeros (\(0011\,1111\) for 6); used in flash ADCs and priority logic.
 - *Binary counter*: \(\lceil\log_2N\rceil\) flip-flops, an incrementer (ripple carry: slow for wide counters; fast counters use lookahead on the toggle condition \(t_i=\prod_{j<i}q_j\)).
-- *Ring counter*: \(N\) flip-flops in a ring holding a single 1: one-hot states, no decoding, \(N\) states.
+- *Ring counter*: \(N\) flip-flops in a ring holding a single 1: [[id:finite-state-machine][one-hot]] states, no decoding, \(N\) states.
 - *Johnson counter*: a ring with the last output inverted: \(N\) flip-flops, \(2N\) states, one bit changes per step, glitch-free decoding of each state with a 2-input gate.
 
-| counter | flip-flops for \(M\) states | decoding | bits switching per step |
-|---+---+---+---|
-| binary | \(\log_2 M\) | \(\log_2 M\)-input gates | ~2 average |
-| ring | \(M\) | none | 2 |
-| Johnson | \(M/2\) | 2-input gates | 1 |
+| counter | flip-flops (M states) | decoding one state      | bits flipping per step |
+|---------+-----------------------+-------------------------+------------------------|
+| binary  | log₂ M                | gate with log₂ M inputs | ≈ 2 on average         |
+| ring    | M                     | none (one-hot)          | 2                      |
+| Johnson | M / 2                 | 2-input gate            | 1                      |
 
 * Example
 #+begin_src vhdl

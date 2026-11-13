@@ -1,0 +1,45 @@
+:PROPERTIES:
+:ID:       multiple-inheritance
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     definition
+:REQUIRES: cpp-inheritance-visibility virtual-functions
+:SEE:      abstract-class-interface uml-generalization casts-rtti
+:ALIASES:  multiple inheritance, diamond problem, virtual inheritance, virtual base class, ambiguity
+:END:
+#+title: Multiple inheritance and the diamond
+#+summary: A C++ class can have several base classes; when two of them share a base (the diamond), the derived object contains two copies of it and inherited names become ambiguous, unless the shared base is inherited =virtual=, which keeps a single shared subobject constructed by the most derived class.
+
+* Definition
+#+begin_src c++
+  struct Person { std::string name; };
+  struct Student : virtual Person { int year; };
+  struct Worker  : virtual Person { int seniority; };
+  struct WorkingStudent : Student, Worker {
+    // the most derived class builds Person
+    WorkingStudent(std::string n) : Person{n} {}
+  };
+#+end_src
+- Without =virtual=, =WorkingStudent= has two =Person= subobjects: =ws.name= is ambiguous (=ws.Student::name= vs =ws.Worker::name=) and a =WorkingStudent*= cannot convert to =Person*= unambiguously.
+- With [[id:virtual-functions][virtual]] inheritance there is one =Person=; access goes through an extra indirection (virtual base pointer).
+- Two bases declaring the same member function: the call is ambiguous until the [[id:inheritance][derived class]] overrides it or qualifies it (=Student::print()=).
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, box/.style={draw, minimum width=2.2cm, minimum height=0.55cm}]
+\node[box, draw=kbcyan] (p) at (0,0) {Person};
+\node[box] (s) at (-1.9,-1.3) {Student}; \node[box] (w) at (1.9,-1.3) {Worker};
+\node[box, draw=kbamber] (ws) at (0,-2.6) {WorkingStudent};
+\draw[-{Triangle[open,length=7pt,width=8pt]}] (s) -- node[left, kbguide] {virtual} (p);
+\draw[-{Triangle[open,length=7pt,width=8pt]}] (w) -- node[right, kbguide] {virtual} (p);
+\draw[-{Triangle[open,length=7pt,width=8pt]}] (ws) -- (s); \draw[-{Triangle[open,length=7pt,width=8pt]}] (ws) -- (w);
+\end{tikzpicture}
+The diamond: with =virtual= the two paths lead to one shared Person.
+
+* Java's answer
+Java forbids [[id:uml-generalization][multiple inheritance]] of classes and allows multiple [[id:abstract-class-interface][interfaces]]. Since Java 8 default methods reintroduce a mild diamond: if two interfaces provide the same default method, the class must override it (and may call =A.super.m()=).
+
+* Intuition
+Inheriting from two parents that share a grandparent: do you want two copies of the grandparent's data or one? =virtual= is how you answer "one".
+
+* Pitfall
+Virtual bases are constructed by the most derived class only: the =Person= initialisers written in =Student= and =Worker= are ignored when building a =WorkingStudent=, which surprises everyone once.

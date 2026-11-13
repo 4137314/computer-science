@@ -1,0 +1,55 @@
+:PROPERTIES:
+:ID:       condition-variable
+:DOMAIN:   programming
+:AREA:     concurrency
+:KIND:     method
+:REQUIRES: mutual-exclusion
+:SEE:      deadlock-starvation java-monitors threads-data-race
+:ALIASES:  condition variable, producer consumer, bounded buffer, wait, notify_one, notify_all, spurious wakeup, unique_lock
+:END:
+#+title: Condition variables and the producer–consumer problem
+#+summary: A mutex makes a thread wait for access; a condition variable makes it wait for a condition (buffer not empty, not full): =wait(lock, pred)= atomically releases the mutex and sleeps until notified, then re-acquires it and re-checks the predicate, which also handles spurious wake-ups.
+
+* Method
+Shared state protected by one mutex; one condition variable per condition waited on.
+1. the waiter takes a =std::unique_lock=, calls =cv.wait(lock, [&]{ return condition; })=;
+2. the notifier changes the state under the lock, then calls =cv.notify_one()= (or =notify_all()=).
+=wait= with a [[id:stl-algorithms][predicate]] is a loop: =while (!pred()) cv.wait(lock);=, so a wake-up without the condition (spurious, or another consumer was faster) just goes back to sleep.
+
+* Example: bounded buffer
+#+begin_src c++
+  template <class T> class BoundedQueue {
+    std::queue<T> q; size_t cap; std::mutex m;
+    std::condition_variable not_empty, not_full;
+  public:
+    explicit BoundedQueue(size_t c) : cap(c) {}
+    void push(T x) {
+      std::unique_lock<std::mutex> lk(m);
+      not_full.wait(lk, [&] { return q.size() < cap; });
+      q.push(std::move(x));
+      not_empty.notify_one();
+    }
+    T pop() {
+      std::unique_lock<std::mutex> lk(m);
+      not_empty.wait(lk, [&] { return !q.empty(); });
+      T x = std::move(q.front()); q.pop();
+      not_full.notify_one();
+      return x;
+    }
+  };
+#+end_src
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, >={Stealth}]
+\node[draw, kbcyan] (p) at (0,0) {producer}; \node[draw, kbamber] (c) at (6,0) {consumer};
+\foreach \i in {0,...,4} \draw (2.2+\i*0.4,-0.25) rectangle ++(0.4,0.5);
+\foreach \i in {0,1,2} \fill[kbguide] (2.4+\i*0.4,0) circle (0.1);
+\draw[->] (p) -- (2.15,0); \draw[->] (4.25,0) -- (c);
+\node[kbcyan] at (1.1,-0.75) {waits if full}; \node[kbamber] at (4.9,-0.75) {waits if empty};
+\end{tikzpicture}
+
+* Intuition
+A mutex is a door; a condition variable is a waiting room next to it, where you sleep until someone inside says "your condition may now be true — come and check".
+
+* Pitfall
+Waiting without a predicate (=if= instead of =while=) breaks on spurious wake-ups, and changing the condition without holding the mutex can lose a notification: the waiter checks, the notifier changes and notifies, then the waiter sleeps for ever.

@@ -13,7 +13,7 @@
 * Method
 Model the circuit as a graph: nodes are combinational blocks with delay \(d(v)\), edges carry a weight \(w(e)\) = number of registers on them. A retiming assigns an integer lag \(r(v)\) to each node: \(r(v)\) registers are moved from its outputs to its inputs. The new weights are
 \[ w_r(u\to v)=w(u\to v)+r(v)-r(u), \]
-legal if all \(w_r\ge0\). Around any cycle the total weight is unchanged (the lags cancel), so loops keep their latency, and the cycle-level behaviour is preserved. The clock period is the longest path with zero registers; Leiserson and Saxe find the minimum period by testing candidate periods, each check being a system of difference constraints solved as shortest paths.
+legal if all \(w_r\ge0\). Around any cycle the total weight is unchanged (the lags cancel), so loops keep their latency, and the cycle-level behaviour is preserved. The [[id:setup-hold-time][clock period]] is the [[id:static-timing-analysis][longest path]] with zero registers; Leiserson and Saxe find the minimum period by testing candidate periods, each check being a system of difference constraints solved as shortest paths.
 
 * Picture
 \begin{tikzpicture}[font=\scriptsize, g/.style={draw, minimum width=0.8cm, minimum height=0.5cm}, r/.style={draw, fill=kbamber, fill opacity=0.4, text opacity=1, minimum width=0.25cm, minimum height=0.5cm, inner sep=0}]

@@ -4,7 +4,7 @@
 :AREA:     cpp
 :KIND:     method
 :REQUIRES: cpp-special-members method-overloading
-:SEE:      implicit-conversion function-objects stl-containers equals-hashcode
+:SEE:      implicit-conversion function-objects stl-containers equals-hashcode bitset
 :ALIASES:  operator overloading, friend, operator+, operator++, prefix, postfix, operator<<, operator<
 :END:
 #+title: Operator overloading in C++
@@ -31,7 +31,8 @@ Operators that build a new value (=+=, =*=, postfix =++=) return by value; opera
       return os << c.re << "+" << c.im << "i";
     }
   };
-  Complex operator+(Complex l, const Complex& r) { return l += r; }  // 2 + c works too
+  // 2 + c works too
+  Complex operator+(Complex l, const Complex& r) { return l += r; }
 #+end_src
 
 * When to use

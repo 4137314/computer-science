@@ -4,7 +4,7 @@
 :AREA:     generic-programming
 :KIND:     construction
 :REQUIRES: generic-programming
-:SEE:      stl-containers template-metaprogramming bitset
+:SEE:      stl-containers template-metaprogramming bitset template-specialization perfect-forwarding
 :ALIASES:  template, function template, class template, instantiation, template argument deduction, specialization, typename
 :END:
 #+title: C++ templates

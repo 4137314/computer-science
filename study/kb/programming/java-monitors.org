@@ -1,0 +1,44 @@
+:PROPERTIES:
+:ID:       java-monitors
+:DOMAIN:   programming
+:AREA:     concurrency
+:KIND:     definition
+:REQUIRES: threads-data-race java-references
+:SEE:      condition-variable mutual-exclusion deadlock-starvation java-immutability
+:ALIASES:  synchronized, monitor, intrinsic lock, wait, notify, notifyAll, volatile, Thread, Runnable, ExecutorService, java.util.concurrent
+:END:
+#+title: Threads and monitors in Java
+#+summary: Every Java object has an intrinsic lock and a wait set, i.e. it is a monitor: =synchronized= methods or blocks acquire the lock (mutual exclusion), =wait()= releases it and sleeps until =notify()=/=notifyAll()=, =volatile= guarantees visibility of single variables; higher-level tools live in =java.util.concurrent=.
+
+* Definition
+- *Creating threads*: =new Thread(runnable).start()=, or better an =ExecutorService= that reuses a pool: =pool.submit(() -> work())= returns a =Future=.
+- =synchronized void m()= locks =this= (=static synchronized= locks the =Class= object); =synchronized (obj) { ... }= locks =obj=. Locks are reentrant: a thread holding a lock can enter other blocks synchronised on it.
+- =wait()= (only while holding the lock) releases it and suspends the thread; =notify()= wakes one waiter, =notifyAll()= all of them; the woken thread re-acquires the lock before returning from =wait=.
+- =volatile= fields: every read sees the latest write (no caching in registers), but =count++= on a volatile is still a race — use =AtomicInteger=.
+- =java.util.concurrent=: =ReentrantLock= and =Condition= (C++-like), =ConcurrentHashMap=, =BlockingQueue= (ready-made producer–consumer), =CountDownLatch=, =AtomicLong=.
+
+* Example
+#+begin_src java
+  public class Counter {
+      private int value;
+      public synchronized void inc() { value++; }
+      public synchronized int get() { return value; }
+  }
+  public class Box<T> {                       // one-slot buffer with wait/notify
+      private T item;
+      public synchronized void put(T x) throws InterruptedException {
+          while (item != null) wait();       // while, not if
+          item = x; notifyAll();
+      }
+      public synchronized T take() throws InterruptedException {
+          while (item == null) wait();
+          T x = item; item = null; notifyAll(); return x;
+      }
+  }
+#+end_src
+
+* Intuition
+In Java the lock comes with the object: you do not create mutexes, you decide which object guards which data.
+
+* Pitfall
+Synchronising on different objects for the same data protects nothing. And calling =wait= or =notify= without holding the object's lock [[id:java-exceptions][throws]] =IllegalMonitorStateException=.

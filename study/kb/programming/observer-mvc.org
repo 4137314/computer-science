@@ -1,0 +1,44 @@
+:PROPERTIES:
+:ID:       observer-mvc
+:DOMAIN:   programming
+:AREA:     gui
+:KIND:     model
+:REQUIRES: event-handling
+:SEE:      java-inner-classes abstract-class-interface javafx-layout
+:ALIASES:  observer pattern, publish subscribe, listener, model view controller, MVC, property binding, ObservableValue, design pattern
+:END:
+#+title: Observer pattern and model–view–controller
+#+summary: In the observer pattern a subject keeps a list of observers and notifies them when it changes, so it does not depend on who is listening; MVC builds GUIs on it: the model holds the data and notifies, views display it, controllers translate user events into model changes — in JavaFX, properties and bindings implement the pattern.
+
+* Model
+- *Subject*: =addListener(l)=, =removeListener(l)=, and on every change calls =l.changed(...)= on each registered observer.
+- *Observer*: an interface with one [[id:function-objects][callback]]; event handlers are observers of controls.
+- *MVC*: Model (state and rules, no GUI code) → notifies → View (renders) ; View → user events → [[id:finite-state-machine][Controller]] → updates the Model. The model can be tested without a GUI and shown by several views at once.
+- *[[id:javafx-scene-graph][JavaFX]] properties*: =IntegerProperty=, =StringProperty= are observable; =label.textProperty().bind(model.nameProperty())= keeps the view in sync automatically.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, >={Stealth}, b/.style={draw, minimum width=1.9cm, minimum height=0.6cm}]
+\node[b, draw=kbcyan] (m) at (0,0) {Model}; \node[b, draw=kbamber] (v) at (4,0.9) {View}; \node[b, draw=kbmagenta] (c) at (4,-0.9) {Controller};
+\draw[->, dashed] (m) -- node[above, sloped] {notifies} (v);
+\draw[->] (v) -- node[right] {user events} (c);
+\draw[->] (c) -- node[below, sloped] {updates} (m);
+\end{tikzpicture}
+
+* Example
+#+begin_src java
+  public class Counter {                                    // model
+      private final IntegerProperty value = new SimpleIntegerProperty(0);
+      public IntegerProperty valueProperty() { return value; }
+      public void inc() { value.set(value.get() + 1); }
+  }
+  Counter model = new Counter();
+  Label view = new Label(); Button plus = new Button("+");
+  view.textProperty().bind(model.valueProperty().asString());   // view observes model
+  plus.setOnAction(e -> model.inc());                            // controller
+#+end_src
+
+* Intuition
+The data does not know who is watching; it just announces "I changed", and every interested window redraws itself.
+
+* Pitfall
+Observers that are never removed keep the subject from being garbage collected and receive updates for windows long closed; register and unregister symmetrically.

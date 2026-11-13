@@ -33,11 +33,17 @@ The circuit becomes a timing graph: nodes are pins, edges carry delays. Sources 
 Each edge is visited twice: \(O(|V|+|E|)\).
 
 * Picture
-\begin{tikzpicture}[font=\scriptsize, ->, >={Stealth}, g/.style={draw, circle, minimum size=0.6cm}]
-\node[g] (a) at (0,1) {A}; \node[g] (b) at (0,-0.2) {B}; \node[g] (c) at (2,0.4) {g1}; \node[g] (d) at (4,1) {g2}; \node[g] (y) at (6,0.4) {Y};
-\draw (a) -- node[above] {0} (c); \draw (b) -- node[below] {0} (c); \draw[kbmagenta, line width=1pt] (c) -- node[above] {2} (d); \draw (a) -- node[above] {0} (d);
-\draw[kbmagenta, line width=1pt] (d) -- node[above] {3} (y); \draw (c) -- node[below] {1} (y);
-\node[kbamber] at (2,-0.4) {a=0}; \node[kbamber] at (4,0.3) {a=2}; \node[kbamber] at (6,-0.3) {a=5};
+\begin{tikzpicture}[font=\scriptsize, ->, >={Stealth}, g/.style={draw, circle, minimum size=0.65cm}]
+\node[g] (a) at (0,1.3) {A}; \node[g] (b) at (0,-0.6) {B};
+\node[g, label={[kbamber]above:$a=0$}] (c) at (2.2,0.3) {g1};
+\node[g, label={[kbamber]above:$a=2$}] (d) at (4.4,1.3) {g2};
+\node[g, label={[kbamber]above:$a=5$}] (y) at (6.6,0.3) {Y};
+\draw (a) -- node[above, pos=0.6] {0} (c); \draw (b) -- node[below, pos=0.6] {0} (c);
+\draw (a) -- node[above] {0} (d);
+\draw[kbmagenta, line width=1pt] (c) -- node[below right=-1pt] {2} (d);
+\draw[kbmagenta, line width=1pt] (d) -- node[above right=-1pt] {3} (y);
+\draw (c) -- node[below] {1} (y);
+\node[kbguide] at (3.3,-1.2) {edge labels: delays; amber: latest arrival times};
 \end{tikzpicture}
 The critical path (magenta) sets the arrival time 5 at the output.
 

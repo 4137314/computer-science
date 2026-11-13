@@ -4,14 +4,14 @@
 :AREA:     power
 :KIND:     construction
 :REQUIRES: cmos-power sequential-logic
-:SEE:      low-power-encoding dvfs-parallelism
+:SEE:      low-power-encoding dvfs-parallelism power-gating
 :ALIASES:  clock gating, gated clock, integrated clock gating cell, ICG, enable, latch-based gating, operand isolation
 :END:
 #+title: Clock gating and operand isolation
 #+summary: Registers that keep their value still burn power on every clock edge (clock tree, flip-flop internals); clock gating stops the clock of a register bank when its enable is off, using a latch plus AND cell so the gated clock has no glitches; operand isolation similarly freezes the inputs of unit whose result is not used.
 
 * Construction
-A register with enable is normally a multiplexer feeding back \(q\) (=if en = '1' then q <= d;=): the clock still toggles every flip-flop. With gating, \(\mathrm{gclk}=\mathrm{clk}\land \mathrm{en}_L\), where \(\mathrm{en}_L\) is the enable latched while the clock is low: since it can only change while =clk= is 0, the AND output cannot glitch. The mux disappears, and the whole bank and its local clock tree stop switching.
+A register with enable is normally a [[id:vhdl-concurrent-assignments][multiplexer]] feeding back \(q\) (=if en = '1' then q <= d;=): the clock still toggles every flip-flop. With gating, \(\mathrm{gclk}=\mathrm{clk}\land \mathrm{en}_L\), where \(\mathrm{en}_L\) is the enable latched while the clock is low: since it can only change while =clk= is 0, the AND output cannot glitch. The mux disappears, and the whole bank and its local [[id:clock-skew-jitter][clock tree]] stop switching.
 
 * When to gate
 - the enable is off often (wait states, idle units, FSM states where a register is not loaded);

@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       java-streams
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     method
+:REQUIRES: lambda-expressions java-collections
+:SEE:      stl-algorithms comparable-comparator java-inner-classes
+:ALIASES:  Stream API, stream, filter, map, reduce, collect, Collectors, method reference, Optional, lazy evaluation, functional interface
+:END:
+#+title: Java streams and method references
+#+summary: =collection.stream()= starts a pipeline of lazy intermediate operations (=filter=, =map=, =sorted=, =distinct=) closed by one terminal operation (=collect=, =reduce=, =count=, =forEach=); behaviour is passed as lambdas or method references (=String::length=), the Java counterpart of STL algorithms with predicates.
+
+* Method
+- *Source*: =list.stream()=, =Arrays.stream(a)=, =Stream.of(...)=, =IntStream.range(0, n)=.
+- *Intermediate* (lazy, return a stream): =filter(Predicate)=, =map(Function)=, =flatMap=, =sorted(Comparator)=, =distinct()=, =limit(n)=.
+- *Terminal* (runs the pipeline): =collect(Collectors.toList())=, =Collectors.groupingBy=, =reduce(identity, op)=, =count()=, =min/max(Comparator)= (returning =Optional=), =anyMatch=.
+- *Method references*: =Class::staticMethod=, =obj::method=, =Class::instanceMethod= (receiver = first argument), =Class::new=.
+Functional interfaces of =java.util.function=: =Predicate<T>= (T→boolean), =Function<T,R>=, =Consumer<T>=, =Supplier<T>=, =BinaryOperator<T>=.
+
+* Example
+#+begin_src java
+  Map<String, Double> avgByCourse = exams.stream()
+      .filter(e -> e.grade() >= 18)
+      .collect(Collectors.groupingBy(Exam::course,
+                                     Collectors.averagingInt(Exam::grade)));
+  List<String> top = students.stream()
+      .sorted(Comparator.comparingDouble(Student::average).reversed())
+      .limit(3).map(Student::name).toList();
+  int total = IntStream.rangeClosed(1, 100).sum();      // 5050
+#+end_src
+
+* Intuition
+Say what you want (keep these, [[id:stl-algorithms][transform]] them, group them), not how to loop; the library decides the loop, possibly in parallel.
+
+* Pitfall
+Streams are single-use, lazy (nothing happens without a terminal operation) and should not modify their source or shared state in lambdas; =parallelStream()= with side effects reintroduces data races.

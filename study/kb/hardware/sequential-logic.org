@@ -4,7 +4,7 @@
 :AREA:     vhdl
 :KIND:     construction
 :REQUIRES: vhdl-process
-:SEE:      setup-hold-time finite-state-machine datapath-subsystems signals-variables clock-gating
+:SEE:      setup-hold-time finite-state-machine datapath-subsystems signals-variables clock-gating serial-arithmetic
 :ALIASES:  flip-flop, register, D flip-flop, latch, rising_edge, synchronous reset, asynchronous reset, enable, clocked process, counter
 :END:
 #+title: Flip-flops and registers in VHDL
@@ -34,16 +34,16 @@
     end if;
   end process;
 #+end_src
-- The sensitivity list of a clocked process holds only =clk= and asynchronous inputs (=rst=).
+- The [[id:vhdl-process][sensitivity list]] of a clocked process holds only =clk= and asynchronous inputs (=rst=).
 - Every signal assigned under =rising_edge= becomes a flip-flop; logic before the assignment becomes combinational logic at its D input.
 - *Asynchronous* reset acts immediately; *synchronous* reset only at an edge (it is part of the D logic).
 
 * Flip-flop versus latch
-| | D latch | D flip-flop |
-|---+---+---|
-| transparent | while the enable is high | never |
-| captures | at the falling edge of the enable | at the clock edge |
-| timing | harder to analyse | [[id:setup-hold-time][setup and hold]] around one edge |
+|             | D latch                          | D flip-flop                    |
+|-------------+----------------------------------+--------------------------------|
+| transparent | while the enable is high         | never                          |
+| captures    | when the enable falls            | at the clock edge              |
+| timing      | hard to analyse (time borrowing) | setup and hold around one edge |
 Synchronous design uses flip-flops only, all on one clock.
 
 * Picture

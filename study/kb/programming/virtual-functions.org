@@ -4,20 +4,20 @@
 :AREA:     cpp
 :KIND:     construction
 :REQUIRES: polymorphism cpp-inheritance-visibility
-:SEE:      abstract-class-interface java-dynamic-binding function-objects
+:SEE:      abstract-class-interface java-dynamic-binding function-objects casts-rtti multiple-inheritance
 :ALIASES:  virtual, vtable, virtual table, early binding, late binding, pure virtual, override, virtual destructor
 :END:
 #+title: Virtual functions and the virtual table
 #+summary: In C++ a method is dynamically bound only if declared =virtual= and called through a pointer or reference; the compiler implements it with a per-class table of function pointers, and every polymorphic base class needs a virtual destructor.
 
 * Definition
-- *Early binding*: the compiler resolves the call from the static type. Default in C++.
-- *Late binding*: the call is resolved at run time from the dynamic type. Requested with =virtual= in the base class, and effective only through =B*= or =B&=.
+- *Early binding*: the compiler resolves the call from the [[id:polymorphism][static type]]. Default in C++.
+- *Late binding*: the call is resolved at run time from the dynamic type. Requested with =virtual= in the [[id:inheritance][base class]], and effective only through =B*= or =B&=.
 - =override= (C++11) asks the compiler to check that the method really overrides a virtual one.
-- *Pure virtual*: =virtual void f() = 0;=. A class with at least one is abstract and has no instances.
+- *[[id:abstract-class-interface][Pure virtual]]*: =virtual void f() = 0;=. A class with at least one is abstract and has no instances.
 
 * Construction
-Every class with virtual methods gets a *vtable*: an array with one function pointer per virtual method. Every object of such a class stores a hidden pointer =vptr= to its class's vtable. A call =p->f()= becomes =(*(p->vptr[k]))(p)= with \(k\) the slot of =f=, fixed at compile time: one indirect load and one indirect call.
+Every class with virtual methods gets a *vtable*: an array with one [[id:function-objects][function pointer]] per virtual method. Every object of such a class stores a hidden pointer =vptr= to its class's vtable. A call =p->f()= becomes =(*(p->vptr[k]))(p)= with \(k\) the slot of =f=, fixed at compile time: one indirect load and one indirect call.
 
 * Picture
 \begin{tikzpicture}[font=\small]
@@ -30,7 +30,7 @@ Every class with virtual methods gets a *vtable*: an array with one function poi
 =c->act()= reads the vptr, takes slot 0, calls it.
 
 * Virtual destructor
-=delete c= with =c= of type =Character*= calls the destructor of the static type unless =~Character= is virtual: the =Wizard= part is never destroyed. Rule: a class meant to be used polymorphically declares =virtual ~B() = default;=.
+=delete c= with =c= of type =Character*= calls the [[id:cpp-special-members][destructor]] of the static type unless =~Character= is virtual: the =Wizard= part is never destroyed. Rule: a class meant to be used polymorphically declares =virtual ~B() = default;=.
 
 * Intuition
 =virtual= is the price tag of polymorphism: C++ makes you ask for it, because its rule is that you do not pay for what you do not use.

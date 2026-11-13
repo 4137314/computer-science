@@ -13,24 +13,28 @@
 * Construction
 No assignment exists — a type is defined once and for ever — so computation is recursive.
 #+begin_src c++
-  template <unsigned n> struct factorial { enum { value = n * factorial<n - 1>::value }; };
+  template <unsigned n>
+  struct factorial { enum { value = n * factorial<n - 1>::value }; };
   template <>           struct factorial<0> { enum { value = 1 }; };   // base case
   static_assert(factorial<7>::value == 5040);
 
   template <bool c, class Then, class Else> struct IF { using RET = Then; };
-  template <class Then, class Else> struct IF<false, Then, Else> { using RET = Else; };
+  template <class Then, class Else>
+  struct IF<false, Then, Else> { using RET = Else; };
   IF<(sizeof(int) < sizeof(long)), long, int>::RET i;   // the larger type
 
   // Accumulate<n, F> = F<0> + F<1> + ... + F<n>: a higher-order function
   template <int n, template <int> class F>
   struct Accumulate { enum { RET = Accumulate<n - 1, F>::RET + F<n>::RET }; };
-  template <template <int> class F> struct Accumulate<0, F> { enum { RET = F<0>::RET }; };
-  template <int n> struct Square { enum { RET = n * n }; };   // Accumulate<3,Square>::RET == 14
+  template <template <int> class F>
+  struct Accumulate<0, F> { enum { RET = F<0>::RET }; };
+  // Accumulate<3,Square>::RET == 14
+  template <int n> struct Square { enum { RET = n * n }; };
 #+end_src
 
 * Key points
 - expressions evaluated at compile time; only the instances actually used are generated (laziness);
-- specialisation gives conditionals, deduction gives pattern matching;
+- specialisation gives conditionals, deduction gives [[id:casting-instanceof][pattern matching]];
 - templates with conditionals and recursion can simulate a Turing machine (Veldhuizen), so compile-time computation is as powerful as any;
 - uses: move computation from run time to compile time, choose types that depend on the hardware (=IF<...>::RET=), generate specialised and faster code.
 
@@ -41,4 +45,4 @@ The C++ Core Guidelines: use TMP only when needed, prefer =constexpr= functions 
 The compiler is a second computer that runs before yours; templates are how you program it.
 
 * Pitfall
-Each recursion step is an instantiation: deep recursion hits the compiler's depth limit, and compile times grow quickly.
+Each recursion step is an [[id:cpp-templates][instantiation]]: deep recursion hits the compiler's depth limit, and compile times grow quickly.

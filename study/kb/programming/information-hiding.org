@@ -13,14 +13,14 @@
 * Definition
 A class exposes an *interface* (what it does) and hides its *representation* (how). Visibility of a member of class \(C\):
 
-| modifier | C++ | Java |
-|---+---+---|
-| private | members of \(C\) and its friends | only \(C\) |
-| (none) | — (class default: private) | package-private: classes of the same package |
-| protected | \(C\) and its subclasses | the package of \(C\) and the subclasses of \(C\) |
-| public | everyone | everyone |
+| modifier  | C++                          | Java                             |
+|-----------+------------------------------+----------------------------------|
+| private   | members of C and its friends | only C                           |
+| (none)    | class default is private     | package-private: same package    |
+| protected | C and its subclasses         | package of C and subclasses of C |
+| public    | everyone                     | everyone                         |
 
-Getters and setters give controlled access to the state; they can themselves have reduced visibility (a =protected= getter for a package attribute).
+Getters and setters give controlled access to the state; they can themselves have reduced visibility (a =protected= getter for a [[id:java-packages][package]] attribute).
 
 * Example
 #+begin_src java

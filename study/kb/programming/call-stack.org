@@ -3,8 +3,8 @@
 :DOMAIN:   programming
 :AREA:     memory
 :KIND:     model
-:REQUIRES:
-:SEE:      parameter-passing pointers-references java-references
+:REQUIRES: 
+:SEE:      parameter-passing pointers-references java-references threads-data-race exception-handling
 :ALIASES:  stack, heap, activation record, stack frame, memory model, recursion, static memory
 :END:
 #+title: Memory model: static area, stack and heap
@@ -34,7 +34,8 @@ Stack and heap grow towards each other in the free space between them.
 #+begin_src c++
   int fact(int n) { return n <= 1 ? 1 : n * fact(n - 1); }   // one frame per call
   int* make() { int* p = new int(42); return p; }              // *p survives the call
-  int* bad()  { int x = 42; return &x; }                       // dangling: x died with the frame
+  // dangling: x died with the frame
+  int* bad()  { int x = 42; return &x; }
 #+end_src
 
 * Intuition

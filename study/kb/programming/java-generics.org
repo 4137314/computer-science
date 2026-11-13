@@ -4,7 +4,7 @@
 :AREA:     java
 :KIND:     construction
 :REQUIRES: generic-programming casting-instanceof
-:SEE:      generic-invariance java-collections wrapper-autoboxing stack-and-queue
+:SEE:      generic-invariance java-collections wrapper-autoboxing stack-and-queue comparable-comparator
 :ALIASES:  generics, type parameter, generic class, generic method, type erasure, raw type, diamond operator
 :END:
 #+title: Java generics and type erasure
@@ -22,17 +22,19 @@
   String x = s.pop();        // no cast in the source
   s.push(3);                 // compile error: int is not a String
 
-  static <T extends Comparable<T>> T max(T a, T b) { return a.compareTo(b) >= 0 ? a : b; }
+  static <T extends Comparable<T>> T max(T a, T b) {
+      return a.compareTo(b) >= 0 ? a : b;
+  }
 #+end_src
 
 * Type erasure
-After checking, the compiler replaces each type parameter with its bound (=Object=, or =Comparable= for =T extends Comparable<T>=) and inserts casts at the uses: =String x = (String) s.pop();=. Consequences:
+After checking, the compiler replaces each [[id:generic-programming][type parameter]] with its bound (=Object=, or =Comparable= for =T extends Comparable<T>=) and inserts casts at the uses: =String x = (String) s.pop();=. Consequences:
 - one =.class= per generic class, no run-time overhead, compatibility with pre-generic code (raw types, with warnings);
 - type parameters cannot be primitive (=Stack<int>= is illegal; use =Stack<Integer>=);
 - no =new T()=, no =new T[n]=, no =x instanceof Stack<String>=, no static field of type =T=.
 
 * Intuition
-Generics are a compile-time contract. The compiler checks you keep it and then throws the contract away, leaving the casts it proved safe.
+Generics are a compile-time contract. The compiler checks you keep it and then [[id:java-exceptions][throws]] the contract away, leaving the casts it proved safe.
 
 * Pitfall
-Raw types (=Stack s = new Stack();=) switch the checks off and turn type errors into =ClassCastException= far from their cause. Always use the parameterised form.
+Raw types (=Stack s = new Stack();=) switch the checks off and turn type errors into =[[id:casting-instanceof][ClassCastException]]= far from their cause. Always use the parameterised form.

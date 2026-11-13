@@ -34,12 +34,14 @@ with \(\mathrm{cost}=0\) at the leaves. Optimal cover of the tree; \(O(n\cdot p)
 \end{algorithmic}
 
 * Picture
-\begin{tikzpicture}[font=\scriptsize, n/.style={draw, circle, minimum size=0.45cm, inner sep=0}]
-\node[n] (r) at (0,0) {N}; \node[n] (i) at (-1,-0.9) {I}; \node[n] (m) at (1,-0.9) {N};
-\node[n] (j) at (-1,-1.8) {N}; \node at (0.6,-1.8) {c}; \node at (1.4,-1.8) {d}; \node at (-1.4,-2.6) {a}; \node at (-0.6,-2.6) {b};
-\draw (r) -- (i); \draw (r) -- (m); \draw (i) -- (j); \draw (m) -- (0.6,-1.65); \draw (m) -- (1.4,-1.65); \draw (j) -- (-1.4,-2.45); \draw (j) -- (-0.6,-2.45);
-\draw[kbcyan, rounded corners, line width=1pt] (-1.5,-2.15) rectangle (-0.5,-0.55); \node[kbcyan] at (-2.1,-1.35) {AND2};
-\draw[kbamber, rounded corners, line width=1pt] (-0.4,0.35) rectangle (1.45,-1.25); \node[kbamber] at (2.1,-0.3) {NAND2+?};
+\begin{tikzpicture}[font=\scriptsize, n/.style={draw, circle, minimum size=0.55cm, inner sep=0}]
+\node[n] (r) at (0,0) {N}; \node[n] (i) at (-1.2,-1) {I}; \node[n] (m) at (1.2,-1) {N}; \node[n] (j) at (-1.2,-2) {N};
+\node (a) at (-1.7,-3) {$a$}; \node (b) at (-0.7,-3) {$b$}; \node (c) at (0.8,-2) {$c$}; \node (d) at (1.6,-2) {$d$};
+\draw (r) -- (i); \draw (r) -- (m); \draw (i) -- (j); \draw (j) -- (a); \draw (j) -- (b); \draw (m) -- (c); \draw (m) -- (d);
+\draw[kbcyan, rounded corners, line width=1pt] (-1.65,-2.4) rectangle (-0.75,-0.6); \node[kbcyan, anchor=east] at (-1.8,-1.5) {AND2};
+\draw[kbamber, rounded corners, line width=1pt] (-0.4,-0.38) rectangle (0.4,0.38); \node[kbamber, anchor=west] at (0.5,0.1) {NAND2};
+\draw[kbmagenta, rounded corners, line width=1pt] (0.8,-1.38) rectangle (1.6,-0.62); \node[kbmagenta, anchor=west] at (1.75,-1.0) {NAND2};
+\node[kbguide] at (0,-3.6) {cost $=$ area(AND2) $+\ 2\cdot$area(NAND2)};
 \end{tikzpicture}
 Each candidate cover is a set of patterns tiling the tree; dynamic programming keeps the cheapest per node.
 
@@ -47,4 +49,4 @@ Each candidate cover is a set of patterns tiling the tree; dynamic programming k
 Mapping is tiling a floor with the tiles the library sells, paying for each tile, and computing the cheapest tiling bottom-up.
 
 * Pitfall
-Cutting the DAG into trees loses optimality at the cuts (patterns cannot span a multi-fanout point), and the result depends on the NAND2 decomposition chosen in step 1.
+Cutting the DAG into trees loses optimality at the cuts (patterns cannot span a multi-fanout point), and the result depends on the NAND2 [[id:multilevel-logic-optimization][decomposition]] chosen in step 1.

@@ -19,7 +19,8 @@
   while (!ok) {
       System.out.println("Age: ");
       if (in.hasNextInt()) { age = in.nextInt(); ok = true; }
-      else { System.out.println("The age must be an integer!"); in.next(); }  // discard the token
+      // discard the token
+      else { System.out.println("The age must be an integer!"); in.next(); }
   }
   in.close();
 #+end_src

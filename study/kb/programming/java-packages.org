@@ -15,7 +15,7 @@
 - A class without a package declaration belongs to the unnamed default package.
 - The fully qualified name is =package.Class=; =import java.util.List;= or =import java.util.*;= allows =List=. =java.lang= is imported automatically (=String=, =Math=, =System=, =Object=).
 - Packages correspond to directories: =it/unitn/shapes/Circle.java=.
-- Package-private visibility (no modifier) makes classes and members usable only within the package: the package is a module whose public classes are its interface.
+- [[id:information-hiding][Package-private]] visibility (no modifier) makes classes and members usable only within the package: the package is a module whose public classes are its interface.
 
 * Example
 #+begin_src java

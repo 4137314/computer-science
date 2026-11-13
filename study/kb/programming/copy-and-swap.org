@@ -1,0 +1,46 @@
+:PROPERTIES:
+:ID:       copy-and-swap
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     construction
+:REQUIRES: shallow-deep-copy exception-safety
+:SEE:      move-semantics operator-overloading
+:ALIASES:  copy-and-swap idiom, unified assignment operator, swap, self-assignment
+:END:
+#+title: The copy-and-swap idiom
+#+summary: Implement assignment as "take the argument by value, swap its contents with =*this=": the copy (or move) happens in the parameter, the swap cannot throw, and the old state dies with the parameter — one operator that is correct for self-assignment, gives the strong guarantee and serves both copy and move assignment.
+
+* Construction
+#+begin_src c++
+  class A {
+    int i = 0;
+    B* pb = nullptr;
+  public:
+    A(const A& a) : i(a.i), pb(a.pb ? new B(*a.pb) : nullptr) {}   // the real copy
+    A(A&& a) noexcept : i(a.i), pb(a.pb) { a.pb = nullptr; }      // the real move
+    ~A() { delete pb; }
+
+    friend void swap(A& x, A& y) noexcept {
+      using std::swap;
+      swap(x.i, y.i);
+      swap(x.pb, y.pb);
+    }
+    // by value: copy-constructed or move-constructed
+    A& operator=(A other) noexcept {
+      swap(*this, other);
+      return *this;
+    // other (holding the old state) is destroyed here
+    }
+  };
+#+end_src
+
+* Derivation
+- *Self-assignment*: =a = a= copies =a= into =other=, swaps, destroys the old copy: correct without a test.
+- *[[id:exception-safety][Strong guarantee]]*: the only operation that can throw is the copy into =other=, which happens before =*this= is touched.
+- *Copy and move*: if the argument is an [[id:value-categories][lvalue]], =other= is copy-constructed; if it is an rvalue, move-constructed. One function covers both assignments, so the [[id:move-semantics][rule of five]] reduces to four functions plus =swap=.
+
+* Intuition
+Make a fresh, correct object first; then exchange contents with it and let the old contents be thrown away by a [[id:cpp-special-members][destructor]] that already works.
+
+* Pitfall
+Copy-and-swap always builds a new object, even when reusing the existing buffer would be cheaper (assigning a vector to an equal-sized one): for performance-critical types a hand-written assignment can be faster, at the price of weaker guarantees.

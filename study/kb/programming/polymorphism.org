@@ -4,7 +4,7 @@
 :AREA:     oop
 :KIND:     definition
 :REQUIRES: inheritance
-:SEE:      liskov-substitution virtual-functions java-dynamic-binding casting-instanceof generic-programming
+:SEE:      liskov-substitution virtual-functions java-dynamic-binding casting-instanceof generic-programming abstract-class-interface
 :ALIASES:  subtype polymorphism, dynamic binding, late binding, static type, dynamic type, upcast
 :END:
 #+title: Polymorphism and dynamic binding
@@ -27,12 +27,12 @@ Java binds every instance method dynamically, except =static=, =private=, =final
 #+end_src
 
 * Picture
-\begin{tikzpicture}[font=\small]
+\begin{tikzpicture}[font=\small, >={Stealth}]
 \node[draw, kbcyan] (v) at (0,0) {Point p};
-\node[draw, kbamber, align=center] (o) at (4,0) {NamedPoint\\object};
-\draw[-{Stealth}] (v) -- node[above, font=\scriptsize]{reference} (o);
-\node[font=\scriptsize, kbguide] at (0,-0.6) {static type: what may be called};
-\node[font=\scriptsize, kbguide] at (4,-0.75) {dynamic type: which body runs};
+\node[draw, kbamber, align=center] (o) at (5,0) {NamedPoint\\object};
+\draw[->] (v) -- node[above, font=\scriptsize] {reference} (o);
+\node[font=\scriptsize, kbcyan, align=center] at (0,-1.0) {static type\\what may be called};
+\node[font=\scriptsize, kbamber, align=center] at (5,-1.1) {dynamic type\\which body runs};
 \end{tikzpicture}
 
 * Why it matters
@@ -42,4 +42,4 @@ Code written once against a supertype keeps working, unchanged, on subtypes writ
 The compiler checks the label on the box; the run time looks inside.
 
 * Pitfall
-Fields are not polymorphic: a field redeclared in a subclass hides the superclass one, and =p.x= reads the field of the static type.
+Fields are not polymorphic: a field redeclared in a [[id:inheritance][subclass]] hides the superclass one, and =p.x= reads the field of the static type.

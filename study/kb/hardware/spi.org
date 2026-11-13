@@ -15,11 +15,11 @@ Lines: SCK (master clock), MOSI (master out, slave in), MISO (master in, slave o
 
 Modes:
 | mode | CPOL (idle SCK) | CPHA | data sampled on | data changes on |
-|---+---+---+---+---|
-| 0 | 0 | 0 | rising edge | falling edge |
-| 1 | 0 | 1 | falling edge | rising edge |
-| 2 | 1 | 0 | falling edge | rising edge |
-| 3 | 1 | 1 | rising edge | falling edge |
+|------+-----------------+------+-----------------+-----------------|
+| 0    | 0               | 0    | rising edge     | falling edge    |
+| 1    | 0               | 1    | falling edge    | rising edge     |
+| 2    | 1               | 0    | falling edge    | rising edge     |
+| 3    | 1               | 1    | rising edge     | falling edge    |
 
 With CPHA = 0 the first bit must be on the line when SS falls, before the first edge.
 
@@ -38,4 +38,4 @@ Mode 0: data changes on falling edges and is sampled on rising ones (dashed).
 Two shift registers joined in a ring: each clock moves the ring one bit, and after eight clocks master and slave have swapped bytes.
 
 * Pitfall
-There is no acknowledgement or standard framing: if master and slave disagree on the mode or word length, the data are shifted by a bit or garbled, silently.
+There is no acknowledgement or standard framing: if master and slave disagree on the mode or [[id:fixed-point-arithmetic][word length]], the data are shifted by a bit or garbled, silently.

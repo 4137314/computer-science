@@ -4,7 +4,7 @@
 :AREA:     timing
 :KIND:     inequality
 :REQUIRES: sequential-logic
-:SEE:      static-timing-analysis gate-delay-model pipelining retiming
+:SEE:      static-timing-analysis gate-delay-model pipelining retiming metastability clock-skew-jitter
 :ALIASES:  setup time, hold time, clock-to-q, setup violation, hold violation, clock period, maximum frequency, clock skew, metastability
 :END:
 #+title: Setup and hold constraints
@@ -16,7 +16,7 @@ For a path from register \(R_1\) through combinational logic to register \(R_2\)
 The maximum clock frequency is \(f_{max}=1/T_{min}\), set by the slowest register-to-register path.
 
 * Derivation
-A value launched by \(R_1\) at edge \(k\) leaves at \(t_{cq}\), crosses the logic in at most \(t_{max}\) and must arrive \(t_{su}\) before edge \(k+1\) at \(R_2\), which comes at \(T+t_{sk}\): \(t_{cq}+t_{max}+t_{su}\le T+t_{sk}\). The same edge \(k\) also makes \(R_2\) capture the *old* value; the new one, arriving at the earliest after \(t_{cq}+t_{min}\), must not corrupt it before \(t_h\) after the edge at \(R_2\): \(t_{cq}+t_{min}\ge t_{sk}+t_h\). \(T\) cancels from the second inequality.
+A value launched by \(R_1\) at edge \(k\) leaves at \(t_{cq}\), crosses the logic in at most \(t_{max}\) and must arrive \(t_{su}\) before edge \(k+1\) at \(R_2\), which comes at \(T+t_{sk}\): \(t_{cq}+t_{max}+t_{su}\le T+t_{sk}\). The same edge \(k\) also makes \(R_2\) [[id:lambda-expressions][capture]] the *old* value; the new one, arriving at the earliest after \(t_{cq}+t_{min}\), must not corrupt it before \(t_h\) after the edge at \(R_2\): \(t_{cq}+t_{min}\ge t_{sk}+t_h\). \(T\) cancels from the second inequality.
 
 * Picture
 \begin{tikzpicture}[font=\scriptsize, yscale=0.6]
@@ -28,11 +28,11 @@ A value launched by \(R_1\) at edge \(k\) leaves at \(t_{cq}\), crosses the logi
 The data must not change inside the window around the capturing edge.
 
 * Fixing violations
-- *Setup*: shorten the critical path (logic restructuring, faster gates, [[id:retiming][retiming]], [[id:pipelining][pipelining]]) or lengthen the period.
+- *Setup*: shorten the [[id:static-timing-analysis][critical path]] (logic restructuring, faster gates, [[id:retiming][retiming]], [[id:pipelining][pipelining]]) or lengthen the period.
 - *Hold*: add delay (buffers) on the short path; lowering the frequency does not help.
 
 * Intuition
 Setup is a race the data must win against the next edge; hold is a race the data must not win against the current one.
 
 * Pitfall
-A violated constraint leaves the flip-flop possibly metastable: its output can hover between 0 and 1 for an unbounded time. Asynchronous inputs, which can violate any constraint, need a two-flip-flop synchroniser.
+A violated constraint leaves the [[id:sequential-logic][flip-flop]] possibly metastable: its output can hover between 0 and 1 for an unbounded time. Asynchronous inputs, which can violate any constraint, need a two-flip-flop synchroniser.

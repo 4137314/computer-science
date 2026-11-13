@@ -1,0 +1,45 @@
+:PROPERTIES:
+:ID:       java-inner-classes
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     definition
+:REQUIRES: java-object-class abstract-class-interface
+:SEE:      event-handling lambda-expressions java-streams observer-mvc
+:ALIASES:  nested class, static nested class, inner class, local class, anonymous class, effectively final, this$0, functional interface
+:END:
+#+title: Nested, inner and anonymous classes
+#+summary: Java classes can be declared inside other classes: static nested classes are ordinary classes in the outer namespace, inner classes carry a hidden reference to an outer instance and see its fields, local and anonymous classes live in a method and capture its effectively final variables; a lambda is a compact anonymous implementation of a functional interface.
+
+* Definition
+| kind          | declared in   | outer instance  | typical use                    |
+|---------------+---------------+-----------------+--------------------------------|
+| static nested | the class     | no              | helpers: Map.Entry, Builder    |
+| inner         | the class     | yes, Outer.this | iterators, views on outer data |
+| local         | a method      | if non-static   | one-off helper with a name     |
+| anonymous     | an expression | if non-static   | listeners, comparators         |
+| lambda        | an expression | captures only   | one-method interfaces          |
+
+Local, anonymous classes and lambdas can use local variables of the enclosing method only if they are *effectively final* (never reassigned): the value is copied into the object.
+
+* Example
+#+begin_src java
+  public class Stack<T> implements Iterable<T> {
+      private Object[] data = new Object[16]; private int size;
+      public Iterator<T> iterator() {
+          return new Iterator<T>() {                  // anonymous inner class
+              private int i = size;                    // reads Stack.this.size
+              public boolean hasNext() { return i > 0; }
+              @SuppressWarnings("unchecked") public T next() { return (T) data[--i]; }
+          };
+      }
+  }
+  int threshold = 10;
+  // lambda, threshold effectively final
+  list.removeIf(x -> x < threshold);
+#+end_src
+
+* Intuition
+An inner object is born attached to its outer object and can read its private parts; a static nested class is just a class with a longer name.
+
+* Pitfall
+An inner (non-static) instance keeps its outer instance alive: storing a listener or iterator for long can leak a whole window or data structure. Prefer static nested classes when the outer state is not needed.

@@ -42,8 +42,8 @@ A full adder from two half adders, then an \(N\)-bit [[id:ripple-carry-adder][ri
   -- an instance with a different width
   u1 : entity work.adder generic map ( N => 16 ) port map ( x, y, '0', z, open );
 #+end_src
-- *Formal* parameters are the ports of the component, *actual* ones the signals of the enclosing architecture. Named association (=a => x=) is robust to reordering; positional association is shorter. =open= leaves an output unconnected.
-- A =component= declaration (older style) or direct =entity work.name= instantiation.
+- *Formal* parameters are the ports of the component, *actual* ones the signals of the enclosing architecture. Named [[id:uml-association][association]] (=a => x=) is robust to reordering; positional association is shorter. =open= leaves an output unconnected.
+- A =component= declaration (older style) or direct =entity work.name= [[id:cpp-templates][instantiation]].
 - Each instance has a label (=fa=, =u1=).
 
 * Intuition

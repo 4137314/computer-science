@@ -33,6 +33,19 @@ The grade is an attribute of the association: every link (student, course) has i
 * From diagram to code
 A navigable end with multiplicity =0..1= becomes a pointer (C++) or a possibly-null reference (Java); =1= becomes a member or a non-null reference; =0..*= becomes a container (=std::vector=, =List<T>=). An association attribute becomes a class of its own (=Exam=) holding the two ends.
 
+* Worked example
+#+begin_src c++
+  class Course;
+  class Exam { Student* s; Course* c; int grade; };          // association class
+  class Student {
+    std::string name; int number;
+    // 1   : enrolled-in (navigable)
+    Programme* programme;
+    std::vector<Exam*> exams;                                // 0..*: exam
+  };
+#+end_src
+Multiplicity 1 becomes a pointer that must never be null after construction, \(0..*\) a container, the association attribute a class of its own holding both ends.
+
 * Intuition
 The multiplicities are the invariants the code must maintain. Writing them down first tells you which fields may be null and which collections may be empty.
 

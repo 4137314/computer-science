@@ -33,13 +33,16 @@ Types of simulation: compiled (evaluate every gate every cycle) or event-driven 
 With \(n\) gates, simulated time \(T\) and activity proportional to \(n\) per time unit, about \(Tn\) events are processed. The cost of each queue insertion decides the total:
 - *sorted linked list*: insertion \(O(n)\) (scan for the position): total \(O(Tn^2)\);
 - *balanced tree* (heap): \(O(\log n)\): total \(O(Tn\log n)\);
-- *timing wheel*: a circular array of buckets, one per time unit up to the maximum delay; inserting at \(t+d\) is indexing bucket \((t+d)\bmod W\): \(O(1)\), total \(O(Tn)\). Events beyond the wheel go to an overflow list.
+- *timing wheel*: a circular array of [[id:hashmap-internals][buckets]], one per time unit up to the maximum delay; inserting at \(t+d\) is indexing bucket \((t+d)\bmod W\): \(O(1)\), total \(O(Tn)\). Events beyond the wheel go to an overflow list.
 
 * Picture
-\begin{tikzpicture}[font=\scriptsize]
-\foreach \i in {0,...,7} {\draw[kbcyan] (\i*45:1.2) -- (\i*45+45:1.2); \node at (\i*45+22.5:1.45) {\i};}
-\draw[-{Stealth}, kbamber, line width=1pt] (0,0) -- (22.5:1.0); \node at (0,-0.3) {now};
-\node[draw] (e) at (3,0.6) {$(s,1)$}; \draw[-{Stealth}] (e) -- (112:1.2);
+\begin{tikzpicture}[font=\scriptsize, >={Stealth}]
+\foreach \i in {0,...,7} {\draw[kbcyan] (\i*0.8,0) rectangle ++(0.8,0.6); \node at (\i*0.8+0.4,0.3) {\i};}
+\draw[->, kbamber, line width=1pt] (2.8,1.5) node[above] {now: $t \bmod 8=3$} -- (2.8,0.65);
+\node[draw, kbmagenta] (e) at (5.6,1.6) {$(s,1)$ at $t+2$};
+\draw[->, kbmagenta] (e.south) -- (4.4,0.65);
+\draw[->, kbguide] (6.5,0.0) .. controls (7.4,-1.3) and (-0.8,-1.3) .. (-0.1,0.0);
+\node[kbguide] at (3.2,-1.35) {the pointer advances one bucket per time unit and wraps around};
 \end{tikzpicture}
 A timing wheel: the pointer advances one bucket per time unit; an event with delay 2 goes two buckets ahead.
 

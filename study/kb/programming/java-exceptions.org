@@ -13,20 +13,23 @@
 * Definition
 #+begin_src text
   Throwable
-  ├── Error                    (JVM problems: OutOfMemoryError, StackOverflowError)  unchecked
-  └── Exception                                                                       checked
-      ├── IOException, FileNotFoundException, ...                                     checked
-      └── RuntimeException     (NullPointerException, ArrayIndexOutOfBounds,
-                                ClassCastException, IllegalArgumentException, ...)    unchecked
+  ├── Error                  unchecked: JVM problems
+  │                          (OutOfMemoryError, StackOverflowError)
+  └── Exception              checked
+      ├── IOException, ...   checked
+      └── RuntimeException   unchecked: programming errors
+                             (NullPointerException, ClassCastException,
+                              IllegalArgumentException, ...)
 #+end_src
-The *catch-or-declare* rule: a method in which a checked exception can arise must either handle it with =try/catch= or list it in its signature, =void load() throws IOException=. So callers know from the interface which failures to expect. Run-time exceptions signal programming errors and are exempt.
+The *catch-or-declare* rule: a method in which a checked exception can arise must either handle it with =try/catch= or list it in its signature, =void load() throws IOException=. So callers know from the interface which failures to expect. Run-time [[id:exception-handling][exceptions]] signal programming errors and are exempt.
 
 * Example
 #+begin_src java
   class EmptyStackException extends RuntimeException {}       // unchecked, by choice
 
   static List<String> read(String path) throws IOException {  // declared
-      try (BufferedReader r = new BufferedReader(new FileReader(path))) {   // closed for us
+      // closed for us
+      try (BufferedReader r = new BufferedReader(new FileReader(path))) {
           return r.lines().toList();
       }
   }
@@ -46,4 +49,4 @@ The *catch-or-declare* rule: a method in which a checked exception can arise mus
 Checked exceptions are part of the contract: the signature tells you what can go wrong that is not your fault.
 
 * Pitfall
-=catch (Exception e) {}= swallows every error, including bugs; catch the narrowest type you can handle. A =catch= of a superclass placed before its subclass makes the second unreachable: compile error.
+=catch (Exception e) {}= swallows every error, including bugs; catch the narrowest type you can handle. A =catch= of a superclass placed before its [[id:inheritance][subclass]] makes the second unreachable: compile error.

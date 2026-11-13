@@ -13,12 +13,12 @@
 * Construction
 Arithmetic: \(G=X+Y+C_{in}\) with \(X=A\) and \(Y\) chosen by \(S_1S_0\):
 
-| \(S_1S_0\) | \(Y\) | \(C_{in}=0\) | \(C_{in}=1\) |
-|---+---+---+---|
-| 00 | all 0 | \(A\) (transfer) | \(A+1\) (increment) |
-| 01 | \(B\) | \(A+B\) | \(A+B+1\) |
-| 10 | \(\bar B\) | \(A+\bar B=A-B-1\) | \(A-B\) (subtract) |
-| 11 | all 1 | \(A-1\) (decrement) | \(A\) (transfer) |
+| S1 S0 | Y input | Cin = 0               | Cin = 1               |
+|-------+---------+-----------------------+-----------------------|
+| 0 0   | all 0   | G = A (transfer)      | G = A + 1 (increment) |
+| 0 1   | B       | G = A + B (add)       | G = A + B + 1         |
+| 1 0   | not B   | G = A + B̄ = A − B − 1 | G = A − B (subtract)  |
+| 1 1   | all 1   | G = A − 1 (decrement) | G = A (transfer)      |
 
 Each bit of the conditioning logic is \(Y_i=B_iS_0+\bar B_iS_1\). Logic: a 4:1 mux per bit selects \(A\wedge B\), \(A\vee B\), \(A\oplus B\), \(\bar A\). A further select chooses arithmetic, logic or shifter output.
 

@@ -11,13 +11,13 @@
 #+summary: A programmable connection is a fuse (blown to open), an antifuse (shorted to close), a floating-gate transistor whose threshold is shifted by trapped charge (EPROM, EEPROM, Flash) or a transistor driven by an SRAM cell; they differ in reprogrammability, volatility, area and speed.
 
 * Definition
-| technology | how | reprogrammable | volatile | notes |
-|---+---+---+---+---|
-| fuse | high current melts a link: open | no (OTP) | no | old PROMs |
-| antifuse | high voltage breaks a dielectric: short | no (OTP) | no | small, fast, radiation hard |
-| EPROM | hot electrons charge a floating gate | UV erase, off-board | no | quartz window |
-| EEPROM, Flash | tunnelling charges and discharges the gate | electrically, in system | no | limited write cycles |
-| SRAM | a memory cell drives a pass transistor or a mux | unlimited | yes | reload at power-up; most FPGAs |
+| technology    | programmed by               | erase     | notes                 |
+|---------------+-----------------------------+-----------+-----------------------|
+| fuse          | current opens a link        | never     | old PROMs             |
+| antifuse      | voltage shorts a dielectric | never     | small, fast, rad-hard |
+| EPROM         | hot electrons charge a gate | UV light  | quartz window         |
+| EEPROM, Flash | tunnelling charges a gate   | in system | finite writes         |
+| SRAM          | a cell drives a switch      | any time  | volatile, reload      |
 
 * Floating gate
 A floating-gate transistor has a second gate, isolated by oxide, between the control gate and the channel. Electrons trapped on it raise the threshold voltage \(V_T\): with the normal read voltage on the control gate the transistor no longer conducts. The charge stays for years without power. Erasing removes it: UV light (EPROM) or Fowler–Nordheim tunnelling with a reverse voltage (EEPROM, Flash, by blocks).
@@ -26,4 +26,4 @@ A floating-gate transistor has a second gate, isolated by oxide, between the con
 The choice is between switches you set once (fuses, antifuses), switches that remember (floating gates), and switches that forget when you switch off but can change at will (SRAM).
 
 * Pitfall
-SRAM-based devices must load their configuration from an external non-volatile memory at every power-up, which takes time and exposes the bitstream.
+SRAM-based devices must load their configuration from an external non-volatile memory at every power-up, which takes time and exposes the [[id:fpga-architecture][bitstream]].

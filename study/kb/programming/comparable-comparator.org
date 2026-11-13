@@ -11,7 +11,7 @@
 #+summary: A class implements =Comparable<T>= to give its natural order (=a.compareTo(b)= negative, zero or positive); a separate =Comparator<T>= object gives any other order; both must define a total order, ideally consistent with =equals=.
 
 * Definition
-- =interface Comparable<T> { int compareTo(T o); }=: implemented by the class itself (=String=, =Integer=, dates). Sorting, =TreeSet= and =TreeMap= use it by default; sorting objects that do not implement it throws =ClassCastException= at run time.
+- =interface Comparable<T> { int compareTo(T o); }=: implemented by the class itself (=String=, =Integer=, dates). Sorting, =TreeSet= and =TreeMap= use it by default; sorting objects that do not implement it [[id:java-exceptions][throws]] =ClassCastException= at run time.
 - =interface Comparator<T> { int compare(T a, T b); }=: a separate object, so a class can have several orders, and classes one cannot modify can be ordered. Passed to =Collections.sort(list, c)=, =list.sort(c)=, =new TreeSet<>(c)=.
 Requirements: =sgn(a.compareTo(b)) == -sgn(b.compareTo(a))=, transitivity, and preferably =a.compareTo(b) == 0= iff =a.equals(b)=.
 
@@ -19,10 +19,12 @@ Requirements: =sgn(a.compareTo(b)) == -sgn(b.compareTo(a))=, transitivity, and p
 #+begin_src java
   public class Student implements Comparable<Student> {
       String name; int grade;
-      public int compareTo(Student o) { return name.compareTo(o.name); }   // natural: by name
+      // natural: by name
+      public int compareTo(Student o) { return name.compareTo(o.name); }
   }
   students.sort(Comparator.comparingInt((Student s) -> s.grade).reversed()
-                          .thenComparing(s -> s.name));                  // by grade, then name
+                          // by grade, then name
+                          .thenComparing(s -> s.name));
 #+end_src
 
 * Intuition

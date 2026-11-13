@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       perfect-forwarding
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     construction
+:REQUIRES: move-semantics cpp-templates
+:SEE:      smart-pointers stl-containers value-categories
+:ALIASES:  forwarding reference, universal reference, std::forward, reference collapsing, emplace_back, make_unique
+:END:
+#+title: Forwarding references and perfect forwarding
+#+summary: In a template, a parameter =T&&= with deduced =T= binds to both lvalues and rvalues (a forwarding reference): reference collapsing makes =T= an lvalue reference for lvalues; =std::forward<T>(x)= then passes the argument on with its original value category, which is how =emplace_back= and =make_unique= build objects in place without extra copies.
+
+* Construction
+Reference collapsing: =& &=, =& &&=, =&& &= collapse to =&=; only =&& &&= gives =&&=. For
+#+begin_src c++
+  template <class T> void wrapper(T&& x) { target(std::forward<T>(x)); }
+#+end_src
+- called with an [[id:value-categories][lvalue]] of type =A=: \(T=\)=A&=, parameter =A& &&= → =A&=; =std::forward<A&>(x)= is an lvalue: =target= copies;
+- called with an rvalue: \(T=\)=A=, parameter =A&&=; =std::forward<A>(x)= is an rvalue: =target= moves.
+
+* Example
+#+begin_src c++
+  template <class T, class... Args>
+  std::unique_ptr<T> my_make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));   // pack expansion
+  }
+  std::vector<Film> v;
+  v.push_back(Film("Tenet", 2020));    // constructs a temporary, then moves it
+  v.emplace_back("Tenet", 2020);       // forwards the arguments, constructs in place
+#+end_src
+
+* Intuition
+A [[id:pipeline-hazards][forwarding]] wrapper should be invisible: whatever the caller passed — something to copy or something to steal from — the final target should see exactly that.
+
+* Pitfall
+=T&&= is a forwarding reference only when =T= is deduced for that very function; =void f(std::vector<T>&&)= or a member =void g(T&&)= of a [[id:cpp-templates][class template]] is a plain rvalue reference. Forwarding the same argument twice may move from it twice.

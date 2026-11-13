@@ -11,16 +11,21 @@
 #+summary: When the inputs of a gate arrive at different times, its output can make spurious transitions before settling; glitches waste dynamic power (up to a large fraction in arithmetic circuits) and can corrupt asynchronous signals; balancing path delays, adding redundant terms and registering signals reduce them.
 
 * Definition
-A *glitch* is a transition of a node that is not needed by its final value in the cycle. A *static hazard* is a glitch on an output that should stay constant (\(1\to0\to1\)); a *dynamic hazard* is multiple transitions on an output that changes once. Cause: different delays on reconverging paths.
+A *glitch* is a transition of a node that is not needed by its final value in the cycle. A *static [[id:pipeline-hazards][hazard]]* is a glitch on an output that should stay constant (\(1\to0\to1\)); a *dynamic hazard* is multiple transitions on an output that changes once. Cause: different delays on reconverging paths.
 
 * Example
 \(f=ab+\bar a c\) with \(b=c=1\): \(f=1\) whatever \(a\). When \(a\) falls, the term \(ab\) turns off immediately while \(\bar a c\) turns on only after the inverter delay: \(f\) dips to 0 for one inverter delay. The redundant consensus term \(bc\) holds \(f=1\) and removes the hazard.
 
 * Picture
-\begin{tikzpicture}[font=\scriptsize, yscale=0.5]
-\draw (0,4) node[left] {$a$} -- (2,4) -- (2,3.2) -- (6,3.2);
-\draw (0,2.4) node[left] {$\bar a$} -- (2.6,2.4) -- (2.6,1.6) -- (6,1.6); \draw (0,1.6) -- (2.6,1.6); \draw (0,2.4) -- (0,2.4);
-\draw[kbmagenta, line width=1pt] (0,0.8) node[left, black] {$f$} -- (2.1,0.8) -- (2.1,0) -- (2.7,0) -- (2.7,0.8) -- (6,0.8);
+\begin{tikzpicture}[font=\scriptsize, yscale=0.55]
+\foreach \y/\l in {4/{$a$},3/{$\bar a$},2/{$ab$},1/{$\bar a c$},0/{$f=ab+\bar a c$}} \node[anchor=east] at (-0.2,\y*1.4+0.3) {\l};
+\draw (0,5.6+0.6) -- (2,5.6+0.6) -- (2,5.6) -- (6,5.6);
+\draw (0,4.2) -- (2.6,4.2) -- (2.6,4.8) -- (6,4.8);
+\draw (0,2.8+0.6) -- (2.2,2.8+0.6) -- (2.2,2.8) -- (6,2.8);
+\draw (0,1.4) -- (2.8,1.4) -- (2.8,2.0) -- (6,2.0);
+\draw[kbmagenta, line width=1pt] (0,0.6) -- (2.4,0.6) -- (2.4,0) -- (3.0,0) -- (3.0,0.6) -- (6,0.6);
+\draw[kbguide, dashed] (2.4,-0.4) -- (2.4,6.4); \draw[kbguide, dashed] (3.0,-0.4) -- (3.0,6.4);
+\node[kbmagenta, below] at (2.7,-0.4) {glitch};
 \end{tikzpicture}
 The output dips while \(\bar a\) is still catching up.
 

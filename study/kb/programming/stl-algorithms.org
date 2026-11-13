@@ -23,8 +23,11 @@ A comparator must be a strict weak ordering: =comp(a, b)= true when \(a\) goes b
   struct Entry { std::string name; int points; };
   std::vector<Entry> r = {{"Giovanna", 7}, {"Franco", 9}, {"Carla", 9}};
   std::stable_sort(r.begin(), r.end(),
-                   [](const Entry& a, const Entry& b) { return a.points > b.points; });
-  auto n = std::count_if(r.begin(), r.end(), [](const Entry& e) { return e.points >= 8; });
+                   [](const Entry& a, const Entry& b) {
+                                      return a.points > b.points;
+                                    });
+  auto n = std::count_if(r.begin(), r.end(),
+                         [](const Entry& e) { return e.points >= 8; });
   int total = std::accumulate(r.begin(), r.end(), 0,
                               [](int s, const Entry& e) { return s + e.points; });
 #+end_src
@@ -34,4 +37,4 @@ A comparator must be a strict weak ordering: =comp(a, b)= true when \(a\) goes b
 Write the loop once, correctly, in the library; say only what differs (the predicate) at the call site.
 
 * Pitfall
-=std::sort= needs random-access iterators, so it does not work on =std::list=, which has its own member =l.sort()=. =remove_if= does not change the size of the container.
+=std::sort= needs random-access [[id:stl-iterators][iterators]], so it does not work on =std::list=, which has its own member =l.sort()=. =remove_if= does not change the size of the container.

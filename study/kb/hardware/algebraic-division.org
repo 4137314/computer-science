@@ -3,7 +3,7 @@
 :DOMAIN:   hardware
 :AREA:     logic-synthesis
 :KIND:     method
-:REQUIRES:
+:REQUIRES: 
 :SEE:      multilevel-logic-optimization boolean-difference
 :ALIASES:  algebraic division, weak division, Boolean division, kernel, co-kernel, divisor, quotient, remainder, factoring
 :END:

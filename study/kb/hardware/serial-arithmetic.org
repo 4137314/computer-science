@@ -11,7 +11,7 @@
 #+summary: A serial adder processes one bit per clock, least significant first, with one full adder and a flip-flop holding the carry: \(n\) cycles per \(n\)-bit addition, constant area; serial and digit-serial units trade throughput for area and wiring, and fit serial data streams.
 
 * Construction
-Shift registers present \(a_i\) and \(b_i\) at cycle \(i\); a full adder computes \(s_i\) and \(c_{i+1}\); a D flip-flop stores \(c_{i+1}\) for the next cycle (reset to \(c_0\) at the start of each word). Sum bits are shifted out. Area: one full adder and one flip-flop, independent of \(n\); time: \(n\) cycles, but each cycle is a single full-adder delay, so the clock can be fast.
+Shift registers present \(a_i\) and \(b_i\) at cycle \(i\); a [[id:ripple-carry-adder][full adder]] computes \(s_i\) and \(c_{i+1}\); a [[id:sequential-logic][D flip-flop]] stores \(c_{i+1}\) for the next cycle (reset to \(c_0\) at the start of each word). Sum bits are shifted out. Area: one full adder and one flip-flop, independent of \(n\); time: \(n\) cycles, but each cycle is a single full-adder delay, so the clock can be fast.
 
 *Digit-serial*: process \(d\) bits per cycle with a \(d\)-bit adder: \(n/d\) cycles. Serial multipliers combine a serial operand with a parallel one (\(n\) cycles, \(n\) adders).
 

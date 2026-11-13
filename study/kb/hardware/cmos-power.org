@@ -4,7 +4,7 @@
 :AREA:     power
 :KIND:     model
 :REQUIRES: gate-delay-model
-:SEE:      switching-activity clock-gating dvfs-parallelism low-power-encoding digital-design-flow
+:SEE:      switching-activity clock-gating dvfs-parallelism low-power-encoding digital-design-flow power-gating
 :ALIASES:  dynamic power, static power, leakage, short-circuit power, switching power, activity factor, CV^2f, energy per operation
 :END:
 #+title: Power dissipation in CMOS
@@ -20,13 +20,13 @@
 Charging \(C_L\) from 0 to \(V_{DD}\) moves charge \(Q=C_LV_{DD}\) out of the supply at voltage \(V_{DD}\): energy \(QV_{DD}=C_LV_{DD}^2\). The capacitor ends with \(\tfrac12C_LV_{DD}^2\), so the other half is dissipated in the PMOS. Discharging dissipates the stored half in the NMOS. One full cycle \(0\to1\to0\) costs \(C_LV_{DD}^2\); at \(\alpha f\) such cycles per second, \(P=\alpha C_LV_{DD}^2f\).
 
 * Levers
-| parameter | how to reduce |
-|---+---|
-| \(\alpha\) | [[id:switching-activity][activity]] reduction, [[id:clock-gating][clock gating]], [[id:low-power-encoding][encodings]], [[id:glitches][glitch]] removal |
-| \(C_L\) | smaller gates, shorter wires, fewer nodes |
-| \(V_{DD}\) | [[id:dvfs-parallelism][voltage scaling]], multiple supplies |
-| \(f\) | lower frequency (saves power, not energy per operation) |
-| \(I_{leak}\) | power gating, high-threshold cells |
+| parameter       | how to reduce it                                           |
+|-----------------+------------------------------------------------------------|
+| activity α      | fewer transitions: clock gating, encodings, glitch removal |
+| capacitance C_L | smaller gates, shorter wires, fewer nodes                  |
+| supply V_DD     | voltage scaling, multiple supplies (quadratic gain)        |
+| frequency f     | lower clock: saves power, not energy per operation         |
+| leakage I_leak  | power gating, high-threshold cells                         |
 
 * Intuition
 Every bit flip pays a toll proportional to the capacitance and to the square of the voltage. Low-power design is flipping fewer bits, smaller wires, at lower voltage.

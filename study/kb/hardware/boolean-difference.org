@@ -3,8 +3,8 @@
 :DOMAIN:   hardware
 :AREA:     logic-synthesis
 :KIND:     definition
-:REQUIRES:
-:SEE:      algebraic-division multilevel-logic-optimization switching-activity
+:REQUIRES: 
+:SEE:      algebraic-division multilevel-logic-optimization switching-activity generalized-bypass
 :ALIASES:  Boolean difference, Shannon expansion, cofactor, observability, don't care, sensitivity
 :END:
 #+title: Shannon cofactors and the Boolean difference
@@ -20,7 +20,7 @@ Cofactors: \(f_x=f|_{x=1}\), \(f_{\bar x}=f|_{x=0}\). Shannon expansion: \(f=x\,
 \(f=xy+z\): \(f_x=y+z\), \(f_{\bar x}=z\), \(\partial f/\partial x=(y+z)\oplus z=y\bar z\). The value of \(x\) matters only when \(y=1,z=0\). In a network, if \(x\) is an internal node, its logic can be changed freely on the inputs where \(y\bar z=0\).
 
 * Uses
-- node simplification in multilevel logic: don't-cares from the rest of the network;
+- node [[id:multilevel-logic-optimization][simplification]] in multilevel logic: don't-cares from the rest of the network;
 - testing: a fault on \(x\) is detectable only where \(\partial f/\partial x=1\);
 - power: transitions of \(x\) propagate to \(f\) with probability \(P(\partial f/\partial x=1)\).
 

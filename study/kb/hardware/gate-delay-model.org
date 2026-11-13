@@ -3,7 +3,7 @@
 :DOMAIN:   hardware
 :AREA:     timing
 :KIND:     model
-:REQUIRES:
+:REQUIRES: 
 :SEE:      static-timing-analysis timing-driven-mapping cmos-power glitches
 :ALIASES:  gate delay, propagation delay, load-dependent delay, fanout, slew, transition time, delay table, wire delay, Elmore delay, RC delay
 :END:
@@ -18,13 +18,16 @@
 
 * Picture
 \begin{tikzpicture}
-\begin{axis}[width=6.8cm, height=4.6cm, axis lines=left, xlabel={load $C_L$ (fF)}, ylabel={delay (ps)}, xmin=0, xmax=40, ymin=0, ymax=260, legend pos=north west]
+\begin{axis}[width=6.8cm, height=4.6cm, axis lines=left, xlabel={load $C_L$ (fF)}, ylabel={delay (ps)}, xmin=0, xmax=40, ymin=0, ymax=260]
 \addplot+[domain=0:40] {20+6*x}; \addlegendentry{INV x1}
 \addplot+[domain=0:40] {28+3*x}; \addlegendentry{INV x2}
 \addplot+[domain=0:40] {40+1.5*x}; \addlegendentry{INV x4}
 \end{axis}
 \end{tikzpicture}
 Bigger gates have more intrinsic delay but a smaller slope: each wins in a range of loads.
+
+* Worked example
+An inverter with \(d=20+6\,C_L\) ps drives four inputs of 3 fF each and 8 fF of wire: \(C_L=20\) fF, \(d=140\) ps. Replacing it with an x4 inverter (\(d=40+1.5\,C_L\), input capacitance 4× larger) gives 70 ps, but its own input load grows from 3 to 12 fF, slowing the gate that drives it by \(6\cdot9=54\) ps with the x1 slope: the net gain is about 16 ps, not 70. Sizing is a chain problem, not a single-gate one.
 
 * Intuition
 A gate is a current source charging a capacitor. More capacitance, more time; more current (a bigger gate), less time.

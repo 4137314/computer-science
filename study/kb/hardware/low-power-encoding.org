@@ -13,8 +13,8 @@
 * Construction
 - *Gray counter*: consecutive values differ in one bit, \(g=b\oplus(b\gg1)\). A binary counter flips about 2 bits per step on average (bit \(i\) toggles every \(2^i\) steps: \(\sum_i 2^{-i}\to2\)), a Gray counter exactly 1.
 - *Bus-invert*: for an \(n\)-bit bus, if the Hamming distance between the new word and the current bus value exceeds \(n/2\), send the complement and set an extra =INV= line. At most \(n/2+1\) lines switch per transfer.
-- *FSM state assignment*: weight each pair of states by the probability of the transition between them; give heavy pairs codes at Hamming distance 1.
-- *Sample representation*: in two's complement a signal oscillating around 0 flips all its sign-extension bits at each zero crossing; sign-magnitude flips only the sign bit.
+- *FSM [[id:fsm-state-encoding][state assignment]]*: weight each pair of states by the probability of the transition between them; give heavy pairs codes at Hamming distance 1.
+- *Sample representation*: in [[id:ripple-carry-adder][two's complement]] a signal oscillating around 0 flips all its sign-extension bits at each zero crossing; sign-magnitude flips only the sign bit.
 - *Input ordering*: in a chain of gates, connect the signal with the highest activity (or the latest one) nearest the output, so its transitions reach fewer internal nodes.
 
 * Example
@@ -24,4 +24,4 @@ Bus of 8 lines at =00000000=, next word =11111110=: 7 lines would switch. Bus-in
 Power is spent on changes, not on values: choose the representation in which the data you actually send changes least.
 
 * Pitfall
-Encoders and decoders consume power and add delay: bus-invert pays off on long, heavily loaded buses (off-chip), not on short internal ones.
+Encoders and decoders [[id:event-handling][consume]] power and add delay: bus-invert pays off on long, heavily loaded buses (off-chip), not on short internal ones.

@@ -23,8 +23,8 @@ The course PDFs live in `assets/` (`cpp/`, `java/`, `vhdl/`) and are not version
 
 | path | content |
 |---|---|
-| `study/kb/programming/` | 57 notes: uml, memory, oop, cpp, generic-programming, java, concurrency, gui |
-| `study/kb/hardware/` | 57 notes: complexity, programmable-logic, vhdl, simulation, timing, logic-synthesis, power, high-level-synthesis, arithmetic, processors, interfaces |
+| `study/kb/programming/` | 70 notes: uml, memory, oop, cpp (also exception safety, copy-and-swap, casts, multiple inheritance, perfect forwarding), generic-programming (specialization, concepts), java (monitors, inner classes, streams, HashMap internals, immutability), concurrency (condition variables), gui (observer/MVC) |
+| `study/kb/hardware/` | 65 notes: complexity, programmable-logic, vhdl (also state encoding), simulation, timing (metastability, skew and jitter), logic-synthesis (two-level minimization), power (power gating), high-level-synthesis, arithmetic (Booth, fixed point), processors (pipeline hazards), interfaces |
 | `study/kb-config.el` | domains and areas in study order, forbidden words, extra TikZ libraries |
 | `study/study.mk` | `make study*` targets |
 | `study/computer-science.desktop.in` | launcher entry template |
@@ -33,8 +33,15 @@ The course PDFs live in `assets/` (`cpp/`, `java/`, `vhdl/`) and are not version
 One note per concept, in English, with `REQUIRES` (prerequisites, an acyclic graph that
 gives the study order) and `SEE` (lateral links); sections follow the reader's format
 (Definition/Statement/Model, Derivation, Picture, Example or Algorithm, Intuition,
-Pitfall). Formulas, TikZ/pgfplots figures and `algorithmic` pseudocode are rendered to SVG;
+Pitfall, and a Worked example with numbers where it helps). Formulas, TikZ/pgfplots figures and `algorithmic` pseudocode are rendered to SVG;
 code examples are org source blocks (C++, Java, VHDL).
+
+## Reading conventions
+
+Tables are plain text (Unicode symbols instead of formulas), aligned and at most 86
+columns wide, so they line up in the reader's 90-column column; in a much narrower window
+Emacs wraps them. Plot legends sit above the axes (global pgfplots style in
+`study/kb-config.el`), and display formulas are rendered on a single line.
 
 ## Use
 

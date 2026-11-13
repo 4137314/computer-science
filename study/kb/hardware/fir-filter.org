@@ -11,11 +11,11 @@
 #+summary: \(y[n]=\sum_{k=0}^{N-1}h_k\,x[n-k]\): in direct form a delay line feeds \(N\) multipliers and a chain of adders (critical path one multiplier plus \(N-1\) adders); retiming the delays across the adders gives the transposed form, critical path one multiplier and one adder; a serial version uses one MAC for \(N\) cycles.
 
 * Construction
-- *Direct form*: registers \(x[n],x[n-1],\dots\) (tapped delay line), products \(h_kx[n-k]\), adder chain. Critical path \(T_{mul}+(N-1)T_{add}\).
+- *Direct form*: registers \(x[n],x[n-1],\dots\) (tapped delay line), products \(h_kx[n-k]\), adder chain. [[id:static-timing-analysis][Critical path]] \(T_{mul}+(N-1)T_{add}\).
 - *Direct pipelined*: registers in the adder chain (and matching ones on the delay line) cut the path to \(T_{mul}+T_{add}\), adding latency.
 - *Transposed form*: the input \(x[n]\) is broadcast to all multipliers and the registers sit between the adders: \(z_k[n]=h_kx[n]+z_{k+1}[n-1]\), \(y[n]=z_0[n]\). Critical path \(T_{mul}+T_{add}\) with no extra latency. It is obtained from the direct form by [[id:retiming][retiming]]: reverse the order of additions, move the delays across the adders, remove the addition with 0.
-- *Serial*: one multiply–accumulate unit, a coefficient ROM and a circular buffer: \(N\) cycles per output, minimal area.
-- *Adder tree / CSA*: the \(N\) products summed in carry-save form.
+- *Serial*: one multiply–accumulate unit, a coefficient ROM and a [[id:stack-and-queue][circular buffer]]: \(N\) cycles per output, minimal area.
+- *[[id:carry-save-adder][Adder tree]] / CSA*: the \(N\) products summed in carry-save form.
 
 * Picture
 \begin{tikzpicture}[font=\scriptsize, r/.style={draw, kbamber, minimum width=0.45cm, minimum height=0.45cm}, m/.style={draw, kbcyan, circle, inner sep=1pt}, a/.style={draw, circle, inner sep=1pt}]

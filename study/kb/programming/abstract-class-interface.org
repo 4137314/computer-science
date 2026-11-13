@@ -4,19 +4,19 @@
 :AREA:     oop
 :KIND:     definition
 :REQUIRES: polymorphism
-:SEE:      virtual-functions java-generics event-handling comparable-comparator
+:SEE:      virtual-functions java-generics event-handling comparable-comparator java-inner-classes
 :ALIASES:  abstract class, abstract method, interface, pure virtual, default method, implements, multiple inheritance of type, marker interface
 :END:
 #+title: Abstract classes and interfaces
 #+summary: An abstract class has at least one method without a body and cannot be instantiated; an interface is a set of method signatures that classes implement, giving multiple inheritance of type without multiple inheritance of state.
 
 * Definition
-- *Abstract method*: declared without a body; =abstract void draw();= (Java), =virtual void draw() = 0;= (C++, pure virtual).
+- *Abstract method*: declared without a body; =abstract void draw();= (Java), =virtual void draw() = 0;= (C++, [[id:virtual-functions][pure virtual]]).
 - *Abstract class*: has at least one abstract method (Java can also mark it =abstract= explicitly). It has no instances, but can have fields, constructors and concrete methods; subclasses become concrete when they implement every abstract method.
 - *Interface* (Java): a collection of method signatures and constants, no state. A class =implements= any number of interfaces and must give a body to every method (or be abstract). Since Java 8 interfaces may have =default= and =static= methods. An interface can =extend= several interfaces. Empty marker interfaces (=Cloneable=, =Serializable=) label a capability.
 
 * Why interfaces
-With multiple inheritance of classes, two superclasses can provide conflicting implementations of the same method (the diamond problem). Java separates the two uses of inheritance: a single hierarchy of classes for implementation, a multiple hierarchy of interfaces for types. An =Animal= can be both =Flying= and =Swimming= (a duck) without inheriting two bodies of =move()=.
+With [[id:uml-generalization][multiple inheritance]] of classes, two superclasses can provide conflicting implementations of the same method (the [[id:multiple-inheritance][diamond problem]]). Java separates the two uses of inheritance: a single hierarchy of classes for implementation, a multiple hierarchy of interfaces for types. An =Animal= can be both =Flying= and =Swimming= (a duck) without inheriting two bodies of =move()=.
 
 * Picture
 \begin{tikzpicture}[font=\small, box/.style={draw, minimum width=1.9cm, minimum height=0.6cm}]
@@ -28,11 +28,14 @@ With multiple inheritance of classes, two superclasses can provide conflicting i
 \draw[dashed, -{Triangle[open,length=7pt,width=8pt]}] (d) -- (f);
 \draw[dashed, -{Triangle[open,length=7pt,width=8pt]}] (d) -- (s);
 \end{tikzpicture}
-One superclass (solid), many interfaces (dashed).
+One [[id:inheritance][superclass]] (solid), many interfaces (dashed).
 
 * Example
 #+begin_src java
-  interface Shape { double area(); default String describe() { return "area " + area(); } }
+  interface Shape {
+      double area();
+      default String describe() { return "area " + area(); }
+  }
   abstract class Polygon implements Shape { protected int sides; }
   class Square extends Polygon {
       private final double l;
@@ -46,4 +49,4 @@ One superclass (solid), many interfaces (dashed).
 An interface is a role a class can play; an abstract class is an unfinished class that shares code with its children.
 
 * Pitfall
-An interface cannot be instantiated, but =new Shape() { ... }= is legal: it creates an anonymous class that implements it.
+An interface cannot be instantiated, but =new Shape() { ... }= is legal: it creates an [[id:event-handling][anonymous class]] that implements it.

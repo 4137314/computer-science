@@ -32,4 +32,4 @@
 Ask what is copied: the value, or a way to reach it. A copied address still leads to the same house.
 
 * Pitfall
-In C++ passing an object by value calls its copy constructor: for a class that owns memory without a [[id:shallow-deep-copy][deep copy]], the copy shares the memory and the destructor of the copy frees it under the caller's feet.
+In C++ passing an object by value calls its [[id:cpp-special-members][copy constructor]]: for a class that owns memory without a [[id:shallow-deep-copy][deep copy]], the copy shares the memory and the destructor of the copy frees it under the caller's feet.

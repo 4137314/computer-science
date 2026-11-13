@@ -4,7 +4,7 @@
 :AREA:     concurrency
 :KIND:     definition
 :REQUIRES: call-stack
-:SEE:      mutual-exclusion lambda-expressions event-handling
+:SEE:      mutual-exclusion lambda-expressions event-handling java-monitors
 :ALIASES:  thread, std::thread, join, data race, race condition, preemption, interleaving, concurrency
 :END:
 #+title: Threads and data races
@@ -18,12 +18,12 @@ A *data race* occurs when two threads access the same memory location concurrent
 * Derivation
 =++counter= is three steps: load, add, store. Two threads, each incrementing once, starting from 0:
 
-| thread A | thread B | counter |
-|---+---+---|
-| load 0 | | 0 |
-| | load 0 | 0 |
-| add, store 1 | | 1 |
-| | add, store 1 | 1 |
+| thread A     | thread B     | counter |
+|--------------+--------------+---------|
+| load 0       |              | 0       |
+|              | load 0       | 0       |
+| add, store 1 |              | 1       |
+|              | add, store 1 | 1       |
 
 One increment is lost. With \(n\) increments per thread the final value can be anything between \(2\) and \(2n\).
 

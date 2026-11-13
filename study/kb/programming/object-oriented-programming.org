@@ -3,8 +3,8 @@
 :DOMAIN:   programming
 :AREA:     oop
 :KIND:     definition
-:REQUIRES:
-:SEE:      uml-class-diagram information-hiding inheritance polymorphism generic-programming
+:REQUIRES: 
+:SEE:      uml-class-diagram information-hiding inheritance polymorphism generic-programming method-overloading
 :ALIASES:  OOP, object orientation, class, object, encapsulation, programming in the large
 :END:
 #+title: Object-oriented programming
@@ -36,7 +36,7 @@ Function-oriented design methods (functional, control-flow, data-flow diagrams) 
 The state sits inside, reachable only through the methods on the boundary.
 
 * C++ and Java
-C++ adds classes to C and keeps value semantics, pointers, manual memory and multiple inheritance; its design rules are zero-overhead abstraction, a direct map to hardware and stability. Java removes pointers and manual memory, adds a garbage collector and a single-rooted class hierarchy (=Object=), and replaces multiple inheritance of classes with interfaces.
+C++ adds classes to C and keeps value semantics, pointers, manual memory and [[id:uml-generalization][multiple inheritance]]; its design rules are zero-overhead abstraction, a direct map to hardware and stability. Java removes pointers and manual memory, adds a [[id:java-references][garbage collector]] and a single-rooted class hierarchy (=Object=), and replaces [[id:multiple-inheritance][multiple inheritance]] of classes with interfaces.
 
 * Intuition
 An object is a small machine with buttons. Users press buttons; only the machine knows what is inside. Changing the inside without changing the buttons breaks nobody.

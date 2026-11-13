@@ -1,0 +1,41 @@
+:PROPERTIES:
+:ID:       two-level-minimization
+:DOMAIN:   hardware
+:AREA:     logic-synthesis
+:KIND:     method
+:REQUIRES: 
+:SEE:      pla-pal multilevel-logic-optimization boolean-difference np-hard-optimization
+:ALIASES:  two-level minimization, Karnaugh map, Quine-McCluskey, prime implicant, essential prime implicant, cover, sum of products, don't care, Espresso
+:END:
+#+title: Two-level minimization: prime implicants and covers
+#+summary: A minimum sum of products is a cover of the on-set by prime implicants (cubes that cannot be enlarged without hitting the off-set); Quine–McCluskey generates all primes by merging cubes differing in one variable, essential primes are taken first, and the rest is a set-cover problem — NP-hard in general, solved heuristically by Espresso.
+
+* Method
+1. *Implicant*: a cube \(c\) (product of literals) with \(c\Rightarrow f\). *Prime*: no literal can be removed keeping \(c\Rightarrow f\). Every minimum SOP uses only primes.
+2. *Generate primes* (Quine–McCluskey): list minterms (and don't-cares) by number of ones; merge pairs differing in exactly one bit (\(x\bar y z+xyz=xz\)); repeat on the merged cubes; cubes never merged are prime.
+3. *Prime implicant chart*: rows = primes, columns = minterms (not don't-cares). A minterm covered by a single prime makes that prime *essential*.
+4. *Cover* the remaining minterms with the fewest (cheapest) primes: row/column dominance, then branching (Petrick's method) — exponential in the worst case.
+A Karnaugh map does the same by eye for up to 4–5 variables: largest power-of-two rectangles of ones, wrapping at the edges.
+
+* Example
+\(f(a,b,c)=\sum m(0,1,2,5,6,7)\). Merging: \(000+001=\bar a\bar b\), \(000+010=\bar a\bar c\), \(001+101=\bar bc\), \(010+110=b\bar c\), \(101+111=ac\), \(110+111=ab\). No further merges: six primes. Every minterm is covered by two primes, none essential (a cyclic cover). Minimum covers have three primes: \(f=\bar a\bar b+b\bar c+ac\) or \(f=\bar a\bar c+\bar bc+ab\).
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\foreach \c/\l in {0/00,1/01,2/11,3/10} \node at (\c*0.7+0.35,0.95) {\l};
+\node at (-0.35,0.95) {$a\backslash bc$};
+\foreach \r/\l in {0/0,1/1} \node at (-0.35,0.35-\r*0.7) {\l};
+\foreach \r in {0,1} \foreach \c in {0,...,3} \draw (\c*0.7,0.7-\r*0.7) rectangle ++(0.7,-0.7);
+\foreach \r/\c/\v in {0/0/1,0/1/1,0/2/0,0/3/1,1/0/0,1/1/1,1/2/1,1/3/1} \node at (\c*0.7+0.35,0.35-\r*0.7) {\v};
+\draw[kbcyan, rounded corners, line width=1pt] (0.06,0.64) rectangle (1.34,0.06);
+\draw[kbamber, rounded corners, line width=1pt] (2.16,0.62) rectangle (2.74,-0.62);
+\draw[kbmagenta, rounded corners, line width=1pt] (0.76,-0.08) rectangle (2.04,-0.64);
+\node[anchor=west] at (3.1,0.35) {\textcolor{kbcyan}{$\bar a\bar b$} $+$ \textcolor{kbamber}{$b\bar c$} $+$ \textcolor{kbmagenta}{$ac$}};
+\end{tikzpicture}
+Three prime rectangles cover the six ones.
+
+* Intuition
+Make every product as large as possible (prime), then pick the fewest large products that together touch every one.
+
+* Pitfall
+Greedy "take the biggest prime first" is not optimal on cyclic charts; and two-level minimality says nothing about multilevel area or delay — it is only the first step of synthesis.

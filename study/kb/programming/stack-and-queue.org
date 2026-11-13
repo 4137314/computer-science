@@ -17,9 +17,11 @@
       protected int size = 0;
       public Stack() { this(10); }
       public Stack(int capacity) { data = new int[capacity]; }
-      public Stack(Stack other) { data = other.data.clone(); size = other.size; }  // deep copy
+      // deep copy
+      public Stack(Stack other) { data = other.data.clone(); size = other.size; }
       public void push(int x) {
-          if (size == data.length) data = java.util.Arrays.copyOf(data, 2 * data.length);
+          if (size == data.length)
+              data = java.util.Arrays.copyOf(data, 2 * data.length);
           data[size++] = x;
       }
       public int pop() {
@@ -40,18 +42,20 @@
 #+end_src
 
 * Picture
-\begin{tikzpicture}[font=\small]
-\foreach \i/\v in {0/a,1/b,2/c} {\draw (\i*0.8,0) rectangle (\i*0.8+0.8,0.6); \node at (\i*0.8+0.4,0.3) {\v};}
-\draw[-{Stealth}, kbcyan] (2.0,1.1) -- (2.0,0.65); \node[kbcyan, font=\scriptsize] at (2.0,1.3) {push, pop (stack)};
-\draw[-{Stealth}, kbamber] (0.4,0.65) -- (0.4,1.1); \node[kbamber, font=\scriptsize] at (0.4,1.3) {pop (queue)};
+\begin{tikzpicture}[font=\small, >={Stealth}]
+\foreach \i/\v in {0/a,1/b,2/c} {\draw (\i*0.9,0) rectangle (\i*0.9+0.9,0.7); \node at (\i*0.9+0.45,0.35) {\v};}
+\node[kbguide, font=\scriptsize] at (0.45,-0.3) {head (oldest)}; \node[kbguide, font=\scriptsize] at (2.25,-0.3) {top (newest)};
+\draw[->, kbcyan] (3.5,1.0) node[right, font=\scriptsize] {push} -- (2.4,0.72);
+\draw[->, kbcyan] (2.1,0.72) -- (1.8,1.3) node[above, font=\scriptsize] {pop (stack)};
+\draw[->, kbamber] (0.45,0.72) -- (0.2,1.3) node[above, font=\scriptsize] {pop (queue)};
 \end{tikzpicture}
 The stack takes from the top; the queue from the head, where the oldest element is.
 
 * The C++ version
-The same class in C++ owns its array through a pointer, so it needs a destructor (=delete[] data=), a copy constructor and an assignment operator that copy the array: the [[id:shallow-deep-copy][rule of three]]. In Java, =clone()= on the array plays the role of the deep copy and the garbage collector of the destructor.
+The same class in C++ owns its array through a pointer, so it needs a destructor (=delete[] data=), a [[id:cpp-special-members][copy constructor]] and an assignment operator that copy the array: the [[id:shallow-deep-copy][rule of three]]. In Java, =clone()= on the array plays the role of the deep copy and the [[id:java-references][garbage collector]] of the destructor.
 
 * Intuition
-Two ten-line classes contain most of object orientation: hidden representation, invariants, construction, copying, reuse by extension.
+Two ten-line classes contain most of [[id:object-oriented-programming][object orientation]]: hidden representation, invariants, construction, copying, reuse by extension.
 
 * Pitfall
-The queue never reclaims the slots before =head=, and a =Queue= passed where a =Stack= is expected changes the meaning of =pop=: inheritance used for code reuse, not for an is-a relation (see [[id:liskov-substitution][Liskov]]). Composition (a queue that contains an array or a list) is the better design.
+The queue never reclaims the slots before =head=, and a =Queue= passed where a =Stack= is expected changes the meaning of =pop=: inheritance used for code reuse, not for an is-a relation (see [[id:liskov-substitution][Liskov]]). [[id:aggregation-composition][Composition]] (a queue that contains an array or a list) is the better design.

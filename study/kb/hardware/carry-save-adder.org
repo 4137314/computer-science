@@ -13,7 +13,7 @@
 * Construction
 For operands \(x,y,z\), bit \(i\): \(s_i=x_i\oplus y_i\oplus z_i\), \(c_{i+1}=\mathrm{maj}(x_i,y_i,z_i)\). Then
 \[ x+y+z=S+2C, \]
-with \(S=(s_i)\), \(C=(c_i)\): the sum is kept in *redundant* form (two words), and no carry propagates. Delay: one full adder, independent of \(n\).
+with \(S=(s_i)\), \(C=(c_i)\): the sum is kept in *redundant* form (two words), and no carry propagates. Delay: one [[id:ripple-carry-adder][full adder]], independent of \(n\).
 
 *Adder trees*: \(k\) operands need \(k-2\) CSA rows. In a chain they cost \(k-2\) full-adder delays; in a *Wallace tree* each level reduces the count by a factor \(3/2\), so \(\approx\log_{3/2}(k/2)\) levels. A final carry-propagate adder (ripple or lookahead) gives the result. A plain tree of carry-propagate adders would cost \(\lceil\log_2k\rceil\) full additions instead.
 

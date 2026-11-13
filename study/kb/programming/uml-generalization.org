@@ -11,14 +11,14 @@
 #+summary: A generalization makes every instance of a subclass an instance of its superclass, so the subclass inherits all attributes and associations; a family of subclasses can be disjoint and/or complete.
 
 * Definition
-A generalization relates a superclass to one or more subclasses (hollow triangle on the superclass). Every instance of a subclass is an instance of the superclass: \(\mathrm{ext}(\text{Sub})\subseteq\mathrm{ext}(\text{Super})\).
+A generalization relates a [[id:inheritance][superclass]] to one or more subclasses (hollow triangle on the superclass). Every instance of a subclass is an instance of the superclass: \(\mathrm{ext}(\text{Sub})\subseteq\mathrm{ext}(\text{Super})\).
 
-- *Inheritance principle*: every property (attribute, operation, association) of the superclass is a property of the subclass, and is not repeated in the diagram.
+- *Inheritance principle*: every property (attribute, operation, [[id:uml-association][association]]) of the superclass is a property of the subclass, and is not repeated in the diagram.
 - *Disjoint* ={disjoint}=: the subclasses share no instance.
 - *Complete* ={complete}=: the union of the subclasses is the whole superclass.
 - One superclass can have several independent generalizations, one per criterion (occupation: student/worker; role: doctor/patient).
-- *Multiple inheritance*: two non-disjoint subclasses can share instances only through an explicit common subclass (=WorkingStudent=), so that every object keeps one most specific class.
-- *Specialization*: a subclass can restrict an inherited attribute (=Age: 0..120= in Person, =Age: 70..120= in Elder).
+- *[[id:multiple-inheritance][Multiple inheritance]]*: two non-disjoint subclasses can share instances only through an explicit common subclass (=WorkingStudent=), so that every object keeps one most specific class.
+- *[[id:cpp-templates][Specialization]]*: a subclass can restrict an inherited attribute (=Age: 0..120= in Person, =Age: 70..120= in Elder).
 
 * Derivation
 From "every Book has a Title" and "every HistoricalBook is a Book" it follows that every HistoricalBook has a Title. Inheritance is the transitivity of inclusion: if \(x\in\mathrm{ext}(\text{Sub})\subseteq\mathrm{ext}(\text{Super})\) and every element of \(\mathrm{ext}(\text{Super})\) has the property, so does \(x\).

@@ -4,7 +4,7 @@
 :AREA:     cpp
 :KIND:     construction
 :REQUIRES: cpp-special-members aggregation-composition
-:SEE:      move-semantics smart-pointers equals-hashcode
+:SEE:      move-semantics smart-pointers equals-hashcode copy-and-swap
 :ALIASES:  deep copy, shallow copy, rule of three, copy constructor, clone
 :END:
 #+title: Shallow and deep copy, rule of three
@@ -16,7 +16,7 @@
 *Rule of three*: if a class needs a user-defined destructor, copy constructor or copy assignment, it needs all three. (Rule of five with the two move operations.)
 
 * Derivation
-Take =class A { int i; B* pb; };= with =pb= owning a heap =B=. The generated copy constructor copies =pb=: after =A a2(a);= both point to one =B=. Changing =a2='s =B= changes =a='s; when both die, =~A= deletes the same =B= twice. Defining the copy to allocate a new =B= restores one =B= per =A=.
+Take =class A { int i; B* pb; };= with =pb= owning a heap =B=. The generated [[id:cpp-special-members][copy constructor]] copies =pb=: after =A a2(a);= both point to one =B=. Changing =a2='s =B= changes =a='s; when both die, =~A= deletes the same =B= twice. Defining the copy to allocate a new =B= restores one =B= per =A=.
 
 * Picture
 \begin{tikzpicture}[font=\small]

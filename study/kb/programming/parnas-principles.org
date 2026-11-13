@@ -3,7 +3,7 @@
 :DOMAIN:   programming
 :AREA:     oop
 :KIND:     definition
-:REQUIRES:
+:REQUIRES: 
 :SEE:      information-hiding exception-handling call-stack
 :ALIASES:  Parnas, design by contract, contract, precondition, postcondition, specification
 :END:

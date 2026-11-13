@@ -12,8 +12,8 @@
 
 * Construction
 Let \(x\) arrive late and \(f\) depend on it through a long path.
-- *Generalized select (Shannon)*: \(f=x\,f_x+\bar x\,f_{\bar x}\). Compute both cofactors from the early inputs, then a multiplexer driven by \(x\). The delay from \(x\) to \(f\) becomes one mux; area roughly doubles for the cone.
-- *Generalized bypass*: when \(x\) propagates to an intermediate node \(g\) and then along a chain to \(f\), add a path from \(x\) straight to the end, enabled by the Boolean difference \(\partial f/\partial g\) (computed from early signals): the long path is used only when the bypass is not, which makes it [[id:false-path][false]] for timing.
+- *Generalized select (Shannon)*: \(f=x\,f_x+\bar x\,f_{\bar x}\). Compute both cofactors from the early inputs, then a [[id:vhdl-concurrent-assignments][multiplexer]] driven by \(x\). The delay from \(x\) to \(f\) becomes one mux; area roughly doubles for the cone.
+- *Generalized bypass*: when \(x\) propagates to an intermediate node \(g\) and then along a chain to \(f\), add a path from \(x\) straight to the end, enabled by the [[id:boolean-difference][Boolean difference]] \(\partial f/\partial g\) (computed from early signals): the long path is used only when the bypass is not, which makes it false for timing.
 
 * Carry instances
 For a block of \(k\) bits of an adder with carry-in \(c_{in}\), propagate \(p_i=a_i\oplus b_i\), generate \(g_i=a_ib_i\):

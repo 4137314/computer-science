@@ -1,0 +1,27 @@
+:PROPERTIES:
+:ID:       power-gating
+:DOMAIN:   hardware
+:AREA:     power
+:KIND:     construction
+:REQUIRES: cmos-power clock-gating
+:SEE:      dvfs-parallelism
+:ALIASES:  power gating, leakage reduction, sleep transistor, header switch, footer switch, MTCMOS, multi-threshold CMOS, retention register, isolation cell
+:END:
+#+title: Power gating and leakage reduction
+#+summary: Clock gating stops dynamic power but not leakage; power gating disconnects an idle block from the supply with a high-threshold sleep transistor (header or footer), cutting leakage by orders of magnitude, at the cost of wake-up time and energy, isolation cells on the outputs and retention registers for state that must survive.
+
+* Construction
+- *Sleep transistor*: a wide high-\(V_T\) PMOS between \(V_{DD}\) and the block's [[id:virtual-functions][virtual]] supply (header) or NMOS to ground (footer). Off: [[id:cmos-power][leakage]] limited by the high-\(V_T\) device. On: small series resistance, slight speed loss.
+- *Multi-threshold CMOS*: low-\(V_T\) (fast, leaky) cells on critical paths, high-\(V_T\) cells elsewhere.
+- *Isolation cells*: clamp the outputs of a powered-down block to known values so that floating nodes do not cause short-circuit current in powered blocks.
+- *Retention registers*: a small always-on latch saves the state before shutdown.
+- *Break-even time*: gating pays only if the block stays off longer than \(E_{wake}/P_{leak}\), the time in which saved leakage equals the energy spent turning off and on.
+
+* Derivation
+Subthreshold leakage \(I_{leak}\propto e^{-V_T/(n\,kT/q)}\): with \(n\,kT/q\approx40\) mV, raising \(V_T\) by 100 mV reduces leakage by about \(e^{2.5}\approx12\), by 300 mV about \(1800\). This is why a single high-\(V_T\) switch in series controls the leakage of thousands of low-\(V_T\) gates.
+
+* Intuition
+[[id:clock-gating][Clock gating]] is putting a machine on pause; power gating is unplugging it — far more saving, but restarting takes time and you lose what was in its memory unless you saved it.
+
+* Pitfall
+Turning a large block on draws a current surge (in-rush) that disturbs neighbouring blocks' supply; switches are turned on gradually, which adds wake-up latency.

@@ -4,7 +4,7 @@
 :AREA:     java
 :KIND:     theorem
 :REQUIRES: java-object-class casting-instanceof
-:SEE:      comparable-comparator java-collections java-dynamic-binding shallow-deep-copy
+:SEE:      comparable-comparator java-collections java-dynamic-binding shallow-deep-copy hashmap-internals
 :ALIASES:  equals, hashCode, equivalence relation, hash function, hash table, collision, Objects.hash, identity
 :END:
 #+title: The equals–hashCode contract
@@ -20,14 +20,14 @@ For non-null references \(x,y,z\):
 And =x.equals(y)= implies =x.hashCode() == y.hashCode()=. The converse is not required: unequal objects may collide.
 
 * Derivation
-A hash table stores an element in bucket \(h(x)\bmod m\) and, to look it up, scans only that bucket with =equals=. If two equal objects had different hashes they would land in different buckets, so =contains= on one would not find the other, and a =HashSet= would hold "duplicates". Lookup costs \(O(1)\) on average when the hash spreads the elements evenly.
+A [[id:hashmap-internals][hash table]] stores an element in bucket \(h(x)\bmod m\) and, to look it up, scans only that bucket with =equals=. If two equal objects had different hashes they would land in different buckets, so =contains= on one would not find the other, and a =HashSet= would hold "duplicates". Lookup costs \(O(1)\) on average when the hash spreads the elements evenly.
 
 * Picture
 \begin{tikzpicture}[font=\small]
 \foreach \i in {0,...,4} {\draw (0,-\i*0.55) rectangle (0.8,-\i*0.55+0.5); \node[font=\scriptsize] at (0.4,-\i*0.55+0.25) {\i};}
-\node[draw, kbcyan] (a) at (2.2,-0.3) {"ab"}; \node[draw, kbcyan] (b) at (3.6,-0.3) {"ba"};
+\node[draw, kbcyan] (a) at (2.2,-0.3) {\texttt{ab}}; \node[draw, kbcyan] (b) at (3.6,-0.3) {\texttt{ba}};
 \draw[-{Stealth}] (0.8,-0.3) -- (a); \draw[-{Stealth}] (a) -- (b);
-\node[draw, kbamber] (c) at (2.2,-1.95) {"cd"}; \draw[-{Stealth}] (0.8,-1.95) -- (c);
+\node[draw, kbamber] (c) at (2.2,-1.95) {\texttt{cd}}; \draw[-{Stealth}] (0.8,-1.95) -- (c);
 \end{tikzpicture}
 A hash summing character codes puts ="ab"= and ="ba"= in the same bucket: a collision, resolved by =equals=.
 
@@ -35,11 +35,13 @@ A hash summing character codes puts ="ab"= and ="ba"= in the same bucket: a coll
 #+begin_src java
   @Override public boolean equals(Object o) {          // Object, not Point
       if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;   // or: !(o instanceof Point)
+      // or: !(o instanceof Point)
+      if (o == null || getClass() != o.getClass()) return false;
       Point p = (Point) o;
       return x == p.x && y == p.y;
   }
-  @Override public int hashCode() { return Objects.hash(x, y); }  // same fields as equals
+  // same fields as equals
+  @Override public int hashCode() { return Objects.hash(x, y); }
 #+end_src
 =getClass()= makes a =Point= never equal to a =ColorPoint=; =instanceof= allows comparison with subclasses but endangers symmetry and transitivity if subclasses add fields. Which to use depends on the application.
 

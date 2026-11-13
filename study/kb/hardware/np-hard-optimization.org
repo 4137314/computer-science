@@ -12,10 +12,10 @@
 
 * Definition
 An *optimization problem* asks for a legal configuration of a finite number of elements with minimum (or maximum) cost:
-- an expression: the smallest equivalent sum of products;
+- an expression: the smallest equivalent [[id:pla-pal][sum of products]];
 - gates connected by wires: a placement minimising total wire length;
-- a finite-state machine: a binary state encoding with the fastest next-state logic;
-- a data-flow graph: a schedule with minimum latency for a given number of units.
+- a finite-state machine: a binary [[id:fsm-state-encoding][state encoding]] with the fastest [[id:finite-state-machine][next-state logic]];
+- a [[id:data-flow-graph][data-flow graph]]: a schedule with minimum latency for a given number of units.
 With finitely many configurations, trying all of them solves the problem, but their number is exponential in the size.
 
 *P* is the class of decision problems solvable in polynomial time; *NP* those whose solutions can be checked in polynomial time. A problem is *NP-hard* if every NP problem reduces to it in polynomial time; no polynomial algorithm is known for any of them.

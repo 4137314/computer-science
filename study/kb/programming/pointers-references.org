@@ -4,7 +4,7 @@
 :AREA:     cpp
 :KIND:     definition
 :REQUIRES: call-stack
-:SEE:      parameter-passing smart-pointers value-categories java-references
+:SEE:      parameter-passing smart-pointers value-categories java-references cpp-special-members
 :ALIASES:  pointer, reference, new, delete, dangling pointer, memory leak, nullptr, address-of, dereference
 :END:
 #+title: Pointers, references and dynamic memory in C++
@@ -13,7 +13,7 @@
 * Definition
 - =T* p = &x;= stores the address of =x=; =*p= is the object, =p->m= is =(*p).m=. A pointer can be =nullptr=, can be changed to point elsewhere, and supports arithmetic inside arrays.
 - =T& r = x;= makes =r= another name for =x=. It must be initialised, cannot be null, cannot be re-bound.
-- =new T(args)= builds a =T= on the heap and returns its address; =delete p= runs the destructor and frees the memory. Arrays use =new T[n]= and =delete[] p=.
+- =new T(args)= builds a =T= on the heap and returns its address; =delete p= runs the [[id:cpp-special-members][destructor]] and frees the memory. Arrays use =new T[n]= and =delete[] p=.
 
 * Example
 #+begin_src c++

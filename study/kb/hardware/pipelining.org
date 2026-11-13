@@ -4,7 +4,7 @@
 :AREA:     timing
 :KIND:     construction
 :REQUIRES: retiming setup-hold-time
-:SEE:      fir-filter dvfs-parallelism risc-v-datapath carry-save-adder
+:SEE:      fir-filter dvfs-parallelism risc-v-datapath carry-save-adder pipeline-hazards
 :ALIASES:  pipeline, pipeline stage, throughput, latency, initiation interval, pipeline register
 :END:
 #+title: Pipelining
@@ -19,7 +19,7 @@ Without pipelining one result leaves every \(D+t_{reg}\). With \(k\) balanced st
 
 * Picture
 \begin{tikzpicture}
-\begin{axis}[width=6.8cm, height=4.6cm, axis lines=left, xlabel={stages $k$}, ylabel={relative value}, xmin=1, xmax=16, ymin=0, ymax=6, legend pos=north west]
+\begin{axis}[width=6.8cm, height=4.6cm, axis lines=left, xlabel={stages $k$}, ylabel={relative value}, xmin=1, xmax=16, ymin=0, ymax=6]
 \addplot+[domain=1:16, samples=16] {(10+1)/(10/x+1)}; \addlegendentry{throughput}
 \addplot+[domain=1:16, samples=16] {(10+x)/(10+1)}; \addlegendentry{latency}
 \end{axis}

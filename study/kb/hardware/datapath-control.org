@@ -4,7 +4,7 @@
 :AREA:     processors
 :KIND:     model
 :REQUIRES: datapath-subsystems finite-state-machine
-:SEE:      alu-design risc-v-datapath data-flow-graph resource-binding
+:SEE:      alu-design risc-v-datapath data-flow-graph resource-binding risc-v-isa
 :ALIASES:  datapath, control unit, register file, function unit, control word, microprocessor, memory-mapped I/O, bus
 :END:
 #+title: Datapath and control unit
@@ -15,21 +15,27 @@
 - *Operand selection*: the B bus takes a register or a constant (=MB=), the D input takes the function unit or memory (=MD=).
 - *Function unit*: [[id:alu-design][ALU]] and [[id:datapath-subsystems][shifter]], with status flags \(V\) (overflow), \(C\) (carry), \(N\) (negative), \(Z\) (zero).
 - *Control word*: the tuple (DA, AA, BA, MB, FS, MD, RW, MW) of fields that fixes one micro-operation, e.g. \(R1\gets R2+R3\).
-- *Control unit*: fetches an instruction from memory, decodes it into one control word (single-cycle) or a sequence of them (multi-cycle, an [[id:finite-state-machine][FSM]]), and updates the program counter (sequential, branch, jump).
+- *Control unit*: fetches an instruction from memory, decodes it into one control word (single-cycle) or a sequence of them (multi-cycle, an [[id:finite-state-machine][FSM]]), and updates the [[id:risc-v-datapath][program counter]] (sequential, branch, jump).
 - *Memory-mapped I/O*: peripherals respond to addresses, so load and store instructions talk to devices.
 
 * Picture
-\begin{tikzpicture}[font=\scriptsize, b/.style={draw, minimum height=0.6cm, align=center}]
-\node[b, draw=kbcyan, minimum width=2.2cm] (rf) at (0,0) {register file};
-\node[b, draw=kbamber] (fu) at (0,-1.5) {ALU / shifter};
-\node[b] (mem) at (3,-1.5) {data memory};
-\node[b, draw=kbmagenta, minimum width=2.2cm] (cu) at (-3.2,-0.75) {control unit};
-\draw[-{Stealth}] (-0.5,-0.3) -- node[left] {A} (-0.5,-1.2); \draw[-{Stealth}] (0.5,-0.3) -- node[right] {B} (0.5,-1.2);
-\draw[-{Stealth}] (0.5,-0.75) -- (mem.north);
-\draw[-{Stealth}] (fu.south) -- (0,-2.2) -- (1.6,-2.2) -- (1.6,0) -- (rf.east);
-\draw[-{Stealth}] (mem.east) -- (3.8,-1.5) -- (3.8,0.6) -- (0,0.6) -- (rf.north);
-\draw[-{Stealth}, kbmagenta, dashed] (cu) -- node[above] {control word} (rf.west);
-\draw[-{Stealth}, kbmagenta, dashed] (fu.west) -- node[below] {flags} (cu);
+\begin{tikzpicture}[font=\scriptsize, b/.style={draw, minimum height=0.6cm, align=center}, >={Stealth}]
+\node[b, draw=kbcyan, minimum width=3cm] (rf) at (0,0) {register file};
+\node[b, draw=kbamber, minimum width=2.2cm] (alu) at (-0.6,-1.8) {ALU / shifter};
+\node[b, minimum width=1.9cm] (mem) at (2.7,-1.8) {data memory};
+\node[b, minimum width=1.4cm] (mux) at (1.0,-3.3) {MD mux};
+\node[b, draw=kbmagenta, minimum width=1.9cm] (cu) at (-4.3,-1.8) {control unit};
+\draw[->] (-1.1,-0.3) -- node[left] {A} (-1.1,-1.5);
+\draw[->] (0.1,-0.3) -- node[right, pos=0.3] {B} (0.1,-1.5);
+\draw[->] (0.1,-0.85) -- (2.7,-0.85) -- node[right] {data in} (2.7,-1.5);
+\draw[->] (alu.east) -- node[above] {addr} (mem.west);
+\draw[->] (-0.6,-2.1) |- (mux.west);
+\draw[->] (mem.south) |- (mux.east);
+\draw[->] (mux.south) -- (1.0,-3.9) -- (4.3,-3.9) -- node[right] {write back} (4.3,0) -- (rf.east);
+\draw[->, kbmagenta, dashed] (cu.north) |- node[above, pos=0.75] {DA, AA, BA, RW} (rf.west);
+\draw[->, kbmagenta, dashed] (cu.east) -- node[above] {FS} (alu.west);
+\draw[->, kbmagenta, dashed] (cu.south) |- node[below, pos=0.75] {MB, MD, MW} (mux.west);
+\draw[->, kbmagenta, dashed] ([yshift=-2mm]alu.west) -- node[below] {flags} ([yshift=-2mm]cu.east);
 \end{tikzpicture}
 
 * Intuition

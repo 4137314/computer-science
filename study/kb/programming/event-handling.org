@@ -4,7 +4,7 @@
 :AREA:     gui
 :KIND:     model
 :REQUIRES: javafx-scene-graph abstract-class-interface
-:SEE:      lambda-expressions threads-data-race user-input
+:SEE:      lambda-expressions threads-data-race user-input observer-mvc
 :ALIASES:  event-driven programming, EventHandler, listener, callback, anonymous class, event capturing, event bubbling, filter, consume
 :END:
 #+title: Event-driven programming and event handlers
@@ -12,7 +12,7 @@
 
 * Model
 - *Events* form a hierarchy (=MouseEvent=, =KeyEvent=, =ActionEvent=, …), each with its own attributes (position, key, source) and sub-types (=MOUSE_CLICKED=, =KEY_PRESSED=).
-- A *handler* implements =EventHandler<T extends Event>=, whose only method is =void handle(T e)=. It is registered on a node with =addEventHandler(type, h)= or with convenience methods =setOnAction=, =setOnMouseClicked=, =setOnKeyPressed=.
+- A *handler* [[id:abstract-class-interface][implements]] =EventHandler<T extends Event>=, whose only method is =void handle(T e)=. It is registered on a node with =addEventHandler(type, h)= or with convenience methods =setOnAction=, =setOnMouseClicked=, =setOnKeyPressed=.
 - The *target* is the node that has the keyboard focus (key events) or the topmost node under the cursor (mouse events).
 - *Dispatch chain*: from the stage to the target (*capturing*, intercepted by filters registered with =addEventFilter=), then back from the target to the stage (*bubbling*, handlers). =e.consume()= stops the propagation.
 
@@ -22,8 +22,10 @@
       public void handle(ActionEvent e) { System.out.println("click"); }
   }
   btn.setOnAction(new Clicker());
-  btn.setOnAction(new EventHandler<ActionEvent>() {             // anonymous inner class
-      public void handle(ActionEvent e) { counter++; }          // sees the outer fields
+  // anonymous inner class
+  btn.setOnAction(new EventHandler<ActionEvent>() {
+      // sees the outer fields
+      public void handle(ActionEvent e) { counter++; }
   });
   btn.setOnAction(e -> counter++);                              // lambda (Java 8)
 #+end_src

@@ -25,10 +25,14 @@ For =c <= a and b; e <= c or d;= with =a= rising from 0 to 1 at time 10 ns while
 In a waveform viewer =c= and =e= both change "at 10 ns", but =e= is after =c=.
 
 * Picture
-\begin{tikzpicture}[font=\scriptsize]
-\draw[-{Stealth}] (0,0) -- (6.2,0) node[right] {$\delta$ at $t=10$ ns};
-\foreach \d/\s in {0/a,1/c,2/e} {\draw (\d*2+0.5,-0.1) -- (\d*2+0.5,0.1); \node[below] at (\d*2+0.5,-0.1) {$\delta=\d$}; \node[draw, kbcyan] at (\d*2+0.5,0.6) {\s\ changes};}
-\draw[-{Stealth}, kbamber] (1.2,0.6) -- (1.8,0.6); \draw[-{Stealth}, kbamber] (3.2,0.6) -- (3.8,0.6);
+\begin{tikzpicture}[font=\scriptsize, >={Stealth}]
+\draw[->] (-0.6,0) -- (10.2,0) node[right] {$\delta$};
+\node[kbguide, anchor=west] at (-0.6,-0.75) {all at simulated time $t=10$ ns};
+\foreach \d/\s/\c in {0/a/kbcyan,1/c/kbamber,2/e/kbmagenta} {
+  \draw (\d*4.2+0.6,-0.1) -- (\d*4.2+0.6,0.1); \node[below] at (\d*4.2+0.6,-0.1) {$\delta=\d$};
+  \node[draw, \c] (n\d) at (\d*4.2+0.6,0.8) {$\s$ changes};}
+\draw[->] (n0) -- node[above=2pt] {\texttt{c <= a and b}} (n1);
+\draw[->] (n1) -- node[above=2pt] {\texttt{e <= c or d}} (n2);
 \end{tikzpicture}
 
 * Intuition

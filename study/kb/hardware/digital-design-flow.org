@@ -3,7 +3,7 @@
 :DOMAIN:   hardware
 :AREA:     complexity
 :KIND:     model
-:REQUIRES:
+:REQUIRES: 
 :SEE:      vhdl-entity-architecture fpga-architecture static-timing-analysis cmos-power data-flow-graph np-hard-optimization
 :ALIASES:  design flow, abstraction levels, RTL, register transfer level, synthesis, place and route, ASIC, FPGA, area delay power
 :END:
@@ -13,21 +13,21 @@
 * Model
 Levels, with their basic objects:
 
-| level | objects | tools |
-|---+---+---|
-| system / behaviour | algorithms, data-flow graphs | high-level synthesis |
-| architecture (RTL) | registers, ALUs, multiplexers, FSMs | HDL (VHDL), simulation |
-| logic | gates, flip-flops | logic synthesis, technology mapping |
-| circuit | transistors | circuit simulation |
-| layout | polygons, cells, wires | place and route |
+| level              | objects                      | tools                    |
+|--------------------+------------------------------+--------------------------|
+| system / behaviour | algorithms, data-flow graphs | high-level synthesis     |
+| architecture (RTL) | registers, ALUs, muxes, FSMs | VHDL, simulation         |
+| logic              | gates, flip-flops            | logic synthesis, mapping |
+| circuit            | transistors                  | circuit simulation       |
+| layout             | cells, wires, polygons       | place and route          |
 
-A typical flow: specification → HDL description at RTL → functional simulation → logic synthesis (optimisation + mapping to a library or to FPGA LUTs) → static timing analysis → place and route → timing and power sign-off → fabrication or bitstream.
+A typical flow: specification → HDL description at RTL → functional simulation → logic synthesis (optimisation + mapping to a library or to FPGA LUTs) → static timing analysis → place and route → timing and power sign-off → fabrication or [[id:fpga-architecture][bitstream]].
 
 * What to optimize
 - *area*: cost (silicon or FPGA resources);
-- *delay*: clock period \(T\), latency (cycles × \(T\)), throughput;
+- *delay*: [[id:setup-hold-time][clock period]] \(T\), latency (cycles × \(T\)), throughput;
 - *power*: dynamic and static, decisive for battery-powered and dense chips.
-They conflict: a faster circuit is bigger, a lower-power circuit is slower. Design is choosing a point on the Pareto front.
+They conflict: a faster circuit is bigger, a lower-power circuit is slower. Design is choosing a point on the [[id:timing-driven-mapping][Pareto front]].
 
 * Picture
 \begin{tikzpicture}[font=\small, node distance=0.35cm, box/.style={draw, minimum width=3.4cm, minimum height=0.55cm}]

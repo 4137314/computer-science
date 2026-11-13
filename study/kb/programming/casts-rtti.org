@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       casts-rtti
+:DOMAIN:   programming
+:AREA:     cpp
+:KIND:     definition
+:REQUIRES: virtual-functions
+:SEE:      casting-instanceof implicit-conversion multiple-inheritance
+:ALIASES:  static_cast, dynamic_cast, const_cast, reinterpret_cast, RTTI, typeid, run-time type information, named casts, downcast in C++
+:END:
+#+title: C++ named casts and RTTI
+#+summary: C++98 replaced C casts with four named ones: =static_cast= (conversions checked at compile time, including unchecked downcasts), =dynamic_cast= (checked downcast of polymorphic types, =nullptr= or =std::bad_cast= on failure), =const_cast= (add or remove =const=) and =reinterpret_cast= (reinterpret the bits); =typeid= gives the dynamic type.
+
+* Definition
+| cast             | checked when | typical use                                    |
+|------------------+--------------+------------------------------------------------|
+| static_cast      | compile time | numeric conversions, upcasts, known downcasts  |
+| dynamic_cast     | run time     | safe downcast in a polymorphic hierarchy       |
+| const_cast       | compile time | call legacy APIs that forgot const             |
+| reinterpret_cast | never        | pointer ↔ integer, raw memory, hardware access |
+
+- =dynamic_cast<D*>(b)= returns =nullptr= if =*b= is not a =D=; =dynamic_cast<D&>(b)= [[id:java-exceptions][throws]] =std::bad_cast=. It needs at least one virtual function in the base (it reads the type information reachable from the [[id:virtual-functions][vtable]]).
+- =typeid(*b).name()= names the [[id:polymorphism][dynamic type]]; =typeid(b)= on a pointer gives the static pointer type.
+
+* Example
+#+begin_src c++
+  void play(Character* c) {
+    if (auto* w = dynamic_cast<Wizard*>(c)) w->castSpell();   // only wizards
+    c->act();                                                  // everyone
+  }
+  double avg = static_cast<double>(sum) / n;                   // no integer division
+#+end_src
+
+* Intuition
+Each cast says what kind of promise you make: "the compiler can check this", "check it at run time", "I know it is not really const", "trust me, these are just bits".
+
+* Pitfall
+A chain of =dynamic_cast= tests is usually a missing virtual function: let the object decide (polymorphism) instead of asking it what it is. A =static_cast= [[id:casting-instanceof][downcast]] to the wrong type is undefined behaviour, not an error.

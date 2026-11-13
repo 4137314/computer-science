@@ -4,7 +4,7 @@
 :AREA:     oop
 :KIND:     definition
 :REQUIRES: object-oriented-programming uml-generalization
-:SEE:      polymorphism method-overloading cpp-inheritance-visibility stack-and-queue java-object-class
+:SEE:      polymorphism method-overloading cpp-inheritance-visibility stack-and-queue java-object-class javafx-scene-graph
 :ALIASES:  extends, subclass, superclass, derived class, base class, overriding, super, constructor chaining, final
 :END:
 #+title: Inheritance and overriding
@@ -14,9 +14,9 @@
 =class D extends B= (Java) or =class D : public B= (C++) makes =D= a subclass of =B=:
 - =D= inherits every field and method of =B= (private members exist in =D= but are not accessible by name);
 - =D= can *add* fields and methods;
-- =D= can *override* a method of =B=: same name and same parameter types, new body. =super.m()= (Java) or =B::m()= (C++) calls the overridden version.
+- =D= can *[[id:virtual-functions][override]]* a method of =B=: same name and same parameter types, new body. =super.m()= (Java) or =B::m()= (C++) calls the overridden version.
 
-Java allows single inheritance only (one superclass), and every class without =extends= extends =Object=. C++ allows multiple inheritance.
+Java allows single inheritance only (one superclass), and every class without =extends= extends =Object=. C++ allows [[id:multiple-inheritance][multiple inheritance]].
 
 * Constructors
 Constructors are not inherited. The constructor of =D= first builds the =B= part: Java calls =super(...)= as its first statement (implicitly =super()=), C++ uses the initialiser list =D(int x) : B(x) {}=. If =B= has no no-argument constructor, the explicit call is mandatory, or the code does not compile. Destruction (C++) runs in reverse order: =~D= then =~B=.

@@ -3,7 +3,7 @@
 :DOMAIN:   programming
 :AREA:     uml
 :KIND:     definition
-:REQUIRES:
+:REQUIRES: 
 :SEE:      object-oriented-programming uml-association uml-generalization
 :ALIASES:  class diagram, UML, object diagram, instance-of, intensional level, extensional level
 :END:
@@ -13,7 +13,7 @@
 * Definition
 The Unified Modelling Language (Booch, Rumbaugh, Jacobson) collects diagrams of three kinds: structural (class and object diagrams), behavioural (use case, state/transition, sequence, collaboration, activity) and architectural (component, deployment).
 
-A *class* is a box with three compartments: the name, the attributes =name: type=, the operations =name(params): type=, each prefixed by its visibility (=+= public, =-= private, =#= protected, =~= package). An *object* is a box whose title =id : Class= is underlined; it carries a value for every attribute of its class.
+A *class* is a box with three compartments: the name, the attributes =name: type=, the operations =name(params): type=, each prefixed by its [[id:information-hiding][visibility]] (=+= public, =-= private, =#= protected, =~= [[id:java-packages][package]]). An *object* is a box whose title =id : Class= is underlined; it carries a value for every attribute of its class.
 
 - An object has its own life and an identity of its own, independent of the values of its attributes.
 - An object can be an instance of several classes (a class and its superclasses), but there is always one most specific class.
@@ -26,13 +26,16 @@ A *class* is a box with three compartments: the name, the attributes =name: type
 \node[cls, draw=kbamber] (o2) at (2.4,-2.8) {\underline{Iliad : Book}\nodepart{two}Title = ``Iliad''\\Pages = 578};
 \draw[-{Stealth}, dashed] (o1) -- node[left, font=\scriptsize]{instance-of} (c);
 \draw[-{Stealth}, dashed] (o2) -- node[right, font=\scriptsize]{instance-of} (c);
-\node[kbguide, font=\scriptsize] at (4.2,0) {intensional};
-\node[kbguide, font=\scriptsize] at (4.6,-2.0) {extensional};
+\node[kbguide, font=\scriptsize, anchor=west] at (4.6,0) {intensional level};
+\node[kbguide, font=\scriptsize, anchor=west] at (4.6,-2.8) {extensional level};
 \end{tikzpicture}
 One class, two objects: every object has a value for each attribute and no other attribute.
 
 * Typical errors
 In an object diagram an object must name its class, carry a value for every attribute of the class, and carry no attribute that the class does not declare. An object without a class, or with an extra attribute (=Language = "greek"= on a =Book= without =Language=), is a wrong diagram.
+
+* Worked example
+Exercise: students (name, surname, number, age) enrolled in one degree programme (code, name), who passed exams in courses (name, subject). Solution: classes =Student=, =Programme=, =Course=; association =enrolled= Student–Programme with multiplicities \(1..*\) to \(1\); association =exam= Student–Course \(0..*\) to \(0..*\) with association attribute =grade: int= (see [[id:uml-association][associations]]). The grade is neither a property of the student nor of the course.
 
 * Intuition
 The class diagram is the vocabulary of the program: which things exist, what they know, and how they are related. Code that follows a good class diagram has one class per box and one field or method per line in the box.

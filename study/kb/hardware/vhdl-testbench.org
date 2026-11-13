@@ -47,4 +47,4 @@ Run with GHDL: =ghdl -a adder.vhd tb_adder.vhd; ghdl -e tb_adder; ghdl -r tb_add
 The design is the chip; the testbench is the laboratory bench around it — signal generators, a clock, and an oscilloscope that complains.
 
 * Pitfall
-A process without sensitivity list and without =wait= loops for ever at time zero and hangs the simulator; the final =wait;= is mandatory.
+A process without [[id:vhdl-process][sensitivity list]] and without =wait= loops for ever at time zero and hangs the simulator; the final =wait;= is mandatory.

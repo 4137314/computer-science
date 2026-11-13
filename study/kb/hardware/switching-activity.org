@@ -15,12 +15,12 @@ Static probability \(p=P(x=1)\). With temporal independence,
 \[ \alpha_{0\to1}=P(x_{t-1}=0)\,P(x_t=1)=(1-p)\,p,\]
 maximal (\(1/4\)) at \(p=1/2\). For independent inputs \(A\), \(B\):
 
-| gate | \(p_{out}\) | \(\alpha_{0\to1}\) |
-|---+---+---|
-| AND | \(p_Ap_B\) | \((1-p_Ap_B)\,p_Ap_B\) |
-| OR | \(1-(1-p_A)(1-p_B)\) | \((1-p_A)(1-p_B)\big(1-(1-p_A)(1-p_B)\big)\) |
-| NAND | \(1-p_Ap_B\) | \(p_Ap_B(1-p_Ap_B)\) |
-| XOR | \(p_A+p_B-2p_Ap_B\) | \((1-p_{out})\,p_{out}\) |
+| gate | p_out (independent inputs) | α 0→1     | with p_A = p_B = 1/2 |
+|------+----------------------------+-----------+----------------------|
+| AND  | p_A·p_B                    | (1 − p)·p | p = 1/4, α = 3/16    |
+| OR   | 1 − (1 − p_A)(1 − p_B)     | (1 − p)·p | p = 3/4, α = 3/16    |
+| NAND | 1 − p_A·p_B                | (1 − p)·p | p = 3/4, α = 3/16    |
+| XOR  | p_A + p_B − 2·p_A·p_B      | (1 − p)·p | p = 1/2, α = 1/4     |
 
 With \(p_A=p_B=\tfrac12\): NAND has \(p=\tfrac34\), \(\alpha=\tfrac3{16}\); AND \(p=\tfrac14\), \(\alpha=\tfrac3{16}\); XOR \(p=\tfrac12\), \(\alpha=\tfrac14\).
 

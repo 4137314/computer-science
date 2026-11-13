@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       hashmap-internals
+:DOMAIN:   programming
+:AREA:     java
+:KIND:     construction
+:REQUIRES: equals-hashcode java-collections
+:SEE:      stl-containers big-o-complexity
+:ALIASES:  hash table, HashMap, buckets, load factor, rehashing, separate chaining, collision, treeification, amortized cost
+:END:
+#+title: How a hash table works (HashMap)
+#+summary: A hash table is an array of \(m\) buckets; key \(k\) goes to bucket \(h(k)\bmod m\), collisions are chained in the bucket; with load factor \(\alpha=n/m\) bounded (0.75 in =HashMap=), lookups cost \(O(1+\alpha)\) on average, and when \(\alpha\) is exceeded the table doubles and every entry is rehashed — \(O(1)\) amortised per insertion.
+
+* Construction
+- *Index*: =HashMap= mixes the high bits into the low ones, \(h\oplus(h\gg16)\), then takes =h & (m-1)= with \(m\) a power of two.
+- *Collisions*: separate chaining (list per bucket); since Java 8 a bucket with more than 8 entries becomes a balanced tree, bounding the worst case at \(O(\log n)\) for [[id:comparable-comparator][comparable]] keys.
+- *Lookup*: find the bucket, then compare hashes and call =equals= on each entry of the bucket.
+- *Resize*: when \(n>0.75\,m\), allocate \(2m\) buckets and reinsert every entry.
+
+* Derivation
+With uniform hashing a bucket holds on average \(\alpha\) entries, so an unsuccessful search inspects \(\alpha\) of them and a successful one about \(1+\alpha/2\). Doubling at \(n=\alpha_{max}m\) costs \(O(n)\), but it happens after \(n/2\) insertions since the previous doubling; spreading the cost gives a constant per insertion: \(1+2+4+\dots+n<2n\) total moves for \(n\) insertions.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, >={Stealth}]
+\foreach \i in {0,...,7} {\draw (0,-\i*0.45) rectangle (0.6,-\i*0.45+0.4); \node at (0.3,-\i*0.45+0.2) {\i};}
+\node[draw, kbcyan] (a) at (1.8,-0.25) {k1}; \node[draw, kbcyan] (b) at (2.9,-0.25) {k9}; \draw[->] (0.6,-0.25) -- (a); \draw[->] (a) -- (b);
+\node[draw, kbamber] (c) at (1.8,-1.6) {k3}; \draw[->] (0.6,-1.6) -- (c);
+\node[draw, kbmagenta] (d) at (1.8,-2.95) {k7}; \draw[->] (0.6,-2.95) -- (d);
+\node[kbguide, anchor=west] at (3.5,-1.4) {$n=4,\ m=8,\ \alpha=0.5$};
+\node[kbguide, anchor=west] at (3.5,-1.85) {k1, k9 collide: $h \bmod 8 = 0$};
+\end{tikzpicture}
+
+* Intuition
+Hashing turns "search the whole list" into "go straight to the right drawer and look through the few items in it".
+
+* Pitfall
+A poor =hashCode= (constant, or using few fields) puts everything in one bucket and turns \(O(1)\) into \(O(n)\); and iteration order of a =HashMap= is not insertion order — use =LinkedHashMap= when it matters.

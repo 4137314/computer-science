@@ -4,7 +4,7 @@
 :AREA:     oop
 :KIND:     method
 :REQUIRES: call-stack
-:SEE:      java-exceptions parnas-principles cpp-special-members mutual-exclusion
+:SEE:      java-exceptions parnas-principles cpp-special-members mutual-exclusion exception-safety
 :ALIASES:  exception, try, catch, throw, stack unwinding, error handling, propagation
 :END:
 #+title: Exceptions
@@ -14,7 +14,7 @@
 Traditional error handling has known limits: terminating in the callee (a decision that belongs to the caller), conventional return values (confusing when an error has the type of a result, impossible for constructors, no information about the cause), a global error handler (centralised, unreadable). Exceptions:
 - *separate* the handling from the application code;
 - *propagate* errors in a controlled way along the dynamic chain of calls;
-- *group or distinguish* errors through a class hierarchy (catching a base class catches all its subclasses).
+- *group or distinguish* errors through a class hierarchy (catching a [[id:inheritance][base class]] catches all its subclasses).
 
 * Mechanism
 #+begin_src c++

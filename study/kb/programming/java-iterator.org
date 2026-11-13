@@ -12,7 +12,11 @@
 
 * Definition
 #+begin_src java
-  public interface Iterator<E> { boolean hasNext(); E next(); default void remove() { ... } }
+  public interface Iterator<E> {
+      boolean hasNext();
+      E next();
+      default void remove() { throw new UnsupportedOperationException(); }
+  }
   public interface Iterable<T> { Iterator<T> iterator(); }
 #+end_src
 =for (E x : c) body= is translated to
@@ -33,4 +37,4 @@ The code is polymorphic: it works for any =Collection<String>=.
 An iterator is a cursor that knows the structure it walks; for-each hides it when you only need to read.
 
 * Pitfall
-Calling =words.remove(w)= inside a for-each over =words= changes the collection behind the iterator's back: the next =next()= throws =ConcurrentModificationException=.
+Calling =words.remove(w)= inside a for-each over =words= changes the collection behind the iterator's back: the next =next()= [[id:java-exceptions][throws]] =ConcurrentModificationException=.

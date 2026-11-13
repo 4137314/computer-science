@@ -1,0 +1,35 @@
+:PROPERTIES:
+:ID:       fsm-state-encoding
+:DOMAIN:   hardware
+:AREA:     vhdl
+:KIND:     method
+:REQUIRES: finite-state-machine
+:SEE:      low-power-encoding np-hard-optimization metastability
+:ALIASES:  state encoding, state assignment, binary encoding, one-hot encoding, Gray encoding, Johnson encoding, safe state machine, unreachable states
+:END:
+#+title: State encoding of FSMs
+#+summary: The same FSM can store its state as a binary number (\(\lceil\log_2 n\rceil\) flip-flops, complex decoding), one-hot (\(n\) flip-flops, one per state, simple and fast logic), Gray (adjacent codes for frequent transitions, low power) or a custom code; the choice trades flip-flops against next-state logic, speed, power and robustness.
+
+* Method
+| encoding | flip-flops | next-state logic         | good for                    |
+|----------+------------+--------------------------+-----------------------------|
+| binary   | ⌈log₂ n⌉   | dense, many inputs       | ASICs with few states       |
+| Gray     | ⌈log₂ n⌉   | dense                    | sequential paths, low power |
+| one-hot  | n          | sparse, one OR per state | FPGAs (many flip-flops)     |
+| custom   | depends    | optimised by the tool    | area or speed targets       |
+
+In one-hot each state bit's next value is the OR of the arcs entering it: \(S_j^+=\sum_{i\to j}S_i\cdot\mathrm{cond}_{ij}\), at most two levels of logic, and the outputs of a [[id:finite-state-machine][Moore machine]] are ORs of state bits. Optimal binary assignment (minimum logic) is [[id:np-hard-optimization][NP-hard]]; heuristics give adjacent codes to states with many shared transitions or outputs.
+
+* Example
+5 states: binary needs 3 flip-flops (3 unused codes), one-hot 5 (27 unused codes), Gray 3 and can make the main loop S0→S1→S2→S3→S0 change one bit per step.
+#+begin_src vhdl
+  type state_t is (IDLE, START, DATA, STOP, DONE);
+  attribute fsm_encoding : string;                 -- tool-specific (Vivado)
+  attribute fsm_encoding of state : signal is "one_hot";
+#+end_src
+
+* Intuition
+Binary saves memory and pays in decoding; one-hot spends memory to make decoding trivial.
+
+* Pitfall
+Unused codes are reachable after a glitch or upset (radiation, metastable input): a robust design maps =others= to a safe state, and tools need to be told to keep that recovery logic ("safe" FSM).

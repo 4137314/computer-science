@@ -11,13 +11,13 @@
 #+summary: A signal assignment =s <= e= schedules a new value that becomes visible only after the process suspends (one delta cycle later); a variable assignment =v := e= takes effect immediately and is local to the process; so inside one process run, reading a signal after assigning it still gives the old value.
 
 * Statement
-| | signal | variable |
-|---+---+---|
-| declared in | architecture (or port) | process, function |
-| visible to | all processes: communication between components | one process only: local storage |
-| assignment | ~<=~, scheduled: event in the queue after a delta cycle or the given delay | ~:=~, immediate |
-| several assignments in one run | last one wins | each one effective at once |
-| hardware | a wire, or a register output | an intermediate value in the logic |
+|                  | signal                      | variable                  |
+|------------------+-----------------------------+---------------------------|
+| declared in      | architecture or port        | process or subprogram     |
+| visible to       | every process               | one process only          |
+| assignment       | s <= e : scheduled (next δ) | v := e : immediate        |
+| twice in one run | the last one wins           | each takes effect at once |
+| hardware         | a wire or a register output | an intermediate value     |
 
 * Derivation
 #+begin_src vhdl

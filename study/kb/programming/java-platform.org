@@ -3,7 +3,7 @@
 :DOMAIN:   programming
 :AREA:     java
 :KIND:     model
-:REQUIRES:
+:REQUIRES: 
 :SEE:      java-references object-oriented-programming javafx-scene-graph
 :ALIASES:  Java, JVM, Java virtual machine, bytecode, javac, JIT, JDK, JRE, OpenJDK, write once run anywhere
 :END:
@@ -11,8 +11,8 @@
 #+summary: =javac= compiles =.java= sources to bytecode in =.class= files; the Java Virtual Machine loads, verifies and runs that bytecode (interpreting and JIT-compiling it) on any operating system, with a garbage-collected heap and a large standard library.
 
 * Model
-- *Source*: one public class per file =Name.java=; classes grouped in packages.
-- *Compilation*: =javac Name.java= produces =Name.class=, containing bytecode for a stack-based virtual machine, not machine code.
+- *Source*: one public class per file =Name.java=; classes grouped in [[id:java-packages][packages]].
+- *Compilation*: =javac Name.java= produces =Name.class=, containing bytecode for a stack-based [[id:virtual-functions][virtual]] machine, not machine code.
 - *Execution*: =java Name= starts a JVM, which loads the classes on demand, verifies the bytecode, interprets it and compiles the hot parts to native code (just-in-time). Entry point: =public static void main(String[] args)=.
 - *Platform*: JDK (compiler and tools) ⊃ JRE (JVM and libraries). The reference implementation is OpenJDK.
 

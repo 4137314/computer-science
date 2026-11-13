@@ -4,7 +4,7 @@
 :AREA:     cpp
 :KIND:     definition
 :REQUIRES: pointers-references
-:SEE:      shallow-deep-copy move-semantics implicit-conversion operator-overloading
+:SEE:      shallow-deep-copy move-semantics implicit-conversion operator-overloading exception-safety
 :ALIASES:  constructor, destructor, copy constructor, copy assignment, operator=, default constructor, RAII, =default, =delete, special member functions
 :END:
 #+title: Special member functions and RAII
@@ -21,10 +21,24 @@ For =class A {};= the compiler provides
 and, from C++11, =A(A&&)= and =A& operator=(A&&)= (see [[id:move-semantics][move semantics]]). The generated versions work member by member: copy each member, destroy each member.
 - Declaring any constructor with parameters removes the implicit default constructor: =A a;= stops compiling unless =A() = default;= is added back.
 - ~= delete~ forbids an operation: =A(const A&) = delete;= makes =A= non-copyable.
-- The copy constructor is called for initialisation (=A b(a)=, =A b = a=, pass and return by value); ~operator=~ for assignment to an existing object.
+- The [[id:shallow-deep-copy][copy constructor]] is called for initialisation (=A b(a)=, =A b = a=, pass and return by value); ~operator=~ for assignment to an existing object.
 
 * RAII
 Resource Acquisition Is Initialisation: the constructor acquires a resource (memory, file, lock), the destructor releases it. Since destructors run automatically when an object goes out of scope, also during exception unwinding, the resource can never leak. =std::string=, =std::vector=, =std::unique_ptr=, =std::lock_guard= are all RAII classes.
+
+* Worked example
+#+begin_src c++
+  A f(A x) { return x; }   // which special members run?
+
+  int main() {
+    A a;          // A(): default constructor
+    A b = a;      // A(const A&): copy constructor (initialisation, not assignment)
+    b = a;        // operator=(const A&): copy assignment
+    A c = f(a);   // A(const A&) builds the parameter x;
+                  // A(A&&) builds the result (a returned parameter is moved);
+                  // ~A() destroys x at the end of the statement
+  }               // ~A() for c, b, a: reverse order of construction
+#+end_src
 
 * Intuition
 The compiler writes the boring members for you, and they are right as long as every member manages itself. The moment a member is a raw owning pointer, they are wrong.

@@ -4,7 +4,7 @@
 :AREA:     processors
 :KIND:     construction
 :REQUIRES: risc-v-isa finite-state-machine alu-design
-:SEE:      fpga-architecture pipelining datapath-control
+:SEE:      fpga-architecture pipelining datapath-control pipeline-hazards
 :ALIASES:  RISC-V CPU, single-cycle processor, multi-cycle processor, instruction fetch, decode, execute, memory access, write back, program counter, soft core
 :END:
 #+title: A non-pipelined RISC-V processor
@@ -12,7 +12,7 @@
 
 * Construction
 - *Fetch*: =instr <= imem(pc)=; with a synchronous BRAM the instruction is available one cycle after the address.
-- *Decode*: register file read (distributed RAM, asynchronous read or latched output); immediate generator by format; opcode decoded into control signals.
+- *Decode*: [[id:datapath-control][register file]] read (distributed RAM, asynchronous read or latched output); immediate generator by format; opcode decoded into control signals.
 - *Execute*: ALU on (rs1, rs2 or imm); comparator for branches (=beq=, =bne=, =blt=, =bge=, unsigned variants); branch target \(pc+imm_B\), jump targets \(pc+imm_J\) (=jal=) and \((rs1+imm_I)\,\&\,\sim1\) (=jalr=).
 - *Memory*: loads read =dmem(rs1+imm)= (with byte/half selection and sign extension), stores write =rs2=.
 - *Write back*: \(rd\gets\) ALU result, loaded value, \(pc+4\) (jumps) or immediate (=lui=), unless \(rd=x0\).
@@ -33,4 +33,4 @@ Assemble small programs, load their hex into the instruction memory, and compare
 Five questions per instruction: what is it, what are its operands, what does it compute, does it touch memory, where does the result go — and where is the next instruction.
 
 * Pitfall
-Synchronous block RAM returns data one cycle after the address: a design that expects the instruction or the loaded word in the same cycle works in a zero-delay mental model and fails in simulation and hardware.
+Synchronous [[id:fpga-architecture][block RAM]] returns data one cycle after the address: a design that expects the instruction or the loaded word in the same cycle works in a zero-delay mental model and fails in simulation and hardware.

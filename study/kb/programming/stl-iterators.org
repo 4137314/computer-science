@@ -22,7 +22,8 @@ They reproduce part of pointer behaviour through overloaded operators, but they 
 #+begin_src c++
   std::list<int> l = {3, 1, 4};
   for (std::list<int>::iterator it = l.begin(); it != l.end(); ++it) *it *= 2;
-  for (int x : l) std::cout << x;      // range-for: the same loop, written by the compiler
+  // range-for: the same loop, written by the compiler
+  for (int x : l) std::cout << x;
 #+end_src
 
 * Picture

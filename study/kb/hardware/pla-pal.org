@@ -29,10 +29,10 @@ Every input enters the AND plane in true and complemented form. Each AND line co
 \(P_0=x_0\bar x_1\), \(P_1=\bar x_0x_1\), \(P_2=x_0x_1\); \(f_0=P_0+P_2\), \(f_1=P_1+P_2\): \(P_2\) is shared, which a PLA allows.
 
 * Example
-A full adder: \(s=a\oplus b\oplus c\) needs four products (its four odd minterms), \(c_{out}=ab+ac+bc\) three. A PLA with 7 AND lines and 2 outputs implements it; a PAL needs at least 4 products per output.
+A [[id:ripple-carry-adder][full adder]]: \(s=a\oplus b\oplus c\) needs four products (its four odd minterms), \(c_{out}=ab+ac+bc\) three. A PLA with 7 AND lines and 2 outputs [[id:abstract-class-interface][implements]] it; a PAL needs at least 4 products per output.
 
 * Intuition
 A PLA is a minimised truth table in hardware: only the product terms you need, wired to the outputs that need them.
 
 * Pitfall
-Two-level forms of some functions are huge: the parity of \(n\) bits needs \(2^{n-1}\) products. Such functions belong in multilevel logic.
+Two-level forms of some functions are huge: the [[id:uart][parity]] of \(n\) bits needs \(2^{n-1}\) products. Such functions belong in multilevel logic.

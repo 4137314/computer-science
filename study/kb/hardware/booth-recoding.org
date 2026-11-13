@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       booth-recoding
+:DOMAIN:   hardware
+:AREA:     arithmetic
+:KIND:     construction
+:REQUIRES: array-multiplier
+:SEE:      carry-save-adder serial-arithmetic
+:ALIASES:  Booth encoding, radix-4 Booth, modified Booth, signed multiplication, recoding, partial product reduction
+:END:
+#+title: Radix-4 Booth recoding
+#+summary: Rewriting the two's-complement multiplier \(b\) in digits \(d_j\in\{-2,-1,0,1,2\}\), each computed from an overlapping triple of bits \(b_{2j+1}b_{2j}b_{2j-1}\), halves the number of partial products; every partial product is \(0\), \(\pm a\) or \(\pm2a\) — a shift and an inversion — and signed operands are handled directly.
+
+* Construction
+\[ b=\sum_{j=0}^{n/2-1}d_j\,4^j,\qquad d_j=-2b_{2j+1}+b_{2j}+b_{2j-1},\quad b_{-1}=0. \]
+| b(2j+1) b(2j) b(2j-1) | d(j) | partial product |
+|-----------------------+------+-----------------|
+| 0 0 0                 | 0    | 0               |
+| 0 0 1                 | +1   | +a              |
+| 0 1 0                 | +1   | +a              |
+| 0 1 1                 | +2   | +2a (shift)     |
+| 1 0 0                 | −2   | −2a             |
+| 1 0 1                 | −1   | −a              |
+| 1 1 0                 | −1   | −a              |
+| 1 1 1                 | 0    | 0               |
+Negation is inversion plus a 1 added at the row's least significant position (folded into the [[id:carry-save-adder][adder tree]]).
+
+* Derivation
+[[id:ripple-carry-adder][Two's complement]]: \(b=-b_{n-1}2^{n-1}+\sum_{i<n-1}b_i2^i\). Since \(2^i=2^{i+1}-2^i\), each bit can be written as \(b_i=2b_i-b_i\); regrouping pairs of positions gives \(\sum_j(b_{2j-1}+b_{2j}-2b_{2j+1})4^j\), which telescopes exactly to the two's-complement value, sign bit included.
+
+* Example
+\(b=0111_2=7\), bits with \(b_{-1}=0\): triple \((b_1b_0b_{-1})=110\Rightarrow d_0=-1\); \((b_3b_2b_1)=011\Rightarrow d_1=+2\). Check: \(-1+2\cdot4=7\). So \(a\cdot7=8a-a\): two partial products instead of three non-zero ones.
+
+* Intuition
+Long runs of ones become "subtract at the start, add at the end", and looking at bits two at a time halves the rows to add.
+
+* Pitfall
+[[id:array-multiplier][Partial products]] are signed: each row must be sign-extended to the full width (or use the sign-extension-prevention trick with constant ones), otherwise the high half of the product is wrong.

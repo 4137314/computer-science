@@ -4,7 +4,7 @@
 :AREA:     java
 :KIND:     definition
 :REQUIRES: java-platform call-stack
-:SEE:      parameter-passing pointers-references equals-hashcode wrapper-autoboxing java-packages
+:SEE:      parameter-passing pointers-references equals-hashcode wrapper-autoboxing java-packages java-object-class stack-and-queue java-monitors
 :ALIASES:  reference type, primitive type, new, garbage collection, garbage collector, finalize, static, this, null, array
 :END:
 #+title: Objects, references and garbage collection in Java
@@ -14,7 +14,7 @@
 - *Primitive types*: =byte short int long float double char boolean=, held by value.
 - *Reference types*: classes, interfaces, arrays. A variable holds a reference (or =null=); assignment copies the reference, not the object.
 - *Creation*: =new C(args)= allocates on the heap and runs a constructor. If no constructor is written, the compiler provides a no-argument one; writing any constructor removes it.
-- *Destruction*: none in the language. The garbage collector frees objects unreachable from the roots (stack variables, static fields). =finalize()= is not a destructor (deprecated); resources are released explicitly with =close()= and try-with-resources.
+- *Destruction*: none in the language. The garbage collector frees objects unreachable from the roots (stack variables, static fields). =finalize()= is not a destructor (deprecated); resources are released explicitly with =close()= and [[id:java-exceptions][try-with-resources]].
 - *static*: a field or method of the class, not of the instances (=Math.sqrt=, =System.out=). A static method has no =this= and can call only static members directly.
 - *final*: a variable assigned once; =static final= gives constants.
 - *Arrays* are objects: =int[] a = new int[n];= with =a.length=; copying uses =System.arraycopy= or =Arrays.copyOf=.

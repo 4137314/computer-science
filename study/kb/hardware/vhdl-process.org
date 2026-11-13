@@ -33,6 +33,14 @@
 2. every output is assigned on every path — simplest with default assignments at the top.
 Breaking rule 2 means the output keeps its old value on some path: a latch. Breaking rule 1 makes simulation differ from the synthesised hardware.
 
+* Worked example
+#+begin_src vhdl
+  process (sel, a, b) begin
+    if sel = '1' then y <= a; end if;     -- y not assigned when sel = '0'
+  end process;
+#+end_src
+When =sel= is 0, =y= must keep its previous value: synthesis builds a level-sensitive latch enabled by =sel=. Adding =else y <= b;= (or a default =y <= b;= before the =if=) makes it a 2:1 multiplexer. If =b= were missing from the sensitivity list, simulation would not react to changes of =b= while synthesis (which ignores the list) would: simulation and hardware would disagree.
+
 * Intuition
 A process is a black box with one rule inside: when an input changes, recompute everything from scratch. If on some path you do not say what an output is, the hardware has to remember it.
 

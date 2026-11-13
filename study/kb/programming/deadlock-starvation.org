@@ -14,7 +14,7 @@
 Coffman's conditions: a deadlock can occur only if all four hold.
 1. *Mutual exclusion*: a resource is held by one thread at a time.
 2. *Hold and wait*: a thread holds a resource while waiting for another.
-3. *No preemption*: resources are released only voluntarily.
+3. *No [[id:threads-data-race][preemption]]*: resources are released only voluntarily.
 4. *Circular wait*: there is a cycle \(T_1\to T_2\to\dots\to T_1\) of "waits for a resource held by".
 
 * Derivation
@@ -36,7 +36,7 @@ Order the mutexes globally and make every thread lock in increasing order. A cyc
 - two mutexes locked in different orders by different threads: fixed order or =std::lock=.
 
 * Starvation
-A thread is *starved* when the access policy keeps postponing it indefinitely, though no deadlock exists (readers that keep a writer out). Fair queues and priorities that age prevent it. Semaphores and monitors are other classical primitives; Java gives every object a monitor (=synchronized=).
+A thread is *starved* when the access policy keeps postponing it indefinitely, though no deadlock exists (readers that keep a writer out). Fair queues and priorities that age prevent it. Semaphores and monitors are other classical primitives; Java gives every object a [[id:java-monitors][monitor]] (=synchronized=).
 
 * Intuition
 Two cars at a narrow bridge, each waiting for the other to back up. Nobody is wrong locally; the cycle is the bug.

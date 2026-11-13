@@ -13,12 +13,12 @@
 * Definition
 The *signature* of a method is its name plus the number, order and types of its parameters. Two methods with the same name and different signatures are *overloaded*; the compiler resolves each call to the most specific applicable one using the static (declared) types of the arguments.
 
-| | overloading | overriding |
-|---+---+---|
-| where | same class (or inherited) | subclass |
-| signature | different | identical |
-| chosen | at compile time | at run time |
-| on | static types of the arguments | dynamic type of the receiver |
+|           | overloading                   | overriding                   |
+|-----------+-------------------------------+------------------------------|
+| where     | same class (or inherited)     | subclass                     |
+| signature | different                     | identical                    |
+| chosen    | at compile time               | at run time                  |
+| based on  | static types of the arguments | dynamic type of the receiver |
 
 * Example
 #+begin_src java
@@ -36,4 +36,4 @@ The *signature* of a method is its name plus the number, order and types of its 
 Overloading is a convenience of naming, decided by the compiler; nothing about it is dynamic.
 
 * Pitfall
-=int f()= and =double f()= cannot coexist: the return type is not part of the signature. Combining overloading with overriding is the classic trap: the overload is fixed at compile time, then the override is chosen at run time among the methods with that exact signature (see [[id:java-dynamic-binding][the binding rule]]).
+=int f()= and =double f()= cannot coexist: the return type is not part of the signature. Combining overloading with overriding is the classic trap: the overload is fixed at compile time, then the [[id:virtual-functions][override]] is chosen at run time among the methods with that exact signature (see [[id:java-dynamic-binding][the binding rule]]).

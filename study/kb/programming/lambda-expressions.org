@@ -4,7 +4,7 @@
 :AREA:     cpp
 :KIND:     definition
 :REQUIRES: function-objects
-:SEE:      stl-algorithms event-handling threads-data-race
+:SEE:      stl-algorithms event-handling threads-data-race java-streams
 :ALIASES:  lambda, closure, capture, capture by value, capture by reference, anonymous function
 :END:
 #+title: Lambda expressions
@@ -15,7 +15,7 @@ A lambda is syntax for a [[id:function-objects][function object]] whose class th
 - =[]= captures nothing; ~[=]~ all used variables by copy; =[&]= by reference;
 - =[x, &y]= mixes: =x= by copy (frozen at creation), =y= by reference (read at call time);
 - =mutable= allows changing the copies; =-> ret= fixes the return type when it cannot be deduced.
-Java has lambdas too (=x -> x * 2=), restricted to effectively final captures and used to implement single-method interfaces (=EventHandler=, =Comparator=).
+Java has lambdas too (=x -> x * 2=), restricted to [[id:java-inner-classes][effectively final]] captures and used to implement single-method interfaces (=EventHandler=, =Comparator=).
 
 * Example
 #+begin_src c++

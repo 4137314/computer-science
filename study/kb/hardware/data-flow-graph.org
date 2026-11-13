@@ -23,14 +23,35 @@ Architectural synthesis answers:
 * Example
 The inner loop of a differential-equation solver,
 \[ x_1=x+dx,\quad u_1=u-3x\,u\,dx-3y\,dx,\quad y_1=y+u\,dx, \]
-has 6 multiplications, 2 subtractions, 2 additions and a comparison \(x_1<a\). Its graph has depth 4 (\(3\cdot x\), then \(\cdot u\), then \(\cdot dx\), then the subtractions).
+has 6 multiplications, 2 subtractions, 2 additions and a comparison \(x_1<a\):
+
+| op | computes | op  | computes        |
+|----+----------+-----+-----------------|
+| v1 | 3 · x    | v7  | u − v3          |
+| v2 | u · dx   | v8  | v7 − v5  (= u1) |
+| v3 | v1 · v2  | v9  | y + v6   (= y1) |
+| v4 | 3 · y    | v10 | x + dx   (= x1) |
+| v5 | v4 · dx  | v11 | v10 < a         |
+| v6 | u · dx   |     |                 |
+
+The longest chain v1 → v3 → v7 → v8 has four operations: with unit delays no schedule is shorter than 4 cycles.
 
 * Picture
-\begin{tikzpicture}[font=\scriptsize, o/.style={draw, circle, minimum size=0.5cm, inner sep=0}, ->, >={Stealth}]
-\node[o, draw=kbcyan] (m1) at (0,0) {$\times$}; \node[o, draw=kbcyan] (m2) at (1.2,0) {$\times$}; \node[o, draw=kbcyan] (m3) at (2.4,0) {$\times$}; \node[o, draw=kbcyan] (m4) at (3.6,0) {$\times$}; \node[o, draw=kbamber] (a1) at (4.8,0) {$+$};
-\node[o, draw=kbcyan] (m5) at (0.6,-1) {$\times$}; \node[o, draw=kbcyan] (m6) at (2.4,-1) {$\times$}; \node[o, draw=kbamber] (a2) at (4.8,-1) {$<$};
-\node[o, draw=kbmagenta] (s1) at (0.6,-2) {$-$}; \node[o, draw=kbmagenta] (s2) at (0.6,-3) {$-$};
-\draw (m1) -- (m5); \draw (m2) -- (m5); \draw (m5) -- (s1); \draw (m3) -- (m6); \draw (m6) -- (s1); \draw (s1) -- (s2); \draw (m4) -- (a2); \draw (a1) -- (a2);
+\begin{tikzpicture}[font=\scriptsize, o/.style={draw, circle, minimum size=0.62cm, inner sep=0}, ->, >={Stealth}, x=1.3cm, y=1.1cm]
+\foreach \c in {1,...,4} {\node[kbguide, anchor=east] at (-0.6,1-\c) {cycle \c}; \draw[kbguide, densely dotted, -] (-0.55,1-\c-0.5) -- (4.5,1-\c-0.5);}
+\node[o, draw=kbcyan, label={[kbguide]above:$v_1$}] (v1) at (0,0) {$\times$};
+\node[o, draw=kbcyan, label={[kbguide]above:$v_2$}] (v2) at (1,0) {$\times$};
+\node[o, draw=kbcyan, label={[kbguide]above:$v_4$}] (v4) at (2,0) {$\times$};
+\node[o, draw=kbcyan, label={[kbguide]above:$v_6$}] (v6) at (3,0) {$\times$};
+\node[o, draw=kbamber, label={[kbguide]above:$v_{10}$}] (v10) at (4,0) {$+$};
+\node[o, draw=kbcyan, label={[kbguide]left:$v_3$}] (v3) at (0.5,-1) {$\times$};
+\node[o, draw=kbcyan, label={[kbguide]right:$v_5$}] (v5) at (2,-1) {$\times$};
+\node[o, draw=kbamber, label={[kbguide]right:$v_9$}] (v9) at (3,-1) {$+$};
+\node[o, draw=kbamber, label={[kbguide]right:$v_{11}$}] (v11) at (4,-1) {$<$};
+\node[o, draw=kbmagenta, label={[kbguide]left:$v_7$}] (v7) at (0.5,-2) {$-$};
+\node[o, draw=kbmagenta, label={[kbguide]left:$v_8$}] (v8) at (1.2,-3) {$-$};
+\draw (v1) -- (v3); \draw (v2) -- (v3); \draw (v3) -- (v7); \draw (v7) -- (v8);
+\draw (v4) -- (v5); \draw (v5) -- (v8); \draw (v6) -- (v9); \draw (v10) -- (v11);
 \end{tikzpicture}
 Multiplications (cyan) form the long chains; the subtractions wait for them.
 

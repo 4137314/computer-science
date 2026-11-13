@@ -13,7 +13,7 @@
 * Method
 Without loads (fixed delay per gate), the recursion is exact and optimal on trees:
 \[ a(v)=\min_{m \text{ at } v}\Big(d(m)+\max_{u\in\mathrm{inputs}(m)} a(u)\Big). \]
-With load-dependent delay \(d(m)=d_0(m)+k(m)\,C_L\), the load seen by \(m\) is the input capacitance of the gate chosen above it, not yet known. Remedy: compute at each node the best solution for each possible load value (a small set of library input capacitances), then choose top-down once the load is fixed.
+With [[id:gate-delay-model][load-dependent delay]] \(d(m)=d_0(m)+k(m)\,C_L\), the load seen by \(m\) is the input capacitance of the gate chosen above it, not yet known. Remedy: compute at each node the best solution for each possible load value (a small set of library input capacitances), then choose top-down once the load is fixed.
 
 Keeping several (area, delay) pairs per node — the Pareto front — allows trading: the minimum-delay cover only on critical paths (negative slack), the minimum-area cover elsewhere.
 

@@ -27,7 +27,7 @@
 #+end_src
 - *Entity*: interface. Port modes: =in=, =out=, =inout= (bidirectional, tri-state), =buffer=. Optional =generic= parameters.
 - *Architecture*: body; between =architecture= and =begin= go declarations (signals, constants, types, components), after =begin= concurrent statements.
-- *Description styles*: *structural* (instances of components connected by signals), *data-flow* (concurrent signal assignments, equations), *behavioural* (processes with sequential statements). They can be mixed.
+- *Description styles*: *structural* (instances of components connected by signals), *data-flow* (concurrent signal assignments, equations), *behavioural* (processes with [[id:vhdl-process][sequential statements]]). They can be mixed.
 - VHDL is case-insensitive, strongly typed; comments start with =--=.
 
 * Uses

@@ -20,9 +20,21 @@ The operator \((G,P)\circ(G',P')=(G+PG',\,PP')\) is associative, so all prefixes
 Simpler alternatives: *carry-skip* (bypass a block when \(P=1\)) and *carry-select* (precompute both block sums), see [[id:generalized-bypass][bypass and select]].
 
 * Picture
-\begin{tikzpicture}[font=\scriptsize]
-\foreach \i in {0,...,7} {\node at (7-\i,0.3) {\i};}
-\foreach \l/\d in {1/1,2/2,3/4} {\foreach \i in {0,...,7} {\pgfmathtruncatemacro{\ok}{\i>=\d} \ifnum\ok=1 \fill[kbcyan] (7-\i,-\l*0.7) circle (0.08); \draw[kbguide] (7-\i,-\l*0.7+0.7) -- (7-\i,-\l*0.7); \draw[kbamber] (7-\i+\d,-\l*0.7+0.7) -- (7-\i,-\l*0.7); \else \draw[kbguide] (7-\i,-\l*0.7+0.7) -- (7-\i,-\l*0.7); \fi}}
+\begin{tikzpicture}[font=\scriptsize, x=0.95cm, y=0.95cm]
+\foreach \i in {0,...,7} {\node at (7-\i,0.45) {bit $\i$}; \draw[kbguide] (7-\i,0.2) -- (7-\i,-3.1);}
+\foreach \l/\d in {1/1,2/2,3/4} {
+  \node[anchor=east, kbguide] at (-0.5,-\l) {level \l, span $\d$};
+  \foreach \i in {0,...,7} {
+    \pgfmathtruncatemacro{\ok}{\i>=\d}
+    \ifnum\ok=1
+      \draw[kbamber] (7-\i+\d,-\l+1) -- (7-\i,-\l);
+      \fill[kbcyan] (7-\i,-\l) circle (0.1);
+    \else
+      \fill[kbguide] (7-\i,-\l) circle (0.05);
+    \fi}}
+\foreach \i in {0,...,7} \node at (7-\i,-3.45) {$G_{\i:0}$};
+\fill[kbcyan] (-2.6,-4.1) circle (0.1); \node[anchor=west] at (-2.4,-4.1) {$(G,P)\circ(G',P')$};
+\fill[kbguide] (1.6,-4.1) circle (0.05); \node[anchor=west] at (1.8,-4.1) {pass through};
 \end{tikzpicture}
 Kogge–Stone for 8 bits: at level \(\ell\) each position combines with the one \(2^{\ell-1}\) to its right; three levels.
 

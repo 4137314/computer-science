@@ -1,0 +1,50 @@
+:PROPERTIES:
+:ID:       template-specialization
+:DOMAIN:   programming
+:AREA:     generic-programming
+:KIND:     construction
+:REQUIRES: cpp-templates
+:SEE:      template-metaprogramming bitset stl-containers
+:ALIASES:  full specialization, explicit specialization, partial specialization, vector<bool>, SFINAE, concepts, requires, enable_if, type traits
+:END:
+#+title: Template specialization, SFINAE and concepts
+#+summary: A template can be given a separate definition for chosen arguments: full (explicit) specialization fixes all of them, partial specialization (class templates only) fixes a pattern such as "any pointer"; overload resolution silently discards templates whose substitution fails (SFINAE), which C++20 concepts replace with named, readable constraints.
+
+* Construction
+#+begin_src c++
+  template <class T> struct Printer {                       // primary template
+    static void print(const T& x) { std::cout << x; }
+  };
+  template <> struct Printer<bool> {                        // full specialization
+    static void print(bool b) { std::cout << (b ? "yes" : "no"); }
+  };
+  template <class T> struct Printer<T*> {                   // partial: any pointer
+    static void print(T* p) { std::cout << "ptr to "; Printer<T>::print(*p); }
+  };
+  // full specialization for bool, partial specialization for every pointer type
+#+end_src
+The compiler picks the most specialised matching definition. The standard library specialises =std::vector<bool>= to pack bits, and =std::hash<T>= is specialised by users to put their types in unordered containers.
+
+* SFINAE and concepts
+"[[id:multilevel-logic-optimization][Substitution]] failure is not an error": if substituting the arguments into a template's signature produces an invalid type, that candidate is dropped, not reported.
+#+begin_src c++
+  template <class T, class = std::enable_if_t<std::is_integral_v<T>>>
+  T half(T x) { return x / 2; }                      // C++11/17: only for integers
+
+  template <std::integral T> T half2(T x) { return x / 2; }   // C++20 concept
+
+  template <class T>
+  concept Addable = requires(T a, T b) { { a + b } -> std::convertible_to<T>; };
+  template <Addable T> T sum(std::vector<T> const& v) {
+    T s{};
+    for (auto& x : v) s = s + x;
+    return s;
+  }
+#+end_src
+A call =half2(2.5)= now fails with "constraint =std::integral<double>= not satisfied" instead of pages of [[id:cpp-templates][instantiation]] errors.
+
+* Intuition
+Specialisation is "same name, different recipe for this case"; concepts are "this recipe only for ingredients that have these properties".
+
+* Pitfall
+Function templates cannot be partially specialised; use overloading instead. And an explicit specialisation must be declared before the first use that would instantiate the primary template, or the program is ill-formed.

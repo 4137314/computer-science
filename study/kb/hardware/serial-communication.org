@@ -3,7 +3,7 @@
 :DOMAIN:   hardware
 :AREA:     interfaces
 :KIND:     definition
-:REQUIRES:
+:REQUIRES: 
 :SEE:      uart spi i2c serial-arithmetic
 :ALIASES:  serial communication, parallel communication, synchronous serial, asynchronous serial, baud rate, full duplex, half duplex, I2S
 :END:
@@ -16,17 +16,21 @@
 - *Duplex*: simplex (one direction), half duplex (both, alternately, e.g. I²C), full duplex (both at once, e.g. SPI, UART with TX and RX).
 - *Topology*: point to point (UART), master with several slaves selected by wires (SPI) or by addresses on a shared bus (I²C).
 
-| | UART | SPI | I²C | I²S |
-|---+---+---+---+---|
-| wires | TX, RX | SCK, MOSI, MISO, SS | SCL, SDA | SCK, WS, SD |
-| clock | none (agreed rate) | master | master | master |
-| addressing | none | one select line per slave | 7-bit address | none |
-| typical speed | 9.6–921.6 kbit/s | tens of Mbit/s | 100 kbit/s–3.4 Mbit/s | audio rates |
+|            | UART           | SPI              | I²C            | I²S         |
+|------------+----------------+------------------+----------------+-------------|
+| wires      | TX, RX         | SCK MOSI MISO SS | SCL, SDA       | SCK, WS, SD |
+| clock      | none (agreed)  | master           | master         | master      |
+| addressing | none           | SS per slave     | 7-bit address  | none        |
+| duplex     | full           | full             | half           | one way     |
+| speed      | ≤ 921.6 kbit/s | 10–50 Mbit/s     | 0.1–3.4 Mbit/s | audio       |
 
 I²S carries stereo audio: the word-select line WS says whether the current word is the left or the right channel.
+
+* Worked example
+UART at 115 200 baud, 8N1: each byte costs 10 bit times (start + 8 data + stop): \(115\,200/10=11\,520\) bytes/s, 80% efficiency. SPI at 10 MHz moves 10 Mbit/s = 1.25 MB/s with no framing overhead. I²C at 400 kHz: 9 clocks per byte (8 data + ACK) plus address and start/stop per transaction: below 44 kB/s.
 
 * Intuition
 Serial links trade wires for time. With fast transistors and expensive pins, time is the cheaper resource.
 
 * Pitfall
-Two clock domains meet at every receiver: signals coming from outside must be synchronised (two flip-flops) before the receiver's FSM uses them, or metastability will eventually strike.
+Two clock domains meet at every receiver: signals coming from outside must be synchronised (two flip-flops) before the receiver's FSM uses them, or [[id:setup-hold-time][metastability]] will eventually strike.

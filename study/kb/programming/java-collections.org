@@ -4,7 +4,7 @@
 :AREA:     java
 :KIND:     definition
 :REQUIRES: java-generics
-:SEE:      java-iterator stl-containers equals-hashcode comparable-comparator uml-association
+:SEE:      java-iterator stl-containers equals-hashcode comparable-comparator uml-association java-streams hashmap-internals
 :ALIASES:  Collections Framework, Collection, List, Set, Map, Queue, ArrayList, LinkedList, HashSet, TreeSet, HashMap, TreeMap
 :END:
 #+title: The Java Collections Framework
@@ -13,18 +13,19 @@
 * Definition
 Three parts: *interfaces* (abstract data types), *implementations* (concrete data structures), *algorithms* (polymorphic static methods in =Collections=).
 
-| interface | meaning | hash | tree (sorted) | array / list |
-|---+---+---+---+---|
-| =Set<E>= | no duplicates | =HashSet= | =TreeSet= | |
-| =List<E>= | ordered, by index | | | =ArrayList=, =LinkedList= |
-| =Queue<E>=, =Deque<E>= | FIFO, both ends | | =PriorityQueue= (heap) | =ArrayDeque=, =LinkedList= |
-| =Map<K,V>= | keys to values | =HashMap= | =TreeMap= | |
+| interface | meaning       | hash    | tree (sorted) | array / list          |
+|-----------+---------------+---------+---------------+-----------------------|
+| Set<E>    | no duplicates | HashSet | TreeSet       | —                     |
+| List<E>   | by index      | —       | —             | ArrayList, LinkedList |
+| Queue<E>  | FIFO, deque   | —       | PriorityQueue | ArrayDeque            |
+| Map<K,V>  | key → value   | HashMap | TreeMap       | —                     |
 
 =Collection<E>= offers =add=, =remove=, =contains=, =size=, =isEmpty=, =iterator=, the bulk operations =addAll=, =removeAll=, =retainAll=, =containsAll=, and =toArray=. =Map= is not a =Collection=; its views =keySet()=, =values()=, =entrySet()= are.
 
 * Example
 #+begin_src java
-  List<String> names = new ArrayList<>();      // declare the interface, choose the class
+  // declare the interface, choose the class
+  List<String> names = new ArrayList<>();
   Set<String> unique = new TreeSet<>(names);   // sorted, no duplicates
   Map<String, Integer> count = new HashMap<>();
   for (String n : names) count.merge(n, 1, Integer::sum);

@@ -18,7 +18,15 @@ With \(d_i\) the execution delay (cycles) of operation \(v_i\):
 These are the arrival and required times of [[id:static-timing-analysis][timing analysis]], counted in cycles.
 
 * Example
-For the solver graph with all delays 1: ASAP puts the four independent multiplications in cycle 1, latency 4. ALAP with \(\bar\lambda=4\) moves the =x+dx= addition and the comparison to cycles 3 and 4, and the =u·dx= multiplication for =y1= to cycle 3. Their mobility (2, 2, 2) is the room a resource-constrained scheduler can use.
+The [[id:data-flow-graph][solver graph]] with all delays 1, \(\bar\lambda=4\):
+
+| op       | v1 | v2 | v3 | v4 | v5 | v6 | v7 | v8 | v9 | v10 | v11 |
+|----------+----+----+----+----+----+----+----+----+----+-----+-----|
+| ASAP     | 1  | 1  | 2  | 1  | 2  | 1  | 3  | 4  | 2  | 1   | 2   |
+| ALAP     | 1  | 1  | 2  | 2  | 3  | 3  | 3  | 4  | 4  | 3   | 4   |
+| mobility | 0  | 0  | 0  | 1  | 1  | 2  | 0  | 0  | 2  | 2   | 2   |
+
+The critical path is v1, v2 → v3 → v7 → v8 (mobility 0). ASAP needs four multipliers in cycle 1; the mobility of v4, v5, v6 is exactly the freedom a [[id:list-scheduling][resource-constrained scheduler]] uses to spread them.
 
 * Picture
 \begin{tikzpicture}[font=\scriptsize]

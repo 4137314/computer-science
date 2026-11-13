@@ -11,15 +11,15 @@
 #+summary: Instead of positioning nodes by coordinates, one puts them in layout panes that compute positions and sizes automatically and recompute them when the window is resized: HBox/VBox in a row or column, BorderPane in five regions, GridPane in a grid, StackPane on top of each other.
 
 * Definition
-| pane | arrangement |
-|---+---|
-| =HBox=, =VBox= | horizontal row, vertical column (spacing, padding, alignment) |
-| =StackPane= | children on top of each other, centred |
-| =FlowPane= | flows and wraps, like text |
-| =TilePane= | grid of equal cells |
-| =BorderPane= | top, bottom, left, right, centre |
-| =GridPane= | grid of rows and columns, with spans; =add(node, col, row)= |
-| =AnchorPane= | children anchored at distances from the edges |
+| pane       | arrangement                                      |
+|------------+--------------------------------------------------|
+| HBox, VBox | a row, a column (spacing, padding, alignment)    |
+| StackPane  | children on top of each other, centred           |
+| FlowPane   | flows and wraps, like text                       |
+| TilePane   | grid of equal cells                              |
+| BorderPane | top, bottom, left, right, centre                 |
+| GridPane   | rows and columns with spans: add(node, col, row) |
+| AnchorPane | children anchored at distances from the edges    |
 
 Panes nest: a =BorderPane= with a =VBox= of buttons on the left and a =GridPane= in the centre. Manual adjustments remain possible: =setLayoutX= or =setTranslateX= move a node, =setPrefWidth=, =setMinWidth=, =setMaxWidth= constrain its size.
 

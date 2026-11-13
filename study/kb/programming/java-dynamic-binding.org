@@ -12,14 +12,15 @@
 
 * Statement
 Two phases.
-1. *Compile time*: look at the static type \(S\) of =x= and at the static types of the arguments. Among the methods named =f= visible in \(S\) (declared or inherited) that are applicable, pick the most specific signature \(\sigma\). If none or more than one is maximal, compilation fails.
+1. *Compile time*: look at the [[id:polymorphism][static type]] \(S\) of =x= and at the static types of the arguments. Among the methods named =f= visible in \(S\) (declared or inherited) that are applicable, pick the most specific signature \(\sigma\). If none or more than one is maximal, compilation fails.
 2. *Run time*: let \(D\) be the dynamic type of the object. Starting from \(D\) and moving up the hierarchy, execute the first method with exactly the signature \(\sigma\).
 Static, private and final methods and constructors are bound at compile time.
 
 * Example
 #+begin_src java
   class A           { void m(A a) { System.out.println("A.m(A)"); } }
-  class B extends A { void m(B b) { System.out.println("B.m(B)"); }      // overload, not override
+  // overload, not override
+  class B extends A { void m(B b) { System.out.println("B.m(B)"); }
                       @Override void m(A a) { System.out.println("B.m(A)"); } }
   A x = new B();  B y = new B();
   x.m(y);   // B.m(A): static type A only knows m(A); the override in B runs

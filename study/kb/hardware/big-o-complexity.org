@@ -3,8 +3,8 @@
 :DOMAIN:   hardware
 :AREA:     complexity
 :KIND:     definition
-:REQUIRES:
-:SEE:      np-hard-optimization static-timing-analysis event-driven-simulation stl-algorithms template-metaprogramming
+:REQUIRES: 
+:SEE:      np-hard-optimization static-timing-analysis event-driven-simulation stl-algorithms template-metaprogramming technology-mapping
 :ALIASES:  big O, asymptotic complexity, time complexity, space complexity, polynomial, exponential, computational complexity
 :END:
 #+title: Computational complexity and big-O
@@ -22,7 +22,7 @@ Count operations through the algorithm. Shifting every component of a circuit by
 
 * Picture
 \begin{tikzpicture}
-\begin{axis}[width=7.2cm, height=5cm, axis lines=left, xlabel={$n$}, ylabel={operations}, xmin=1, xmax=12, ymin=0, ymax=600, legend pos=north west]
+\begin{axis}[width=7.2cm, height=5cm, axis lines=left, xlabel={$n$}, ylabel={operations}, xmin=1, xmax=12, ymin=0, ymax=600]
 \addplot+[domain=1:12, samples=40] {x*ln(x)/ln(2)}; \addlegendentry{$n\log n$}
 \addplot+[domain=1:12, samples=40] {x^2}; \addlegendentry{$n^2$}
 \addplot+[domain=1:12, samples=40] {x^3}; \addlegendentry{$n^3$}

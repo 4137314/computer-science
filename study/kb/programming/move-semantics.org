@@ -4,7 +4,7 @@
 :AREA:     cpp
 :KIND:     construction
 :REQUIRES: value-categories shallow-deep-copy
-:SEE:      smart-pointers stl-containers
+:SEE:      smart-pointers stl-containers perfect-forwarding
 :ALIASES:  move constructor, move assignment, std::move, rule of five, ownership transfer
 :END:
 #+title: Move semantics and the rule of five
@@ -24,10 +24,10 @@ For =class A { int i; B* pb; };= with =pb= owned:
 The cost of a move is a few pointer assignments, independent of the size of what =B= holds.
 
 * Rule of five
-A class that manages a resource defines (or ~= default~ / ~= delete~ explicitly) all of: destructor, copy constructor, copy assignment, move constructor, move assignment. With members that already manage themselves (=std::unique_ptr=, =std::vector=) the defaults are correct and nothing needs writing: the rule of zero.
+A class that manages a resource defines (or ~= default~ / ~= delete~ explicitly) all of: destructor, [[id:cpp-special-members][copy constructor]], copy assignment, move constructor, move assignment. With members that already manage themselves (=std::unique_ptr=, =std::vector=) the defaults are correct and nothing needs writing: the rule of zero.
 
 * When moves happen
-The compiler picks the =&&= overload when the argument is an rvalue: returning a local by value, passing a temporary, =v.push_back(A(3))=, or an explicit =std::move(x)=, which only casts =x= to an rvalue and moves nothing by itself.
+The compiler picks the =&&= overload when the argument is an [[id:value-categories][rvalue]]: returning a local by value, passing a temporary, =v.push_back(A(3))=, or an explicit =std::move(x)=, which only casts =x= to an rvalue and moves nothing by itself.
 
 * Picture
 \begin{tikzpicture}[font=\small]

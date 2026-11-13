@@ -11,7 +11,7 @@
 #+summary: Class templates that own a heap object and delete it automatically: =unique_ptr= is the single owner (movable, not copyable), =shared_ptr= counts its owners and frees on the last, =weak_ptr= observes a shared object without owning it and must =lock()= to use it.
 
 * Construction
-- =std::unique_ptr<T>=: exclusive ownership. Copy is deleted, move transfers ownership: =p1 = std::move(p);= leaves =p= empty. =reset(new T)= replaces the object, =reset()= frees it. Zero overhead over a raw pointer.
+- =std::unique_ptr<T>=: exclusive [[id:aggregation-composition][ownership]]. Copy is deleted, move transfers ownership: =p1 = std::move(p);= leaves =p= empty. =reset(new T)= replaces the object, =reset()= frees it. Zero overhead over a raw pointer.
 - =std::shared_ptr<T>=: shared ownership. A control block keeps the count of owners (=use_count()=); copying increments it, destroying decrements it, the object is deleted when it reaches zero.
 - =std::weak_ptr<T>=: points to an object managed by =shared_ptr= without incrementing the count. =wp.lock()= returns a =shared_ptr= (empty if the object is gone).
 Prefer =std::make_unique<T>(args)= and =std::make_shared<T>(args)= to =new=.

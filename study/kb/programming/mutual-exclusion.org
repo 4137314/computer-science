@@ -4,7 +4,7 @@
 :AREA:     concurrency
 :KIND:     method
 :REQUIRES: threads-data-race
-:SEE:      deadlock-starvation cpp-special-members
+:SEE:      deadlock-starvation cpp-special-members condition-variable
 :ALIASES:  mutex, critical section, atomic, std::atomic, lock_guard, recursive_mutex, std::lock, scoped_lock
 :END:
 #+title: Atomics and mutual exclusion

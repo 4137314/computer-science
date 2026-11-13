@@ -3,7 +3,7 @@
 :DOMAIN:   hardware
 :AREA:     programmable-logic
 :KIND:     construction
-:REQUIRES:
+:REQUIRES: 
 :SEE:      pla-pal fpga-architecture programming-technologies
 :ALIASES:  ROM, lookup table, truth table in memory, memory as logic, decoder
 :END:
@@ -13,7 +13,7 @@
 * Construction
 A ROM with \(n\) address lines and \(m\) data lines has a decoder that activates one of \(2^n\) word lines (one per minterm) and an array where each column \(j\) holds output \(f_j\). Programming the array means putting a connection (a transistor) where \(f_j(\text{minterm})=1\) — or 0, depending on the technology — and none elsewhere. The output is
 \[ f_j(x)=\bigvee_{k:\ f_j(k)=1} m_k(x), \]
-the canonical sum of products, with the decoder as fixed AND plane and the array as programmable OR plane.
+the canonical [[id:two-level-minimization][sum of products]], with the decoder as fixed AND plane and the array as programmable OR plane.
 
 * Picture
 \begin{tikzpicture}[font=\small]
