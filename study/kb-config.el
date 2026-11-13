@@ -16,3 +16,7 @@
 
 ;; TikZ libraries for UML boxes and logic gates.
 (kb-preamble-add "\\usetikzlibrary{shapes.multipart,shapes.geometric,shapes.gates.logic.US,matrix}")
+
+;; Display formulas are rendered as inline $\displaystyle ...$: a wide text block keeps
+;; them on one line instead of letting TeX break them at relations.
+(kb-preamble-add "\\setlength{\\textwidth}{40cm}")

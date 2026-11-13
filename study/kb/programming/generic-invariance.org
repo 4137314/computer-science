@@ -12,7 +12,8 @@
 
 * Statement
 For a generic type \(G\) and \(B<:A\), neither \(G\langle B\rangle<:G\langle A\rangle\) nor the converse holds: generics are *invariant*. With wildcards,
-\[ G\langle B\rangle <: G\langle ?\ \text{extends}\ A\rangle, \qquad G\langle A\rangle <: G\langle ?\ \text{super}\ B\rangle, \qquad G\langle T\rangle <: G\langle ?\rangle. \]
+\[ G\langle B\rangle <: G\langle ?\ \text{extends}\ A\rangle, \qquad G\langle A\rangle <: G\langle ?\ \text{super}\ B\rangle, \]
+\[ G\langle T\rangle <: G\langle ?\rangle. \]
 
 * Derivation
 Suppose =List<Integer>= were a subtype of =List<Number>=:
