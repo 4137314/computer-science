@@ -1,0 +1,31 @@
+:PROPERTIES:
+:ID:       bcd-adder
+:DOMAIN:   hardware
+:AREA:     arithmetic
+:KIND:     construction
+:REQUIRES: ripple-carry-adder
+:SEE:      counters seven-segment-decoder twos-complement
+:ALIASES:  BCD, binary coded decimal, sommatore BCD, BCD adder, decimal correction, add 6
+:END:
+#+title: BCD adder
+#+summary: BCD codes each decimal digit in 4 bits (codes 1010–1111 unused); a 4-bit binary adder gives the right digit only when the sum is at most 9, so a correction stage adds 6 and emits a decimal carry when \(C_4+z_3z_2+z_3z_1=1\); cascading one such cell per digit adds multi-digit decimal numbers.
+
+* Construction
+BCD: \(29=0010\,1001\). 8 bits cover only \(0\dots99\) instead of \(0\dots255\): less efficient than binary, but decoding to a display is per digit.
+Per digit: \(Z=A+B+c_{in}\) with a binary 4-bit adder, \(0\le Z\le9+9+1=19\). If \(Z\le9\) it is already the digit. If \(Z\ge10\), the correct digit is \(Z-10\) with a decimal carry; on 4 bits \(Z-10\equiv Z+6\pmod{16}\), so a second adder adds \(0110\).
+Correction condition: \(Z\ge10\) iff the binary carry \(C_4=1\) (\(Z\ge16\)) or \(Z_{3..0}\in\{1010,\dots,1111\}\):
+\[ K=C_4+z_3z_2+z_3z_1. \]
+\(K\) is the decimal carry to the next digit and drives the second adder's operand \(0KK0\). A 3-digit adder is three such cells chained through \(K\).
+
+* Example
+- \(3+6=9\): \(Z=1001\), \(K=0\), no correction.
+- \(2+8=10\): \(Z=1010\), \(K=1\) (\(z_3z_1\)); \(1010+0110=1\,0000\): digit 0, carry 1 → "10".
+- \(7+8=15\): \(Z=1111\), \(K=1\); \(1111+0110=1\,0101\): digit 5, carry 1.
+- \(9+9=18\): \(Z=1\,0010\), \(C_4=1\Rightarrow K=1\); \(0010+0110=1000\): digit 8, carry 1.
+The carry out of the correction adder is ignored: \(K\) already carries the information.
+
+* Intuition
+A binary nibble counts to 15, a decimal digit to 9: adding 6 skips the six codes that BCD never uses.
+
+* Pitfall
+Testing only \(C_4\) misses sums 10–15, which do not overflow 4 bits; testing only the code \(\ge1010\) misses 16–19, whose 4-bit result looks valid (\(9+9\) gives \(0010\)).

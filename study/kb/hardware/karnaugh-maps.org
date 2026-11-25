@@ -1,0 +1,52 @@
+:PROPERTIES:
+:ID:       karnaugh-maps
+:DOMAIN:   hardware
+:AREA:     combinational
+:KIND:     method
+:REQUIRES: canonical-forms
+:SEE:      two-level-minimization nand-nor-synthesis logic-hazards seven-segment-decoder
+:ALIASES:  Karnaugh map, mappa di Karnaugh, K-map, Gray code, codice Gray, prime implicant, implicante primo, essential prime implicant, implicante essenziale, don't care, indifferenza, minimal SOP, minimal POS, five-variable map
+:END:
+#+title: Karnaugh maps
+#+summary: A Karnaugh map lays the truth table out in Gray order so that logically adjacent rows (differing in one variable) are geometrically adjacent, edges wrapping; rectangles of \(2^k\) ones are products with \(k\) fewer literals; the minimal SOP takes all essential prime implicants and covers the remaining ones with as few primes as possible, don't-cares counting as 1 when growing groups and as 0 when choosing them.
+
+* Method
+1. Draw the map: rows and columns numbered in *Gray code* (00, 01, 11, 10), so neighbours differ in one bit; the first and last column (and row) are neighbours too — the map is a torus.
+2. Fill it from the truth table (careful: cell \(ab=11\) is the third column, not the fourth).
+3. *Prime implicants*: from each 1 grow the largest rectangle of \(1,2,4,8,\dots\) cells containing only ones (and don't-cares). A group of \(2^k\) cells is a product of \(n-k\) literals: write the variables that are *constant* across the group.
+4. *Essential primes*: a prime that is the only one covering some 1. They are in every minimal cover.
+5. Cover the ones still uncovered with the fewest, largest primes (choose to minimize overlaps). Covering a 1 twice is fine; using a non-prime group is never minimal.
+*POS*: group the zeros the same way and write each group as a sum with polarity reversed (a variable constant at 0 appears plain): \(f=\prod\).
+*Don't-cares* (\(-\), inputs that never occur or whose output does not matter): treat them as 1 to enlarge primes, as 0 when deciding which primes are needed — a prime is never essential because of a don't-care, and no prime is added to cover only don't-cares.
+*Five variables*: two 4-variable maps for \(v=0\) and \(v=1\) (Shannon on \(v\)), imagined one on top of the other: same cell in both maps = adjacent. Six: four maps. Beyond, split with Shannon.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\foreach \c/\l in {0/00,1/01,2/11,3/10} {\node at (\c*0.7+0.35,0.95) {\l}; \node at (-0.3,0.35-\c*0.7) {\l};}
+\node at (-0.45,1.0) {$xy\backslash zw$};
+\foreach \r in {0,...,3} \foreach \c in {0,...,3} \draw (\c*0.7,0.7-\r*0.7) rectangle ++(0.7,-0.7);
+\foreach \r/\vals in {0/{1,0,1,1},1/{0,1,1,0},2/{0,1,1,0},3/{1,1,1,1}} {\foreach \v [count=\c from 0] in \vals \node at (\c*0.7+0.35,0.35-\r*0.7) {\v};}
+\draw[kbcyan, rounded corners, line width=1pt] (0.78,-0.08) rectangle (2.02,-1.32);
+\draw[kbamber, rounded corners, line width=1pt] (1.46,0.64) rectangle (2.04,-2.04);
+\draw[kbmagenta, rounded corners, line width=1pt] (0.05,0.65) -- (0.65,0.65) -- (0.65,0.05) -- (0.05,0.05);
+\draw[kbmagenta, rounded corners, line width=1pt] (2.75,0.65) -- (2.15,0.65) -- (2.15,0.05) -- (2.75,0.05);
+\draw[kbmagenta, rounded corners, line width=1pt] (0.05,-2.05) -- (0.65,-2.05) -- (0.65,-1.45) -- (0.05,-1.45);
+\draw[kbmagenta, rounded corners, line width=1pt] (2.75,-2.05) -- (2.15,-2.05) -- (2.15,-1.45) -- (2.75,-1.45);
+\draw[kbviolet, rounded corners, line width=1pt, densely dashed] (0.74,-0.74) rectangle (2.06,-2.06);
+\node[anchor=west] at (3.2,0.2) {\textcolor{kbmagenta}{$\bar y\bar w$} (4 corners), \textcolor{kbcyan}{$yw$} essential};
+\node[anchor=west] at (3.2,-0.4) {\textcolor{kbamber}{$zw$}, \textcolor{kbviolet}{$xw$} chosen among the rest};
+\node[anchor=west] at (3.2,-1.0) {$f=\bar y\bar w+yw+xw+zw$};
+\end{tikzpicture}
+The four corners are one group: rows 00 and 10 are adjacent, and so are columns 00 and 10.
+
+* Example
+The map above has six primes, all of four cells: \(\bar y\bar w\), \(yw\), \(xw\), \(x\bar y\), \(zw\), \(\bar yz\). Essential: \(\bar y\bar w\) (only cover of cell 0000) and \(yw\) (only cover of 0101). Still uncovered: 0011 and 1001. Cell 0011 is covered by \(zw\) or \(\bar yz\); cell 1001 by \(xw\) or \(x\bar y\); any choice gives 4 terms, 8 literals, e.g. \(f=\bar y\bar w+yw+xw+zw=\overline{y\oplus w}+w(x+z)\).
+Wrong answer: \(f=\bar y\bar w+yw+x\bar yw+\bar x\bar yzw\) — it is a cover, but with non-prime groups (10 literals).
+
+Don't-care example (BCD input, codes 1010–1111 never occur): segment \(a\) of a [[id:seven-segment-decoder][7-segment decoder]] drops from 14 to 6 literals, \(a=x+z+yw+\bar y\bar w\).
+
+* Intuition
+The map is the adjacency rule \(xy+x\bar y=x\) made visible: each doubling of a rectangle erases one variable, the one that changes inside it.
+
+* Pitfall
+Reading columns in binary order (00, 01, 10, 11) breaks adjacency and produces wrong groups. Groups must be rectangles of a power of two cells: an L-shape of three ones is two overlapping pairs, not one term. In a 5-variable map with columns numbered 000 001 011 010 100 101 111 110 the two middle columns (010 and 100) are *not* adjacent.

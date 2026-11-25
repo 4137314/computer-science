@@ -1,0 +1,29 @@
+:PROPERTIES:
+:ID:       register-transfer-buses
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     construction
+:REQUIRES: rtl-design
+:SEE:      multiplexer datapath-control std-logic alu-design
+:ALIASES:  register transfer, trasferimento tra registri, bus, tri-state, tri-state buffer, buffer tri-state, high impedance, alta impedenza, multiplexer bus, interconnect, ALU, swap registers
+:END:
+#+title: Register transfers: multiplexers, buses, tri-state
+#+summary: Data move between \(m\) registers of \(n\) bits through a dedicated mux per register (any set of transfers in one cycle, \((m-1)n\)-input muxes, wiring explodes), a shared bus driven by one mux (one value per cycle, every register may load it) or a tri-state bus (registers drive the bus through enabled buffers: same transfers as the mux bus, minimal wiring, best scalability, but at most one enable active at a time).
+
+* Construction
+*Dedicated multiplexers*: each register \(R_i\) has a mux choosing among the others' outputs (select \(S_i\)) and a load \(L_i\). Any permutation in one cycle, even a swap \(R_0\gets R_1, R_1\gets R_0\) — it works because all registers sample at the same edge. Cost: \(m\cdot n\) wires back to every mux, each mux with \((m-1)n\) inputs; adding a register changes every mux.
+*Mux bus*: one mux selects one register onto a bus wired to all register inputs; loads choose who stores it. One source per cycle: \(R_0\gets R_2, R_1\gets R_0\) needs two cycles, in the right order (first save \(R_0\) into \(R_1\), then overwrite \(R_0\)). One mux, wiring concentrated in one place, easier to extend.
+*Tri-state bus*: a tri-state buffer passes its input when enabled and otherwise disconnects (high impedance, =Z= in [[id:std-logic][std_logic]]). Each register drives the bus through its own buffer (enable \(E_i\)) and loads from it (\(L_i\)): one line crosses all registers, no central component, lower loads, good speed, adding a register is attaching it. The control must guarantee that at most one \(E_i\) is 1 (a decoder on a source address does it); two drivers fighting short-circuit the bus.
+An ALU or shared adder sits on these structures: sharing saves hardware and serializes operations.
+
+* Example
+Three registers, mux bus with select \(S_1S_0\) (00→R0, 01→R1, 10→R2) and loads \(L_0L_1L_2\):
+- \(S=10\), \(L=100\): \(R_0\gets R_2\).
+- \(S=01\), \(L=101\): \(R_0\gets R_1\) and \(R_2\gets R_1\) (one source, many destinations: fine).
+- \(R_0\gets R_2\) and \(R_1\gets R_0\) together: impossible; cycle 1 \(S=00, L=010\) (\(R_1\gets R_0\)), cycle 2 \(S=10, L=100\) (\(R_0\gets R_2\)).
+
+* Intuition
+Point-to-point roads let everyone travel at once but cover the map with asphalt; a bus is one road with a traffic light.
+
+* Pitfall
+On FPGAs internal tri-states usually do not exist: synthesis turns them into multiplexers. And during the cycle in which the enables switch, two drivers can overlap briefly — real designs leave a gap or use a mux.

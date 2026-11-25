@@ -4,7 +4,7 @@
 :AREA:     arithmetic
 :KIND:     construction
 :REQUIRES: 
-:SEE:      carry-lookahead-adder carry-save-adder vhdl-structural alu-design serial-arithmetic cordic fixed-point-arithmetic
+:SEE:      carry-lookahead-adder carry-save-adder vhdl-structural alu-design serial-arithmetic cordic fixed-point-arithmetic twos-complement magnitude-comparator bcd-adder
 :ALIASES:  full adder, half adder, ripple-carry adder, RCA, carry, generate, propagate, two's complement, overflow
 :END:
 #+title: Full adder and ripple-carry adder

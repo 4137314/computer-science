@@ -1,0 +1,69 @@
+:PROPERTIES:
+:ID:       vending-machine-design
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     example
+:REQUIRES: rtl-design
+:SEE:      fsm-patterns serial-communication sequential-logic finite-state-machine asm-chart
+:ALIASES:  vending machine, macchina del caffè, distributore di bevande, exam design problem, progetto d'esame, serial command decoder, accumulator, accumulatore, timing diagram, diagramma temporale
+:END:
+#+title: Worked design: a vending-machine controller
+#+summary: A typical design problem — decode 3-bit serial commands (start bit + 2 bits), drive a credit accumulator with \(add10/sub10\), dispense when the credit is at least 30 and return change one coin per cycle — is solved with a 9-state machine whose decoding states are a tree on the serial bits, whose fixed operations are chains of Moore states and whose change loop is a single state with outputs conditioned on the status signal \(gt0\).
+
+* Example
+*Specification*. Drink 30 cents; coins of 10 and 20; change and refunds only in 10-cent coins. Commands on a serial line \(L\) (synchronous, idle 0), 3 bits, first the start bit 1: =100= coin 10, =101= coin 20, =110= dispense, =111= refund. Datapath: accumulator *credit* with synchronous \(add10\), \(sub10\) (adding 20 = two cycles of \(add10\)); comparators \(gte30=[\mathit{credit}\ge30]\) and \(gt0=[\mathit{credit}>0]\) (combinational, negligible delay). Outputs: \(dist\) one cycle to dispense, \(ret10\) one coin per cycle. At the end the credit must be 0.
+*States* (Moore outputs in brackets, default 0):
+- IDLE: busy-wait for the start bit; \(L\to\) START.
+- START: read bit 2; \(\bar L\to\) COIN, \(L\to\) REQ.
+- COIN [\(add10\)]: read bit 3; \(\bar L\to\) IDLE (10 added), \(L\to\) ADD2.
+- ADD2 [\(add10\)]: second 10 of a 20 coin; → IDLE.
+- REQ: read bit 3; \(L\to\) CHG (refund); \(\bar L\cdot gte30\to\) D1; \(\bar L\cdot\overline{gte30}\to\) IDLE (not enough credit: keep it, wait).
+- D1 [\(dist, sub10\)] → D2 [\(sub10\)] → D3 [\(sub10\)] → CHG: dispense and take 30.
+- CHG: if \(gt0\): conditional outputs \(ret10=sub10=1\), stay; else → IDLE.
+The change loop cannot go below 0: in CHG \(gt0\) looks at the value of *this* cycle, and the decrement appears in the next one, so with credit 10 the machine pays one coin and sees 0 in the following cycle. The coin decoding uses COIN's output for both coins, so one state is saved.
+*Timing diagram* — two 20-cent coins, then "dispense":
+
+| cycle | L | state | credit | add10 | sub10 | dist | ret10 |
+|-------+---+-------+--------+-------+-------+------+-------|
+| 1     | 1 | IDLE  | 0      | 0     | 0     | 0    | 0     |
+| 2     | 0 | START | 0      | 0     | 0     | 0    | 0     |
+| 3     | 1 | COIN  | 0      | 1     | 0     | 0    | 0     |
+| 4     | 0 | ADD2  | 10     | 1     | 0     | 0    | 0     |
+| 5     | 0 | IDLE  | 20     | 0     | 0     | 0    | 0     |
+| …     | … | …     | …      | …     | …     | …    | …     |
+| 11    | 1 | IDLE  | 40     | 0     | 0     | 0    | 0     |
+| 12    | 1 | START | 40     | 0     | 0     | 0    | 0     |
+| 13    | 0 | REQ   | 40     | 0     | 0     | 0    | 0     |
+| 14    | 0 | D1    | 40     | 0     | 1     | 1    | 0     |
+| 15    | 0 | D2    | 30     | 0     | 1     | 0    | 0     |
+| 16    | 0 | D3    | 20     | 0     | 1     | 0    | 0     |
+| 17    | 0 | CHG   | 10     | 0     | 1     | 0    | 1     |
+| 18    | 0 | CHG   | 0      | 0     | 0     | 0    | 0     |
+| 19    | 0 | IDLE  | 0      | 0     | 0     | 0    | 0     |
+
+Each \(add10\)/\(sub10\) shows in *credit* one cycle later; \(L\) is read in the state *after* the one that saw the previous bit. Nine states: 4 bits binary, or one-hot.
+*Accumulator in VHDL* (asynchronous reset, overflow ignored):
+#+begin_src vhdl
+  acc : process (clk, rst)
+  begin
+    if rst = '1' then
+      credit <= (others => '0');
+    elsif rising_edge(clk) then
+      if add10 = '1' then
+        credit <= credit + 10;            -- credit : unsigned(7 downto 0), numeric_std
+      elsif sub10 = '1' then
+        credit <= credit - 10;
+      end if;
+    end if;
+  end process;
+
+  gte30 <= '1' when credit >= 30 else '0';   -- combinational status signals
+  gt0   <= '1' when credit > 0   else '0';
+#+end_src
+The controller is the usual two-process [[id:finite-state-machine][VHDL FSM]], with the CHG outputs assigned inside =if gt0 = '1'=.
+
+* Intuition
+Decode first (a tree of states that each read one bit), then execute fixed sequences as chains of states, and use a single looping state with a datapath condition for anything of variable length.
+
+* Pitfall
+Using \(gt10\) to stop the change loop, as a careless design would, leaves 10 cents in the machine; testing \(gte30\) in D1 instead of REQ would dispense after the credit has already started to fall. Write the timing diagram cycle by cycle before trusting the diagram: off-by-one errors between "commanded" and "visible" are the most common mistake.

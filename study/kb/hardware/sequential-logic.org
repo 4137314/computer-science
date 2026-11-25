@@ -3,8 +3,8 @@
 :DOMAIN:   hardware
 :AREA:     vhdl
 :KIND:     construction
-:REQUIRES: vhdl-process
-:SEE:      setup-hold-time finite-state-machine datapath-subsystems signals-variables clock-gating serial-arithmetic
+:REQUIRES: vhdl-process edge-triggered-flip-flop
+:SEE:      setup-hold-time finite-state-machine datapath-subsystems signals-variables clock-gating serial-arithmetic registers-shift-registers counters
 :ALIASES:  flip-flop, register, D flip-flop, latch, rising_edge, synchronous reset, asynchronous reset, enable, clocked process, counter
 :END:
 #+title: Flip-flops and registers in VHDL

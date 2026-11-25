@@ -1,0 +1,49 @@
+:PROPERTIES:
+:ID:       sr-latch
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     construction
+:REQUIRES: sequential-circuits
+:SEE:      edge-triggered-flip-flop flip-flop-types metastability critical-races
+:ALIASES:  SR latch, set-reset, flip flop SR, NOR latch, NAND latch, gated latch, D latch, latch D, transparent latch, latch trasparente, forbidden state, stato proibito
+:END:
+#+title: SR latch and D latch
+#+summary: Two cross-coupled NOR gates store one bit: \(S=1\) sets \(Q=1\), \(R=1\) resets it, \(S=R=0\) holds; \(S=R=1\) forces \(Q=\bar Q=0\) and, if both are released together, a race decides the final value, so it is forbidden; the NAND version has active-low inputs; gating with an enable \(C\) and driving \(S=D\), \(R=\bar D\) gives the D latch, transparent while \(C=1\) and holding while \(C=0\).
+
+* Construction
+NOR latch: \(Q=\overline{R+\bar Q}\), \(\bar Q=\overline{S+Q}\).
+
+| S | R | Q⁺              |
+|---+---+-----------------|
+| 0 | 0 | Q (hold)        |
+| 1 | 0 | 1 (set)         |
+| 0 | 1 | 0 (reset)       |
+| 1 | 1 | Q = Q̄ = 0 (no!) |
+
+How it holds: with \(S=R=0\) each NOR is an inverter of the other's output — two inverters in a ring, which has exactly two stable states. *Set*: \(S=1\) forces \(\bar Q=0\), then \(Q=\overline{0+0}=1\), and the loop keeps it after \(S\) returns to 0. Characteristic equation \(Q^+=S+\bar RQ\) with constraint \(SR=0\).
+\(S=R=1\) is *critical*: the outputs are no longer complementary, and if \(S\) and \(R\) fall at the same time both NORs see \(0,0\), both outputs rise, both fall… the final state depends on which gate is faster (a race, possibly [[id:metastability][metastability]] or oscillation).
+NAND latch (\(\bar S\bar R\)): inputs active low, \(\bar S=\bar R=1\) holds, \(\bar S=\bar R=0\) is forbidden.
+*Gated SR*: \(S\) and \(R\) pass through ANDs with an enable \(C\); with \(C=0\) the latch holds whatever the inputs do.
+*D latch*: gated SR with \(S=D\), \(R=\bar D\) (the forbidden combination can no longer occur). \(C=1\): *transparent*, \(Q\) follows \(D\). \(C=0\): \(Q\) keeps the last value \(D\) had before \(C\) fell.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\node[nor gate US, draw, logic gate inputs=nn] (n1) at (0,0.8) {};
+\node[nor gate US, draw, logic gate inputs=nn] (n2) at (0,-0.8) {};
+\draw (n1.output) -- ++(0.3,0) coordinate (q); \draw (q) -- ++(0.5,0) node[right] {$Q$};
+\draw (n2.output) -- ++(0.3,0) coordinate (qn); \draw (qn) -- ++(0.5,0) node[right] {$\bar Q$};
+\draw[kbcyan] (q) -- ++(0,-0.45) -- ++(-1.7,-0.5) coordinate (qb); \draw[kbcyan] (qb) |- (n2.input 1);
+\draw[kbamber] (qn) -- ++(0,0.45) -- ++(-1.7,0.5) coordinate (qnb); \draw[kbamber] (qnb) |- (n1.input 2);
+\draw (n1.input 1) -- ++(-1.3,0) node[left] {$R$};
+\draw (n2.input 2) -- ++(-1.3,0) node[left] {$S$};
+\end{tikzpicture}
+Cross-coupled NORs: each output feeds the other gate.
+
+* Example
+D latch, \(C\) high from 0 to 4, low after; \(D\) goes 0→1 at 1, 1→0 at 3, 0→1 at 5. \(Q\) follows: 1 at 1, 0 at 3, and stays 0 at 5 because \(C=0\). A latch reacts to the *level* of \(C\), not to its edges.
+
+* Intuition
+A latch is a door: open (\(C=1\)) the output sees the input, closed it shows the last thing that walked through.
+
+* Pitfall
+Being transparent for the whole active phase, a latch cannot be the only memory in a loop: the new state runs around the loop and changes again before \(C\) closes (see [[id:edge-triggered-flip-flop][edge-triggered flip-flops]]).

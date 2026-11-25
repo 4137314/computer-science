@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       twos-complement
+:DOMAIN:   hardware
+:AREA:     arithmetic
+:KIND:     definition
+:REQUIRES:
+:SEE:      ripple-carry-adder fixed-point-arithmetic alu-design magnitude-comparator bcd-adder
+:ALIASES:  two's complement, complemento a 2, one's complement, complemento a 1, sign and magnitude, modulo e segno, positional notation, binary numbers, numerazione binaria, overflow, adder-subtractor, sommatore sottrattore, sign extension, range
+:END:
+#+title: Binary numbers and two's complement
+#+summary: In two's complement an \(n\)-bit word \(a_{n-1}\dots a_0\) stands for \(-a_{n-1}2^{n-1}+\sum_{i<n-1}a_i2^i\), range \([-2^{n-1},2^{n-1}-1]\), with a single zero; \(-M\) is obtained by inverting all bits and adding 1, so one adder both adds and subtracts (XOR on \(B\), carry-in 1), and signed overflow happens when the last two carries differ — not when the final carry is 1.
+
+* Definition
+Positional base 2: \(101101.101_2=32+8+4+1+0.5+0.125=45.625\). \(n\) bits distinguish \(2^n\) values; \(v\) values need \(\lceil\log_2v\rceil\) bits.
+- *Unsigned*: \(0\dots2^n-1\); overflow = carry out \(c_n=1\) (e.g. 4 bits: \(12+7=19=1\,0011_2\), the result shows 3, the carry is worth 16).
+- *Sign and magnitude*: one sign bit; two zeros, and subtraction needs its own circuit.
+- *Two's complement*: \(-M\) is coded as \(2^n-M\). Weights \(-2^{n-1},2^{n-2},\dots,1\): the MSB is the sign. Range \([-2^{n-1},2^{n-1}-1]\): 4 bits \([-8,7]\), 8 bits \([-128,127]\), 32 bits \([-2\,147\,483\,648,\;2\,147\,483\,647]\).
+Computing it: \(2^n-M=(2^n-1-M)+1\); \(2^n-1\) is all ones, so \(2^n-1-M\) (*one's complement*) is \(M\) with every bit inverted. Example: \(5=0101\to1010\to1011=-5\); \(12=01100\to10011\to10100=-12\) (5 bits). The complement of the complement is \(M\) again.
+
+* Derivation
+Why the adder works unchanged: \(M+(-N)=M+(2^n-N)=(M-N)+2^n\), and \(2^n\) is the carry out of an \(n\)-bit adder, discarded. If \(M-N<0\) the result is left in two's complement, which is what we want.
+*Adder–subtractor*: \(A-B=A+\bar B+1\). Put an XOR on each \(B\) bit with control \(\mathit{sub}\) (\(b_i\oplus\mathit{sub}\) = \(b_i\) or \(\bar b_i\)) and feed \(c_0=\mathit{sub}\).
+*Signed overflow*: two positives give a negative, or two negatives a positive (operands of different sign never overflow). Equivalently \(V=c_n\oplus c_{n-1}\): the carry into the sign bit differs from the carry out of it.
+*Sign extension*: to widen, copy the MSB: \(1011\) (\(-5\)) → \(1111\,1011\).
+
+* Example
+4 bits.
+- \(5+4\): \(0101+0100=1001\), carries \(c_4=0\), \(c_3=1\): \(V=1\), the result reads \(-7\) — overflow (9 is out of \([-8,7]\)).
+- \(-3+(-2)\): \(1101+1110=1\,1011\), \(c_4=1\), \(c_3=1\): \(V=0\), result \(1011=-5\), correct even though the carry out is 1.
+- \(7-3\): \(0111+1100+1=1\,0100\), discard \(c_4\): \(0100=4\).
+- \(3-6\): \(0011+1001+1=1101=-3\).
+
+* Intuition
+Two's complement is arithmetic on a clock face with \(2^n\) hours: going back \(N\) hours is the same as going forward \(2^n-N\).
+
+* Pitfall
+The final carry means overflow only for unsigned numbers; for signed ones look at \(c_n\oplus c_{n-1}\) (or at the signs). \(-2^{n-1}\) has no positive counterpart: negating \(1000\) gives \(1000\) again.

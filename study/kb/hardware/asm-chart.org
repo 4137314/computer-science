@@ -1,0 +1,42 @@
+:PROPERTIES:
+:ID:       asm-chart
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     definition
+:REQUIRES: mealy-moore
+:SEE:      fsm-patterns rtl-design
+:ALIASES:  ASM chart, Algorithmic State Machine, diagramma ASM, state box, decision box, conditional output box, uscita condizionata, flowchart
+:END:
+#+title: Algorithmic state machine (ASM) charts
+#+summary: An ASM chart draws a state machine as a flowchart: a rectangle per state with its Moore outputs, diamonds testing input conditions (one true and one false exit), rounded boxes for conditional (Mealy) outputs; arrows from one state to the next may pass through several decisions, but every path must end in a state, and inputs are never assigned nor outputs tested.
+
+* Definition
+- *State box* (rectangle): name, optional code, outputs asserted for the whole cycle (Moore). Unlisted outputs are 0 by default.
+- *Decision box* (diamond): a Boolean condition on inputs (or on datapath status signals); two exits, 1 and 0. Decisions can be chained to factor complicated conditions.
+- *Conditional output box* (rounded rectangle) on a path: outputs asserted while in the source state *and* the conditions on the path hold — a Mealy output. It is not a state and takes no clock cycle.
+- One *ASM block* = a state box with everything hanging below it until the next state boxes: everything in a block happens in the same clock cycle; the transition happens at the edge.
+Rules: never assign a value to an input (you cannot decide it); never test an output (you already know it); no loop made only of decisions (with no state box inside it the values never change, the machine would be stuck).
+
+* Example
+Boiler, Moore: state OFF (\(C=0\)): diamond \(L\); 1 → ON, 0 → OFF. State ON (\(C=1\)): diamond \(H\); 1 → OFF, 0 → ON. Two decisions express the four transitions.
+Mealy version: in OFF, on the \(L=1\) path a conditional box \(C=1\) — the burner starts in the same cycle in which \(L\) is seen.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, >={Stealth}, st/.style={draw, minimum width=1.6cm, minimum height=0.55cm}, dec/.style={draw, diamond, aspect=2, inner sep=1pt}, co/.style={draw, rounded corners=6pt, minimum width=1.2cm, minimum height=0.5cm}]
+\node[st] (off) at (0,0) {OFF};
+\node[dec] (l) at (0,-1.1) {$L$};
+\node[co, draw=kbcyan] (c1) at (0,-2.2) {$C{=}1$};
+\node[st] (on) at (0,-3.3) {ON \quad $C{=}1$};
+\node[dec] (h) at (0,-4.4) {$H$};
+\draw[->] (off) -- (l); \draw[->] (l) -- node[right] {1} (c1); \draw[->] (c1) -- (on); \draw[->] (on) -- (h);
+\draw[->] (l.west) node[above left] {0} -- ++(-0.8,0) |- (off.west);
+\draw[->] (h.west) node[above left] {0} -- ++(-0.8,0) |- (on.west);
+\draw[->] (h.east) node[above right] {1} -- ++(1.2,0) |- (off.east);
+\end{tikzpicture}
+Mealy boiler: the cyan conditional box turns the burner on in the cycle in which \(L\) is detected.
+
+* Intuition
+It reads like a program — "in this state do this, if that go there" — which is why it scales to the controllers of [[id:rtl-design][RTL designs]].
+
+* Pitfall
+Two conditional boxes for the same output on different paths are fine; a conditional box that drives a register *load* still takes effect only at the next edge (the register shows the new value in the next state).

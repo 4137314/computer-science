@@ -1,0 +1,35 @@
+:PROPERTIES:
+:ID:       state-minimization
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     method
+:REQUIRES: fsm-synthesis
+:SEE:      fsm-state-encoding np-hard-optimization
+:ALIASES:  state minimization, minimizzazione degli stati, equivalent states, stati equivalenti, partition refinement, implication table, tabella delle implicazioni, merging rows
+:END:
+#+title: State minimization
+#+summary: Two states are equivalent when, for every input sequence, they produce the same output sequence; equivalent states can be merged without changing the behaviour; the minimal machine is found by partition refinement — split first by outputs, then repeatedly split any block whose states move, on some input, into different blocks — until nothing changes.
+
+* Method
+1. \(P_0\): group the states with the same outputs for every input (same row of outputs in the table).
+2. \(P_{k+1}\): two states stay together only if, for every input, their next states lie in the same block of \(P_k\).
+3. Stop when \(P_{k+1}=P_k\): each block is one state of the minimal machine.
+Quick special case: two rows with identical outputs *and* identical next states are equivalent at once. Machines with different numbers of states can do exactly the same thing; the minimal one is unique up to renaming.
+
+* Example
+Mealy machine, input \(x\), entries next state/output:
+
+| state | x = 0 | x = 1 |
+|-------+-------+-------|
+| A     | A/0   | B/0   |
+| B     | C/0   | B/0   |
+| C     | A/0   | D/1   |
+| D     | C/0   | B/0   |
+
+\(P_0=\{A,B,D\}\{C\}\) (C is the only one emitting 1). For \(x=0\): A→A (block 1), B→C (block 2), D→C (block 2): split, \(P_1=\{A\}\{B,D\}\{C\}\). B and D: \(x=0\)→C, C; \(x=1\)→B, B: same blocks, \(P_2=P_1\). D is merged into B: three states, \(A\xrightarrow{1}B\xrightarrow{0}C\xrightarrow{1/1}B\) — a 101 detector with overlap.
+
+* Intuition
+States that no experiment can tell apart are the same state with two names.
+
+* Pitfall
+With don't-cares in the table (incompletely specified machines) equivalence is no longer transitive and the problem becomes hard; also, the minimal number of states is not always the cheapest circuit — a few extra states (one-hot, or an output-decoded encoding) can shrink the logic.

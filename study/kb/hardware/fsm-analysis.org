@@ -1,0 +1,56 @@
+:PROPERTIES:
+:ID:       fsm-analysis
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     method
+:REQUIRES: edge-triggered-flip-flop
+:SEE:      fsm-synthesis flip-flop-types finite-state-machine
+:ALIASES:  analysis of sequential circuits, analisi di circuiti sequenziali, state table, tabella degli stati, state diagram, diagramma degli stati, state equations, equazioni di stato, next-state function, output function, transition
+:END:
+#+title: Analysis of synchronous sequential circuits
+#+summary: In a synchronous circuit the state \(X(n)\) held by the flip-flops and the inputs \(IN(n)\) of clock cycle \(n\) determine the next state \(X(n+1)=\Delta(IN(n),X(n))\) and the outputs \(OUT(n)=\Lambda(IN(n),X(n))\); to analyse a circuit, read \(\Delta\) from the logic driving each flip-flop input and \(\Lambda\) from the logic driving the outputs, tabulate them over all \(2^{n+m}\) state–input combinations and draw the state diagram.
+
+* Method
+Model: \(n\) flip-flops hold the *present state* \(X(n)\), a vector of bits, constant for the whole clock cycle \(n\); combinational logic computes the *next state* \(Y(n)\) and the outputs; at the active edge \(X(n+1)=Y(n)\). With edge-triggered flip-flops present and next state are separate signals: the equations are explicit, no stability problem.
+1. For each flip-flop input, follow the logic backwards to primary inputs and flip-flop outputs: the expressions \(D_i=\dots\) are the next-state function \(\Delta\).
+2. Do the same for each primary output: the output function \(\Lambda\).
+3. *State table*: one row per (present state, input), \(2^{n+m}\) rows for \(n\) flip-flops and \(m\) inputs; columns: next state, outputs.
+4. *State diagram*: a circle per state (at most \(2^n\)), an arrow per row from present to next state labelled input/output. Each state has \(2^m\) outgoing arrows (rows with the same next state and output can share one arrow with a don't-care label).
+5. Read the behaviour off the diagram and say in words what the circuit does.
+
+* Example
+One input \(x\), output \(y\), flip-flops \(a,b\): \(D_a=xa+xb\), \(D_b=x\bar a\), \(y=\bar x(a+b)\).
+
+| ab | x | a⁺b⁺ | y |
+|----+---+------+---|
+| 00 | 0 | 00   | 0 |
+| 00 | 1 | 01   | 0 |
+| 01 | 0 | 00   | 1 |
+| 01 | 1 | 11   | 0 |
+| 10 | 0 | 00   | 1 |
+| 10 | 1 | 10   | 0 |
+| 11 | 0 | 00   | 1 |
+| 11 | 1 | 10   | 0 |
+
+Every \(x=0\) returns to 00, with \(y=1\) unless it was already in 00. So: the machine waits in 00 with \(y=0\); when \(x\) becomes 1 it leaves 00 (and stays out while \(x=1\): 01→11→10→10…); when \(x\) returns to 0 it raises \(y\) for that cycle and goes back to 00. It signals the *end* of a pulse of ones — a Mealy falling-edge detector.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, ->, >={Stealth}, st/.style={draw, circle, minimum size=0.75cm}]
+\node[st, draw=kbcyan] (s0) at (0,0) {00}; \node[st] (s1) at (2.6,0) {01};
+\node[st] (s3) at (2.6,-2) {11}; \node[st] (s2) at (0,-2) {10};
+\draw (s0) edge[loop left] node {0/0} (s0);
+\draw (s0) -- node[below] {1/0} (s1);
+\draw (s1) to[bend right=30] node[above] {0/1} (s0);
+\draw (s1) -- node[right] {1/0} (s3);
+\draw (s3) -- node[below] {1/0} (s2);
+\draw (s3) -- node[pos=0.3, right] {0/1} (s0);
+\draw (s2) -- node[left] {0/1} (s0);
+\draw (s2) edge[loop left] node {1/0} (s2);
+\end{tikzpicture}
+Arrows labelled \(x/y\); the cyan state is the waiting state.
+
+* Intuition
+Analysis is mechanical — a computer could do it: the creative part is only the last step, naming what the states remember.
+
+* Pitfall
+The output written on an arrow belongs to the *present* state and input (the cycle before the transition), not to the state the arrow points to. Unreachable codes (here none) still need a row: after a glitch the machine may land there.

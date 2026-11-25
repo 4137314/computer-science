@@ -1,0 +1,27 @@
+:PROPERTIES:
+:ID:       critical-races
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     definition
+:REQUIRES: fsm-synthesis
+:SEE:      metastability fsm-state-encoding logic-hazards sr-latch
+:ALIASES:  critical race, corsa critica, corse critiche, race condition, state race, corsa sugli stati, input race, corsa sugli ingressi, asynchronous input, ingresso asincrono, synchronizer, sincronizzazione degli ingressi, adjacent encoding
+:END:
+#+title: Critical races
+#+summary: When a transition changes several state bits, or several flip-flops see an input that changes near the clock edge, the bits may switch at different times and the machine may land in a wrong or nonexistent state; a race is critical when the final state depends on the order; asynchronous circuits must avoid it with adjacent encodings (extra states if necessary), synchronous circuits are immune on the state but not on asynchronous inputs, which are fixed by encoding the possible destinations one bit apart or by synchronizing the input with a flip-flop.
+
+* Definition
+*State race (asynchronous circuits)*: the state is held by feedback loops and changes as soon as the next state does. A transition 00→11 really goes through 01 or 10, whichever bit is faster; if from that intermediate code the circuit moves elsewhere (another stable state for the current input), the race is *critical*. Fix: encode states so that every transition changes one bit (adjacent codes on a Karnaugh-like cube); when the transition graph does not allow it (e.g. a triangle of mutual transitions with 2 bits), add intermediate transient states or extra state bits. Synchronous circuits do not have state races: all bits are sampled together at the edge, after the next state has settled.
+*Input race (synchronous circuits)*: a primary input (a button) is not synchronous with the clock. If it changes just before the edge, its effect may reach one flip-flop's \(D\) before the edge and another's after: the flip-flops act on *different* values of the same input.
+
+* Example
+From state \(a=00\): \(S=0\) leads to \(b\), \(S=1\) to \(c\). With \(b=10\), \(c=01\): \(D_x=\bar S\), \(D_y=S\). \(S\) rises right at the edge, \(D_y\) sees the new value and \(D_x\) still the old one: \(x^+y^+=11\) — a state that does not exist.
+Fix by encoding: \(b=10\), \(c=11\). Now \(D_x=1\) regardless of \(S\), only \(D_y=S\) depends on it: the worst case is ending in \(b\) instead of \(c\) — the input was seen one cycle later — never in a phantom state. Rule: the codes of all states reachable from the same state through an input-dependent choice must differ in only one bit among themselves (they need not be adjacent to the source).
+Three destinations \(b,c,d\) cannot be pairwise adjacent with 2 bits: add a state (and a state bit) so the choice is split into two binary steps, at the cost of one cycle of delay — check the specification still allows it.
+General fix: *synchronize* the input with a D flip-flop clocked by the system clock; every flip-flop of the machine then sees the same, stable value, one cycle later. (The synchronizer itself can go [[id:metastability][metastable]]; two in series make it negligible.)
+
+* Intuition
+A race is two runners told to start "now" by a voice that each hears at a slightly different moment.
+
+* Pitfall
+Synchronizing an input that the machine uses only in one flip-flop is unnecessary; feeding the *same* asynchronous signal to several flip-flops (directly or through logic) is the bug — in practice the classic failure of FPGA projects with push buttons, solved by registering every board input.

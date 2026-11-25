@@ -4,7 +4,7 @@
 :AREA:     power
 :KIND:     definition
 :REQUIRES: switching-activity gate-delay-model
-:SEE:      event-driven-simulation tree-height-reduction cmos-power
+:SEE:      event-driven-simulation tree-height-reduction cmos-power logic-hazards
 :ALIASES:  glitch, hazard, spurious transition, static hazard, dynamic hazard, path balancing
 :END:
 #+title: Glitches

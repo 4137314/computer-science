@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       rtl-design
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     method
+:REQUIRES: fsm-patterns
+:SEE:      register-transfer-buses vending-machine-design datapath-control data-flow-graph alu-design magnitude-comparator
+:ALIASES:  RTL, register transfer level, metodo RTL, datapath, data path, control unit, unità di controllo, micro-operation, micro-operazione, control signals, segnali di controllo, status signals, segnali di stato, stopwatch, cronometro
+:END:
+#+title: The RTL design method: datapath and control unit
+#+summary: Large systems are split into a datapath (registers, counters, arithmetic, multiplexers: where data live and are transformed) and a control unit (a state machine deciding which operation happens in each cycle); the controller is first written with symbolic micro-operations (\(TM\gets TM+1\), \(SD\gets TM\)) and conditions, the datapath is built to execute them, then each micro-operation and condition is encoded as control and status signals.
+
+* Method
+Why: an 8-bit register alone has 256 states — too many to draw — but its value rarely affects the *flow* of operations. Separate concerns:
+- *Datapath*: data inputs and outputs, registers and counters, arithmetic/logic units, comparators, multiplexers and buses. Receives *control signals* (enables, loads, mux selects, operation codes), returns *status signals* (terminal count, carry, overflow, comparator outputs).
+- *Control unit*: an FSM with the control inputs and outputs of the system (buttons, lamps), producing the control signals from the state and the status signals.
+Both are synchronous on the same clock; the split is conceptual (deciding vs executing), not "combinational vs sequential".
+Steps:
+1. specification; 2. primary inputs and outputs, data and control; 3. data registers; 4. control FSM with symbolic register transfers and conditions; 5. datapath schematic implementing them; 6. encoding of micro-operations into control signals (default 0, list only those at 1) and of conditions into status signals; 7. detailed design of both; 8. verification (timing diagrams, simulation). Steps 4–5 are usually iterated together.
+Timing rule: a load commanded in state \(s\) is visible in the register only in the *next* cycle (next state); a combinational result (comparator) is valid in the same cycle, after its delay, and must settle before the edge — glitches on it are harmless because the FSM samples at the edge.
+
+* Example
+Stopwatch 00.00–99.99 s, buttons START (reset and run), STOP, CSS (compare and store shortest), RESET (clear best time).
+Datapath: \(TM\) 4-digit BCD counter with sync init \(rsTM\) and enable \(enTM\) (100 Hz clock); \(SD\) 16-bit register with load \(ldSD\); a mux on \(SD\)'s input choosing 99.99 or \(TM\) (\(update\)); a BCD [[id:magnitude-comparator][comparator]] \(AltB=[TM<SD]\); a mux \(DS\) choosing \(TM\) or \(SD\) *before* the single [[id:seven-segment-decoder][7-segment decoder]] (16-bit mux instead of 28-bit, one decoder instead of two).
+\(SD\) must start at 99.99, not 0: initialized at 0 no time would ever be smaller.
+Controller (symbolic): RESET state \(SD\gets99.99\); STOPPED (display \(TM\)) — START → INIT (\(TM\gets0\)) → COUNT (\(TM\gets TM+1\)) until STOP; in STOPPED, CSS → if \(TM<SD\): UPDATE (\(SD\gets TM\)), then SHOW (display \(SD\)). Encoded: \(TM\gets0\): \(rsTM=1\); \(TM\gets TM+1\): \(enTM=1\); \(SD\gets99.99\): \(ldSD=1\); \(SD\gets TM\): \(ldSD=update=1\); display \(SD\): \(DS=1\).
+Detail: START is seen at an edge and INIT costs a cycle, so counting starts 1–2 hundredths late; either run the FSM on a faster clock or initialize \(TM\) to 00.01.
+
+* Intuition
+The datapath is the orchestra, the controller the conductor: it never plays a note, it only says who plays when.
+
+* Pitfall
+Testing in a state the value just loaded in that same state reads the *old* value. Merging states to save flip-flops can silently change the behaviour (e.g. a waiting state that now also reacts to CSS before any time has been measured) — re-check the specification after every optimization.

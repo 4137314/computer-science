@@ -1,0 +1,39 @@
+:PROPERTIES:
+:ID:       sequential-circuits
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     definition
+:REQUIRES: karnaugh-maps
+:SEE:      sr-latch fsm-analysis critical-races finite-state-machine
+:ALIASES:  sequential circuit, circuito sequenziale, combinational vs sequential, feedback, retroazione, state, stato, synchronous, asynchronous, sincrono, asincrono, clock, memory, hysteresis, boiler, caldaia
+:END:
+#+title: Sequential circuits: memory through feedback
+#+summary: A combinational circuit gives the same output for the same input; a function whose output depends on the input history is sequential and needs memory, obtained by feeding an output back to an input (the boiler controller \(C=L+C\bar H\)); separating the memory into well-understood elements and updating it only at clock events gives synchronous circuits, otherwise the circuit is asynchronous and can race or oscillate.
+
+* Definition
+- *Combinational*: \(\mathit{out}(t)=f(\mathit{in}(t))\) (after the transient). Same input, same output, whenever it occurs.
+- *Sequential*: the output depends on the *sequence* of past inputs; the part of the past that matters is the *state*, stored in memory.
+Structure: a combinational network computes outputs and *next state* from inputs and *present state*; a memory holds the present state.
+- *Asynchronous*: the state changes as soon as the next state changes; present and next state depend on each other immediately (feedback through wires).
+- *Synchronous*: the state is updated only at events of a special signal, the *clock*; between events the next state can settle without affecting the present one.
+
+* Example
+Boiler with hysteresis: inputs \(H\) (\(T>T_{max}\)) and \(L\) (\(T<T_{min}\)), output \(C\) (1 = burner on). \(H=L=1\) is impossible (don't-care). For \(H=1\) switch off, for \(L=1\) switch on. For \(H=L=0\) (temperature between the thresholds) *both* answers are needed: on if it was heating, off if it was not — one input, two outputs: not a function. Feed \(C\) back as an input:
+
+| C | H | L | C⁺ |
+|---+---+---+----|
+| 0 | 0 | 0 |  0 |
+| 0 | 0 | 1 |  1 |
+| 0 | 1 | 0 |  0 |
+| 1 | 0 | 0 |  1 |
+| 1 | 0 | 1 |  1 |
+| 1 | 1 | 0 |  0 |
+| - | 1 | 1 |  - |
+
+Map: \(C^+=L+C\bar H\). The loop from the OR output back to the AND input *holds* the value when \(H=L=0\): the circuit remembers. With a D flip-flop in the loop the same equation becomes the synchronous [[id:fsm-synthesis][state machine]] \(X_{n+1}=L+X_n\bar H\), \(C=X_n\).
+
+* Intuition
+Memory is a loop that keeps telling itself the same thing; a clock decides when it is allowed to listen to something new.
+
+* Pitfall
+A feedback equation \(x=F(x,\mathit{in})\) may have no stable solution (\(x=\bar x\) oscillates) or more than one (\(x=x\) can hold either): asynchronous loops must be designed for stability and against [[id:critical-races][races]]. Keep loops inside known memory elements and let the rest be combinational.

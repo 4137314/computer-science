@@ -4,7 +4,7 @@
 :AREA:     vhdl
 :KIND:     method
 :REQUIRES: finite-state-machine
-:SEE:      low-power-encoding np-hard-optimization metastability
+:SEE:      low-power-encoding np-hard-optimization metastability critical-races state-minimization
 :ALIASES:  state encoding, state assignment, binary encoding, one-hot encoding, Gray encoding, Johnson encoding, safe state machine, unreachable states
 :END:
 #+title: State encoding of FSMs

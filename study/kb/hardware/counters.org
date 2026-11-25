@@ -1,0 +1,31 @@
+:PROPERTIES:
+:ID:       counters
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     construction
+:REQUIRES: registers-shift-registers fsm-synthesis
+:SEE:      flip-flop-types bcd-adder seven-segment-decoder fsm-patterns datapath-subsystems
+:ALIASES:  counter, contatore, binary counter, modulo counter, BCD counter, contatore BCD, decade counter, terminal count, TC, count enable, up-down counter, frequency divider, divisore di frequenza, cascade, ripple counter
+:END:
+#+title: Synchronous counters
+#+summary: A counter is a register stepping through a prescribed sequence on each clock edge (with no inputs the transitions are unconditional); a mod-16 binary counter has next-state equations \(D_d=\bar d\), \(D_c=c\oplus d\), … or simply a register fed by an incrementer; a BCD counter treats codes 10–15 as don't-cares; terminal count and enable let counters be cascaded into clocks and timers.
+
+* Construction
+*Mod-16* (\(abcd\), \(a\) MSB), state = count = output. From the table "state + 1":
+\[ D_a=a\bar b+a\bar c+a\bar d+\bar abcd,\quad D_b=b\bar c+b\bar d+\bar bcd,\quad D_c=\bar cd+c\bar d,\quad D_d=\bar d. \]
+In words: bit \(i\) toggles when all lower bits are 1 (\(T_i=Q_{i-1}\cdots Q_0\) with [[id:flip-flop-types][T flip-flops]]). Equivalent: a register whose input is an incrementer (an adder with constant 1, ripple or look-ahead as speed requires).
+*Frequency divider*: \(d\) toggles at \(f/2\), \(c\) at \(f/4\), \(b\) at \(f/8\), \(a\) at \(f/16\).
+*Mod-10 (BCD)*: same encoding, codes 1010–1111 never occur → don't-cares:
+\[ D_a=a\bar d+bcd,\quad D_b=b\bar c+b\bar d+\bar bcd,\quad D_c=\bar a\bar cd+c\bar d,\quad D_d=\bar d. \]
+*Count enable* \(E\): synchronous, the counter advances only if \(E=1\) (a mux or an AND in the toggle condition). *Terminal count* \(TC\): 1 in the cycle in which the counter is at its last value (15, or 9 for BCD); a Moore output.
+*Cascade*: \(E_{k+1}=E_k\cdot TC_k\) — the tens digit advances in the cycle in which the units are at 9 and enabled. Variants: up/down (adder–subtractor), parallel load (mux in front, \(TC\) disabled while loading), modulo selected by an input, arbitrary sequences from a state diagram.
+
+* Example
+Stopwatch seconds 00–59: units BCD counter enabled by the 1 Hz tick; tens counter mod 6 enabled by \(tick\cdot TC_{units}\); minutes enabled by \(tick\cdot TC_{units}\cdot TC_{tens}\). At 09 → 10 the units roll to 0 and the tens step in the same edge.
+Counter mod 3 or 5 chosen by input \(P\): 5 states need 3 bits; \(P\) is an input of the next-state table (or kept as a "map-entered variable" inside the cells).
+
+* Intuition
+A counter is the simplest FSM with no inputs at all: its diagram is a single ring, and its state is its output.
+
+* Pitfall
+Cascading with \(E_{k+1}=TC_k\) alone (without the enable of the lower stage) makes the upper digit count every cycle in which the lower one sits at 9 while stopped. A *ripple counter* (each flip-flop clocked by the previous output) is smaller but asynchronous: its bits change at different times and decoding them glitches.

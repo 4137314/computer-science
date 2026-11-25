@@ -1,0 +1,35 @@
+:PROPERTIES:
+:ID:       registers-shift-registers
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     construction
+:REQUIRES: edge-triggered-flip-flop multiplexer
+:SEE:      counters sequential-logic clock-gating serial-communication register-transfer-buses
+:ALIASES:  register, registro, load enable, parallel register, registro parallelo, shift register, registro a scorrimento, serial in parallel out, SIPO, PISO, bidirectional shift register, synchronous init, init sincrono, asynchronous clear, JTAG
+:END:
+#+title: Registers and shift registers
+#+summary: A register is a group of D flip-flops on the same clock holding logically related bits; a load enable is built with a 2-to-1 multiplexer in front of each flip-flop (\(D_i=\mathit{ld}\,d_i+\overline{\mathit{ld}}\,Q_i\)), not by gating the clock; a shift register chains the flip-flops so the content moves one position per edge, and with a 4-input mux per bit it can hold, shift either way or load in parallel.
+
+* Construction
+*Parallel register with clear*: \(n\) D flip-flops, common clock, common asynchronous clear (active low): \(Q\) is \(D\) delayed to the next edge; clear forces 0 at once and holds it until the first edge after its release.
+*Load enable*: either gate the clock (only the cycles to load get an edge — risky: the gated edge arrives late and the register may sample other registers' *new* values, the skew problem; done today only to save [[id:clock-gating][power]], with dedicated cells) or, the safe synchronous way, choose what to load with a mux:
+\[ D_i=\mathit{ld}\cdot d_i+\overline{\mathit{ld}}\cdot Q_i \]
+(when not loading, reload the current value). A *synchronous init* is one more mux input wired to 0 (applied at the next edge), unlike an *asynchronous reset* (immediate, through the flip-flops' clear pins). The rule: the clock is not to be touched.
+*Shift register*: \(D_0=SI\), \(D_i=Q_{i-1}\), \(SO=Q_{n-1}\); each edge moves the content one place. Tapping every \(Q_i\) gives parallel output (serial-in parallel-out); a mux per bit adds enable, parallel load, direction:
+
+| S1 | S0 | mode                 | Dᵢ    |
+|----+----+----------------------+-------|
+|  0 |  0 | hold                 | Qᵢ    |
+|  0 |  1 | shift towards Qₙ₋₁   | Qᵢ₋₁  |
+|  1 |  0 | shift towards Q₀     | Qᵢ₊₁  |
+|  1 |  1 | parallel load        | dᵢ    |
+
+* Example
+4-bit SIPO, input sequence 1, 0, 0, 1 on \(SI\), starting from 0000 (written \(Q_0Q_1Q_2Q_3\)): 1000, 0100, 0010, 1001 — after four edges the first bit received is in \(Q_3\).
+Uses: serial links (load in parallel, send one bit per cycle on one wire, rebuild on the other side: [[id:uart][UART]], SPI, I²C, USB), bit-serial arithmetic, parity and CRC, scan chains for testing (JTAG: all flip-flops chained to set and read internal values).
+
+* Intuition
+A register is a variable; a shift register is a queue that advances one place per tick.
+
+* Pitfall
+Between consecutive flip-flops of a shift register there is only a wire: the fastest possible path, the first place where [[id:setup-hold-time][hold violations]] and clock skew bite. Never build the shift enable by gating the clock of some stages.

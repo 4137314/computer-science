@@ -4,7 +4,7 @@
 :AREA:     timing
 :KIND:     inequality
 :REQUIRES: sequential-logic
-:SEE:      static-timing-analysis gate-delay-model pipelining retiming metastability clock-skew-jitter
+:SEE:      static-timing-analysis gate-delay-model pipelining retiming metastability clock-skew-jitter edge-triggered-flip-flop fsm-synthesis
 :ALIASES:  setup time, hold time, clock-to-q, setup violation, hold violation, clock period, maximum frequency, clock skew, metastability
 :END:
 #+title: Setup and hold constraints

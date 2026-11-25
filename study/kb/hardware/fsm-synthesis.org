@@ -1,0 +1,46 @@
+:PROPERTIES:
+:ID:       fsm-synthesis
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     method
+:REQUIRES: fsm-analysis
+:SEE:      mealy-moore asm-chart fsm-state-encoding state-minimization finite-state-machine flip-flop-types setup-hold-time
+:ALIASES:  FSM synthesis, sintesi di macchine a stati, progetto di macchine a stati, state machine design, MSF, macchina a stati finiti, sequence recognizer, riconoscitore di sequenze, one-hot, Gray encoding, maximum clock frequency
+:END:
+#+title: Synthesis of finite-state machines
+#+summary: Designing an FSM is analysis run backwards: identify the states (what the machine must remember), draw the transitions, encode the states, choose the flip-flops, write the state table, minimize next-state and output logic with Karnaugh maps, draw the circuit; the 1101 recognizer needs 4 states, \(D_a=ab+bx\), \(D_b=x\), \(y=a\bar bx\) with Gray encoding, or four simple OR-of-arcs equations one-hot.
+
+* Method
+1. *States*: the creative step. A state is an abstraction of the input history — only what the future behaviour depends on (a button was pressed, not how many times; the start bit has arrived; the elevator is going up).
+2. *State diagram*: from every state, where each input combination leads and what the outputs are.
+3. *Encoding*: \(\ge\lceil\log_2N\rceil\) bits; it does not change the function, only the circuit (binary, Gray, [[id:fsm-state-encoding][one-hot]]; also chosen against [[id:critical-races][races]]).
+4. *Memory elements*: D usually; T or JK through their [[id:flip-flop-types][excitation tables]].
+5. *State table*: present state, inputs → next state, outputs; unused codes → don't-cares.
+6. *Karnaugh maps* for each flip-flop input and each output.
+7. *Circuit*, plus a reset to the initial state.
+Speed: the next state must be stable at the flip-flop inputs before the next edge, so \(T_{clk}\ge t_{cq}+t_{logic,max}+t_{setup}\) (1 GHz leaves the logic less than 1 ns). Too slow → setup violation: faster logic or slower clock (chips are binned by speed). Logic *too fast* between two flip-flops on the same edge → hold violation: add delay buffers; it cannot be fixed by the clock, the chip is scrap ([[id:setup-hold-time][setup and hold]]).
+
+* Example
+Recognize 1101 on a serial input \(x\) (one bit per cycle, overlaps allowed), \(y=1\) in the cycle of the last 1 (Mealy).
+States: A nothing useful seen, B "1", C "11", D "110". Transitions (\(x\)/\(y\)): A: 0/0→A, 1/0→B. B: 0/0→A, 1/0→C. C: 1/0→C (still "11"), 0/0→D. D: 1/1→B (the final 1 starts a new sequence), 0/0→A.
+Gray encoding A=00, B=01, C=11, D=10, D flip-flops \(a,b\):
+
+| ab | x | a⁺b⁺ | y |
+|----+---+------+---|
+| 00 | 0 | 00   | 0 |
+| 00 | 1 | 01   | 0 |
+| 01 | 0 | 00   | 0 |
+| 01 | 1 | 11   | 0 |
+| 11 | 0 | 10   | 0 |
+| 11 | 1 | 11   | 0 |
+| 10 | 0 | 00   | 0 |
+| 10 | 1 | 01   | 1 |
+
+Maps: \(D_a=ab+bx\), \(D_b=x\), \(y=a\bar bx\). On \(x=110110101101\) the output is 1 at positions 4, 7 and 12.
+One-hot (\(a,b,c,d\) one flip-flop per state, A=1000…): a state's input is the OR of the arcs entering it — \(D_a=\bar x(a+b+d)\), \(D_b=x(a+d)\), \(D_c=x(b+c)\), \(D_d=\bar xc\), \(y=xd\). More flip-flops, but each equation is written by looking at the diagram, without maps, and decoding a state costs nothing.
+
+* Intuition
+The diagram is the program, the state register its program counter, the next-state logic a big lookup of "where do I go from here".
+
+* Pitfall
+Forgetting arrows: every state must say what happens for *every* input combination (in a synchronous machine "nothing" means a self-loop, and it must be in the table). For overlapping recognition, from D on a 1 go to B, not to A — the last 1 may begin the next match.

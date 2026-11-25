@@ -1,0 +1,49 @@
+:PROPERTIES:
+:ID:       boolean-algebra
+:DOMAIN:   hardware
+:AREA:     combinational
+:KIND:     theorem
+:REQUIRES:
+:SEE:      canonical-forms nand-nor-synthesis karnaugh-maps boolean-difference
+:ALIASES:  Boolean algebra, algebra di Boole, De Morgan, absorption, adjacency, consensus, duality, perfect induction, functionally complete, truth table, tabella della verità, XOR, NAND, NOR
+:END:
+#+title: Boolean algebra: axioms, theorems, complete operator sets
+#+summary: On \(B=\{0,1\}\) with AND, OR, NOT, four pairs of axioms (identity, commutativity, distributivity, complement) imply every identity used to shrink circuits — absorption \(x+xy=x\), adjacency \(xy+x\bar y=x\), simplification \(x+\bar xy=x+y\), consensus, De Morgan; each identity holds together with its dual, any one can be proved by perfect induction, and NAND alone (or NOR alone) is functionally complete.
+
+* Statement
+A function \(f:B^n\to B\) is given by its *truth table* (\(2^n\) rows) or by an *expression*; a vector function \(F:B^n\to B^m\) is \(m\) scalar functions of the same inputs. AND binds tighter than OR: \(ab+\bar bc=(ab)+(\bar bc)\).
+
+Axioms (each with its dual, obtained by swapping \(+\leftrightarrow\cdot\) and \(0\leftrightarrow1\)):
+- identity \(x+0=x\), \(x\cdot1=x\);  commutativity \(x+y=y+x\), \(xy=yx\);
+- distributivity \(x(y+z)=xy+xz\) *and* \(x+yz=(x+y)(x+z)\) (the second one has no counterpart in ordinary arithmetic);
+- complement \(x+\bar x=1\), \(x\bar x=0\).
+
+Theorems:
+- null element \(x+1=1\), \(x\cdot0=0\);  idempotence \(x+x=x\), \(xx=x\);  involution \(\bar{\bar x}=x\);  associativity;
+- *absorption* \(x+xy=x\), \(x(x+y)=x\);
+- *adjacency* \(xy+x\bar y=x\), \((x+y)(x+\bar y)=x\) — the rule behind every [[id:karnaugh-maps][Karnaugh]] group;
+- *simplification* \(x+\bar xy=x+y\), \(x(\bar x+y)=xy\);
+- *consensus* \(xy+\bar xz+yz=xy+\bar xz\) — the term \(yz\) is redundant for the function but not for [[id:logic-hazards][hazards]];
+- *De Morgan* \(\overline{x+y}=\bar x\bar y\), \(\overline{xy}=\bar x+\bar y\) (also for \(n\) variables).
+Derived operators: NAND \(\overline{xy}\), NOR \(\overline{x+y}\), XOR \(x\oplus y=x\bar y+\bar xy\) (1 when the inputs differ), XNOR \(\overline{x\oplus y}=xy+\bar x\bar y\) (equality).
+
+* Derivation
+Absorption from the axioms: \(x+xy=x\cdot1+xy=x(1+y)=x\cdot1=x\).
+Simplification: \(x+\bar xy=(x+\bar x)(x+y)=1\cdot(x+y)=x+y\) (second distributive law).
+Consensus: \(yz=yz(x+\bar x)=xyz+\bar xyz\); the first term is absorbed by \(xy\), the second by \(\bar xz\).
+*Perfect induction*: since \(B^n\) is finite, an identity is proved by comparing the two truth tables row by row.
+
+Completeness: every function has a [[id:canonical-forms][canonical form]] in AND, OR, NOT, so \(\{\)AND, OR, NOT\(\}\) is complete. By De Morgan \(x+y=\overline{\bar x\,\bar y}\), so \(\{\)AND, NOT\(\}\) and \(\{\)OR, NOT\(\}\) are complete too. NAND alone: \(\bar x=\overline{xx}\), \(xy=\overline{\overline{xy}}\), \(x+y=\overline{\bar x\,\bar y}\); dually NOR alone. Also \(\{\)XOR, AND\(\}\) with the constant 1 (\(\bar x=x\oplus1\)).
+
+* Example
+Specification → function: lower the awning (\(t=1\)) if there is sun (\(s\)) or the button is pressed (\(c\)), unless there is too much wind (\(v\)): \(t=\bar v\,(s+c)\). Seat-belt light: \(l=q\,\bar c\) (dashboard on, belt not fastened).
+
+Simplify \(f=\bar a(\bar b+\bar c)+c(a+\bar b)\):
+\[ f=\bar a\bar b+\bar a\bar c+ac+\bar bc=\bar a\bar b+\bar a\bar c+ac \]
+(\(\bar bc\) is the consensus of \(\bar a\bar b\) and \(ac\) on \(a\)): 6 literals instead of 8.
+
+* Intuition
+Every rule says "these two circuits compute the same table"; algebra moves between them, the truth table is the referee.
+
+* Pitfall
+\(x+yz\ne(x+y)z\): the second distributive law needs the brackets on both sums, \((x+y)(x+z)\). And De Morgan negates the operator *and* every operand: \(\overline{a+\bar bc}=\bar a(b+\bar c)\), not \(\bar a+b\bar c\).

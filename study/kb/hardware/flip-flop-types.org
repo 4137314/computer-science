@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       flip-flop-types
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     definition
+:REQUIRES: edge-triggered-flip-flop
+:SEE:      fsm-synthesis counters sr-latch
+:ALIASES:  JK flip-flop, flip flop JK, T flip-flop, toggle, flip flop T, SR flip-flop, characteristic equation, equazione caratteristica, excitation table, tabella di eccitazione, choice of memory elements
+:END:
+#+title: D, T, JK and SR flip-flops: characteristic and excitation tables
+#+summary: Each edge-triggered flip-flop type is described by a characteristic equation (next state from inputs) — D: \(Q^+=D\), T: \(Q^+=T\oplus Q\), JK: \(Q^+=J\bar Q+\bar KQ\), SR: \(Q^+=S+\bar RQ\) with \(SR=0\) — and, for synthesis, by its excitation table (inputs needed for each transition \(Q\to Q^+\)); with T or JK the next-state maps are replaced by maps of the flip-flop inputs, often simpler thanks to the don't-cares.
+
+* Definition
+
+| type | Q⁺            | 0→0 | 0→1 | 1→0 | 1→1 |
+|------+---------------+-----+-----+-----+-----|
+| D    | D             | 0   | 1   | 0   | 1   |
+| T    | T ⊕ Q         | 0   | 1   | 1   | 0   |
+| JK   | J·Q̄ + K̄·Q     | 0-  | 1-  | -1  | -0  |
+| SR   | S + R̄·Q, SR=0 | 0-  | 10  | 01  | -0  |
+
+The last four columns are the *excitation table*: the input values (JK, SR as pairs) that produce the transition; "-" is a don't-care. JK is an SR whose forbidden combination \(J=K=1\) has been given a meaning: toggle. T is a JK with \(J=K=T\). D is the cheapest and the default in synchronous design and in FPGAs.
+
+* Method
+Synthesis with a flip-flop other than D (step 4 of [[id:fsm-synthesis][FSM synthesis]]): for each state bit and each row of the state table, look up the transition \(Q\to Q^+\) and write the required inputs; then make one Karnaugh map per flip-flop input (two for JK) instead of one per next-state bit.
+
+* Example
+2-bit up counter \(Q_1Q_0\): 00→01→10→11→00.
+- With D: \(D_0=\bar Q_0\), \(D_1=Q_1\oplus Q_0\).
+- With T: \(Q_0\) toggles every cycle, \(Q_1\) when \(Q_0=1\): \(T_0=1\), \(T_1=Q_0\). For \(n\) bits \(T_i=Q_{i-1}\cdots Q_0\) — the textbook synchronous counter.
+- With JK: \(J_0=K_0=1\), \(J_1=K_1=Q_0\). The JK maps here have a don't-care in every cell pair, which is why JK designs often need fewer gates.
+
+* Intuition
+The characteristic equation answers "what will it do?" (analysis); the excitation table answers "what must I tell it?" (synthesis).
+
+* Pitfall
+A T flip-flop must start from a known state: toggling an unknown value gives an unknown value forever — give it a reset. In an excitation table, 1→1 for JK is \(K=0\) with \(J\) free, not \(J=1\).

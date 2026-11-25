@@ -1,0 +1,39 @@
+:PROPERTIES:
+:ID:       decoder-encoder
+:DOMAIN:   hardware
+:AREA:     combinational
+:KIND:     construction
+:REQUIRES: canonical-forms
+:SEE:      multiplexer seven-segment-decoder rom-as-logic register-transfer-buses
+:ALIASES:  decoder, decodifica, encoder, codifica, priority encoder, valid bit, one-hot, address decoding, transcoder, conta uni, ones counter
+:END:
+#+title: Decoders, encoders and priority encoders
+#+summary: An \(n\)-to-\(2^n\) decoder raises exactly the output whose index is the input (each output is one minterm, nothing to simplify); an encoder does the reverse assuming one active input (\(A_k=\) OR of the inputs whose index has bit \(k\) set); a priority encoder returns the index of the highest active input plus a valid bit \(V\), and its table is written with don't-care inputs.
+
+* Construction
+*Decoder* \(n\to2^n\): output \(y_k=1\) iff the input equals \(k\). 1-to-2: \(y_0=\bar a\), \(y_1=a\). 2-to-4: \(y_0=\bar a\bar b\), \(y_1=\bar ab\), \(y_2=a\bar b\), \(y_3=ab\) — each output has one minterm, so no Karnaugh map is needed; it is built from two 1-to-2 decoders and four ANDs, and larger ones hierarchically. An *enable* input ANDed into every output turns it into a [[id:multiplexer][demultiplexer]].
+*Encoder* \(2^n\to n\) (one-hot to binary), assuming exactly one input at 1: for 8-to-3
+\[ A_2=D_4+D_5+D_6+D_7,\quad A_1=D_2+D_3+D_6+D_7,\quad A_0=D_1+D_3+D_5+D_7. \]
+*Priority encoder* (4 inputs, \(D_3\) highest): outputs \(A_1A_0\) = index of the highest active input, \(V=1\) if any input is active (so "none active" is not confused with "\(D_0\) active").
+
+| D3 | D2 | D1 | D0 | A1 | A0 | V |
+|----+----+----+----+----+----+---|
+|  0 |  0 |  0 |  0 |  0 |  0 | 0 |
+|  0 |  0 |  0 |  1 |  0 |  0 | 1 |
+|  0 |  0 |  1 |  x |  0 |  1 | 1 |
+|  0 |  1 |  x |  x |  1 |  0 | 1 |
+|  1 |  x |  x |  x |  1 |  1 | 1 |
+
+An input \(x\) means "either value": one line with \(k\) x's stands for \(2^k\) rows of the full table (it is a compact notation, not a don't-care of the output). From the maps:
+\[ V=D_3+D_2+D_1+D_0,\qquad A_1=D_3+D_2,\qquad A_0=D_3+\bar D_2D_1. \]
+
+* Example
+3-input "count the ones" (outputs \(s_1s_0\) in binary): \(s_1=ab+ac+bc\) (majority), \(s_0=a\oplus b\oplus c\) (checkerboard map: no two ones adjacent, every minterm is prime). It is the [[id:ripple-carry-adder][full adder]] in disguise.
+3-input priority encoder (index 1, 2, 3 for \(a,b,c\), 0 if none): \(s_1=b+c\), \(s_0=a\bar b+c\).
+Address decoding: a memory of \(2^{n}\) words uses a decoder on half of the address bits to select a row and a multiplexer on the other half to select the column.
+
+* Intuition
+Decoding spreads a dense code over many wires (one wire per value); encoding packs the wires back into a few bits — and the priority version decides what to do when more than one wire claims the bus, as interrupt controllers do.
+
+* Pitfall
+A plain encoder gives nonsense when two inputs are active (\(D_1\) and \(D_2\) together give \(A_1A_0=11\), "3"); that is why the priority version exists, and why the plain one is designed treating multi-hot inputs as don't-cares.

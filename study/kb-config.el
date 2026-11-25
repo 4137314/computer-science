@@ -6,10 +6,11 @@
       kb-areas
       '(;; programming: modelling, objects, C++, generic code, Java, concurrency, GUI
         "uml" "memory" "oop" "cpp" "generic-programming" "java" "concurrency" "gui"
-        ;; hardware: complexity, devices, VHDL, simulation, timing, synthesis, power,
-        ;; scheduling, arithmetic, processors, interfaces
-        "complexity" "programmable-logic" "vhdl" "simulation" "timing" "logic-synthesis"
-        "power" "high-level-synthesis" "arithmetic" "processors" "interfaces")
+        ;; hardware: Boolean and combinational logic, sequential logic and RTL design,
+        ;; complexity, devices, VHDL, simulation, timing, synthesis, power, scheduling,
+        ;; arithmetic, processors, interfaces
+        "combinational" "sequential" "complexity" "programmable-logic" "vhdl" "simulation"
+        "timing" "logic-synthesis" "power" "high-level-synthesis" "arithmetic" "processors" "interfaces")
       ;; Notes describe concepts: no pointers to the course material.
       kb-forbidden
       "\\b\\(?:TODO\\|FIXME\\|[Ss]lides?\\|[Ll]ectures?\\|[Ll]ezion[ei]\\|file:\\)\\b")

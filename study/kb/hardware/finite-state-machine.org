@@ -3,8 +3,8 @@
 :DOMAIN:   hardware
 :AREA:     vhdl
 :KIND:     construction
-:REQUIRES: sequential-logic
-:SEE:      java-enum datapath-control uart spi i2c np-hard-optimization low-power-encoding risc-v-datapath fsm-state-encoding
+:REQUIRES: sequential-logic fsm-synthesis
+:SEE:      java-enum datapath-control uart spi i2c np-hard-optimization low-power-encoding risc-v-datapath fsm-state-encoding mealy-moore asm-chart vending-machine-design
 :ALIASES:  FSM, finite state machine, Moore machine, Mealy machine, state encoding, one-hot, state diagram, next-state logic, controller
 :END:
 #+title: Finite-state machines

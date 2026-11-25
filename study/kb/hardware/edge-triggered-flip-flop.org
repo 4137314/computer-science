@@ -1,0 +1,40 @@
+:PROPERTIES:
+:ID:       edge-triggered-flip-flop
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     construction
+:REQUIRES: sr-latch
+:SEE:      flip-flop-types setup-hold-time metastability sequential-logic registers-shift-registers
+:ALIASES:  edge-triggered flip-flop, flip flop D, D flip-flop, master-slave, master slave, positive edge, negative edge, fronte di salita, fronte di discesa, preset, clear, asynchronous reset, transparency, clock pulse
+:END:
+#+title: Edge-triggered flip-flops: master–slave
+#+summary: A latch in a feedback loop is transparent for the whole active clock phase, so the state can change several times per cycle (the circuit oscillates, at a rate set by its delays); two latches clocked in opposition — master open while the clock is high, slave open while it is low — are never transparent end to end, so the output changes once per clock edge and takes the value \(D\) had just before that edge.
+
+* Construction
+Why a latch is not enough: in a synchronous loop (next-state logic → latch → next-state logic), while \(C=1\) the latch is transparent; a fast enough logic delivers the new next state before \(C\) falls and the state changes again. Example: \(D=\bar Q\) through a wire — with \(C=1\) the latch oscillates, with \(C=0\) it stops on an unpredictable value. Narrowing the active pulse below the minimum logic delay works on paper but needs very steep, short pulses on a heavily loaded clock net: big drivers, energy, electromagnetic noise.
+*Master–slave*: \(D\to\) master latch (enabled by \(C\)) \(\to Q_M\to\) slave latch (enabled by \(\bar C\)) \(\to Q\).
+- \(C=1\): master transparent, \(Q_M\) follows \(D\); slave closed, \(Q\) still.
+- \(C:1\to0\): master closes on the current \(D\); slave opens and copies \(Q_M\) to \(Q\).
+- \(C=0\): master closed, slave sees a constant input: nothing moves.
+There is never a transparent path from \(D\) to \(Q\). This one is *negative-edge triggered*; with the enables swapped it is *positive-edge triggered* (the usual \(\mathtt{rising\_edge}\) register; drawn with a triangle on \(C\), a bubble for the falling edge).
+*Sampling semantics* (the important part): the value of \(D\) just before the active edge is found on \(Q\) just after it. Between edges \(D\) may do anything — even glitch — provided it is stable in the [[id:setup-hold-time][setup/hold window]] around the edge. Hence the next-state logic only has to settle within one clock period, and combinational [[id:logic-hazards][hazards]] do not propagate.
+*Preset and clear*: asynchronous inputs (often active low, \(\bar S\), \(\bar R\)) that force \(Q=1\) or \(Q=0\) immediately, regardless of the clock — used to start from a known state at power-up.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, x=0.6cm, y=0.4cm]
+\foreach \n/\y in {$C$/6,$D$/3,$Q$/0} \node[left] at (-0.1,\y+0.5) {\n};
+\draw[kbcyan, thick] (0,6) -- (1,6) -- (1,7) -- (3,7) -- (3,6) -- (5,6) -- (5,7) -- (7,7) -- (7,6) -- (9,6) -- (9,7) -- (11,7) -- (11,6) -- (12,6);
+\draw[thick] (0,3) -- (2,3) -- (2,4) -- (2.4,4) -- (2.4,3) -- (3.6,3) -- (3.6,4) -- (8,4) -- (8,3) -- (12,3);
+\draw[kbmagenta, thick] (0,0) -- (5,0) -- (5,1) -- (9,1) -- (9,0) -- (12,0);
+\foreach \t in {1,5,9} \draw[kbguide, densely dotted] (\t,-0.4) -- (\t,7.4);
+\end{tikzpicture}
+Positive-edge flip-flop: at edge 1 \(D=0\) (the glitch after it is ignored), at edge 5 \(D=1\), at edge 9 \(D=0\); \(Q\) changes only at edges.
+
+* Example
+Same \(D\) waveform into a D *latch* (transparent while \(C=1\)): during the high phase 1–3 the glitch at 2–2.4 passes straight to \(Q\); the flip-flop above ignores it. That is the practical difference between level and edge sensitivity.
+
+* Intuition
+A pair of airlock doors: one is always shut, so nothing can run straight through; the data moves one chamber per clock half-period.
+
+* Pitfall
+"Edge-triggered" does not mean "infinitely fast": violating setup or hold makes the internal loop resolve late and possibly at random ([[id:metastability][metastability]]). And the asynchronous clear acts *at once*, not at the next edge — a common timing-diagram mistake.

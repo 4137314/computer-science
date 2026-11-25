@@ -4,7 +4,7 @@
 :AREA:     processors
 :KIND:     model
 :REQUIRES: datapath-subsystems finite-state-machine
-:SEE:      alu-design risc-v-datapath data-flow-graph resource-binding risc-v-isa
+:SEE:      alu-design risc-v-datapath data-flow-graph resource-binding risc-v-isa rtl-design register-transfer-buses
 :ALIASES:  datapath, control unit, register file, function unit, control word, microprocessor, memory-mapped I/O, bus
 :END:
 #+title: Datapath and control unit

@@ -1,0 +1,50 @@
+:PROPERTIES:
+:ID:       logic-hazards
+:DOMAIN:   hardware
+:AREA:     combinational
+:KIND:     definition
+:REQUIRES: karnaugh-maps
+:SEE:      glitches gate-delay-model event-driven-simulation critical-races edge-triggered-flip-flop
+:ALIASES:  hazard, alea, alee, static hazard, static-1 hazard, dynamic hazard, glitch, timing diagram, diagramma temporale, consensus term, implicante di collegamento, propagation delay
+:END:
+#+title: Timing diagrams and static hazards
+#+summary: With gate delays a correct two-level circuit can glitch: when an input change moves the input point from one implicant to another and the first switches off before the second switches on, an output that should stay 1 drops briefly (static-1 hazard); on the Karnaugh map it is a jump between adjacent ones not covered by a common group, and adding the bridging consensus implicant removes it at the cost of minimality.
+
+* Definition
+A *timing diagram* plots every node against time, with two levels only. Without delays it checks the function; with delays it shows the transient. Procedure (event-driven, as a [[id:event-driven-simulation][simulator]] does):
+1. inputs constant for \(t<0\); compute every node at \(t=0\) (steady state);
+2. move to the earliest time at which some signal changes (an *event*);
+3. re-evaluate the gates fed by that signal and schedule their output changes after their delay;
+4. repeat until no events remain.
+Delay from input to output depends on the path: through a 2-to-1 [[id:multiplexer][mux]] a change on \(a\) takes \(2\Delta\), one on \(s\) takes \(3\Delta\) (inverter + AND + OR).
+*Hazard (alea, glitch)*: a short spurious pulse during the transient. *Static-1*: output should stay 1 and drops; *static-0*: should stay 0 and rises; *dynamic*: should change once and changes three times.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, x=0.9cm, y=0.45cm]
+\foreach \n/\y in {$s$/8,$\bar s$/6,$sb$/4,$\bar sa$/2,$f$/0} \node[left] at (-0.1,\y+0.4) {\n};
+\draw[kbcyan, thick] (0,9) -- (1,9) -- (1,8) -- (6,8);
+\draw[thick] (0,6) -- (2,6) -- (2,7) -- (6,7);
+\draw[thick] (0,5) -- (2,5) -- (2,4) -- (6,4);
+\draw[thick] (0,2) -- (3,2) -- (3,3) -- (6,3);
+\draw[kbmagenta, thick] (0,1) -- (3,1) -- (3,0) -- (4,0) -- (4,1) -- (6,1);
+\foreach \t in {1,...,5} {\draw[kbguide, densely dotted] (\t,-0.3) -- (\t,9.3); \node[below] at (\t,-0.3) {\t};}
+\node[right] at (6,0.5) {glitch, $1\Delta$};
+\end{tikzpicture}
+\(a=b=1\), \(s\) falls at \(t=1\), every gate has delay \(\Delta=1\): \(sb\) dies at 2, \(\bar sa\) is born only at 3, so \(f\) drops from 3 to 4.
+
+* Example
+2-to-1 mux, \(f=\bar sa+sb\); map rows \(s\), columns \(ab\):
+
+| s/ab | 00 | 01 | 11 | 10 |
+|------+----+----+----+----|
+| 0    |  0 |  0 |  1 |  1 |
+| 1    |  0 |  1 |  1 |  0 |
+
+With \(a=b=1\) and \(s\) switching, the input point moves between cells \(011\) and \(111\): both ones, adjacent, but in different groups (\(\bar sa\), \(sb\)). The fix is the *bridging* (consensus) implicant \(ab\): \(f=\bar sa+sb+ab\) stays 1 through the transition because \(ab\) does not depend on \(s\). The \(s:0\to1\) transition does not glitch with these delays (\(sb\) rises after \(\Delta\), \(\bar sa\) falls after \(2\Delta\)), but a hazard-free design must cover both directions.
+Rule: an SOP is free of static-1 hazards for single-input changes iff every pair of adjacent ones is covered by a common implicant. Dually, static-0 hazards in a POS are removed by covering adjacent zeros together.
+
+* Intuition
+Two implicants hand the output over like runners passing a baton; if the first lets go before the second grabs, the baton falls. The consensus term is a third runner holding it during the handover.
+
+* Pitfall
+In a synchronous circuit glitches on combinational nodes are harmless for function: an [[id:edge-triggered-flip-flop][edge-triggered flip-flop]] samples only at the edge, after the transient — they cost [[id:glitches][power]]. They matter where a signal is used as a clock, an asynchronous reset or in an asynchronous sequential circuit. Hazards caused by several inputs changing together cannot all be removed by adding terms: in an adder the carry chain makes them unavoidable.

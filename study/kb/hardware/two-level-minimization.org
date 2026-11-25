@@ -3,7 +3,7 @@
 :DOMAIN:   hardware
 :AREA:     logic-synthesis
 :KIND:     method
-:REQUIRES: 
+:REQUIRES: karnaugh-maps
 :SEE:      pla-pal multilevel-logic-optimization boolean-difference np-hard-optimization
 :ALIASES:  two-level minimization, Karnaugh map, Quine-McCluskey, prime implicant, essential prime implicant, cover, sum of products, don't care, Espresso
 :END:

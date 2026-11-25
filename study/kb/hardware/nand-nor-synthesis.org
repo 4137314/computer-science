@@ -1,0 +1,41 @@
+:PROPERTIES:
+:ID:       nand-nor-synthesis
+:DOMAIN:   hardware
+:AREA:     combinational
+:KIND:     construction
+:REQUIRES: karnaugh-maps
+:SEE:      boolean-algebra technology-mapping cmos-power
+:ALIASES:  NAND-NAND, NOR-NOR, sintesi NAND, sintesi NOR, universal gate, porta universale, bubble pushing
+:END:
+#+title: NAND–NAND and NOR–NOR realizations
+#+summary: Applying De Morgan twice, a minimal SOP \(f=\sum p_i\) becomes \(f=\overline{\prod\overline{p_i}}\): every AND and the final OR turn into NANDs with the same implicants; dually a minimal POS becomes a NOR–NOR network; single literals entering the output gate directly must be complemented.
+
+* Construction
+From SOP to NAND–NAND:
+\[ f=p_1+p_2+\dots+p_k=\overline{\overline{p_1+\dots+p_k}}=\overline{\bar p_1\,\bar p_2\cdots\bar p_k}. \]
+Each \(\bar p_i\) is a NAND of the literals of \(p_i\); the outer bar-of-product is a NAND. Procedure: replace every AND by a NAND, the OR by a NAND, and complement a literal that goes straight into the output gate (a one-literal term \(z\) enters as \(\bar z\), since \(\bar p_i=\bar z\)).
+From POS to NOR–NOR: \(f=\prod s_i=\overline{\sum\bar s_i}\), each \(\bar s_i\) a NOR of the literals of \(s_i\); implicants come from the *zeros* of the map.
+The implicants are exactly those of the AND–OR (or OR–AND) form: the map work does not change.
+
+* Example
+\(f=z+\bar y\bar w+yw+x\bar z\):
+\[ f=\overline{\bar z\cdot\overline{\bar y\bar w}\cdot\overline{yw}\cdot\overline{x\bar z}} \]
+three 2-input NANDs (\(\bar y\bar w\), \(yw\), \(x\bar z\)), the literal \(z\) complemented to \(\bar z\), and one 4-input NAND at the output: two levels, one gate type.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, g/.style={draw, logic gate inputs=nn, minimum height=0.9cm, minimum width=0.9cm}]
+\node[nand gate US, g] (g1) at (0,0.8) {};
+\node[nand gate US, g] (g2) at (0,-0.8) {};
+\node[nand gate US, g, draw=kbcyan] (g3) at (2,0) {};
+\draw (g1.input 1) -- ++(-0.4,0) node[left] {$a$}; \draw (g1.input 2) -- ++(-0.4,0) node[left] {$b$};
+\draw (g2.input 1) -- ++(-0.4,0) node[left] {$c$}; \draw (g2.input 2) -- ++(-0.4,0) node[left] {$d$};
+\draw (g1.output) -- ++(0.3,0) |- (g3.input 1); \draw (g2.output) -- ++(0.3,0) |- (g3.input 2);
+\draw (g3.output) -- ++(0.4,0) node[right] {$ab+cd$};
+\end{tikzpicture}
+Two levels of NAND compute \(ab+cd\): the bubbles at the AND outputs and at the OR inputs cancel.
+
+* Intuition
+A NAND is an AND followed by an inverter, and also an OR with inverted inputs; between two levels the two inversions annihilate.
+
+* Pitfall
+Forgetting to invert the single literals feeding the output NAND gives \(\bar z\) where \(z\) was meant. In CMOS, inverting gates are cheaper (4 transistors for a 2-input NAND, 6 for an AND), so NAND–NAND is usually smaller and faster than AND–OR, not just "more uniform".

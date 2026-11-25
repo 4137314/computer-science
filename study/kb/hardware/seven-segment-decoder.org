@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       seven-segment-decoder
+:DOMAIN:   hardware
+:AREA:     combinational
+:KIND:     example
+:REQUIRES: karnaugh-maps decoder-encoder
+:SEE:      counters rtl-design two-level-minimization
+:ALIASES:  seven-segment display, display a 7 segmenti, BCD to 7-segment, transcoder, joint minimization, minimizzazione congiunta, multiple-output minimization
+:END:
+#+title: 7-segment decoder: don't-cares and joint minimization
+#+summary: Each of the seven segments is a separate 4-input function of the digit \(xyzw\); for hexadecimal digits segment \(a\) needs 14 literals, but if only BCD digits 0–9 can occur the six unused codes are don't-cares and \(a=x+z+yw+\bar y\bar w\) needs 6; across outputs a product already built for one segment can be reused by another even when it is not prime there.
+
+* Example
+Segments: \(a\) top, \(b\) top right, \(c\) bottom right, \(d\) bottom, \(e\) bottom left, \(f\) top left, \(g\) middle. Input \(xyzw\), \(x\) most significant.
+*Segment \(a\), hex digits* (off only for 1, 4, b, d). Map, rows \(xy\), columns \(zw\) in Gray order:
+
+| xy/zw  | 00 | 01 | 11 | 10 |
+|--------+----+----+----+----|
+| 00     |  1 |  0 |  1 |  1 |
+| 01     |  0 |  1 |  1 |  1 |
+| 11     |  1 |  0 |  1 |  1 |
+| 10     |  1 |  1 |  0 |  1 |
+
+Primes: \(\bar xz\), \(yz\), \(\bar y\bar w\), \(x\bar w\), \(\bar xyw\), \(x\bar y\bar z\), \(z\bar w\). All but \(z\bar w\) are essential and already cover everything:
+\[ a=\bar xz+yz+\bar y\bar w+x\bar w+\bar xyw+x\bar y\bar z\quad(14\text{ literals}). \]
+*Segment \(a\), decimal digits only*: rows 11 and the cells 1010, 1011 become \(-\). Treating them as 1, the primes grow to \(z\), \(x\), \(yw\), \(\bar y\bar w\):
+\[ a=x+z+yw+\bar y\bar w\quad(6\text{ literals}). \]
+*Segment \(g\)* (off for 0, 1, 7, C): hex \(g=\bar yz+x\bar y+z\bar w+xw+\bar xy\bar z\) (11 literals); decimal \(g=x+z\bar w+y\bar z+\bar yz\) (7 literals).
+*Joint minimization*: \(x\bar y\bar z\) is an essential prime of \(a\) and is therefore built anyway. For \(g\) it is an implicant (not prime: it lies inside \(x\bar y\)); using it instead of \(x\bar y\),
+\[ g=\bar yz+x\bar y\bar z+z\bar w+xw+\bar xy\bar z \]
+has 12 literals on paper but the shared AND costs nothing new: 9 new literals instead of 11.
+
+* Intuition
+Don't-cares are free ones: every unused code is a cell the map may claim to make a rectangle bigger. Sharing gates between outputs is the same idea one level up: the cheapest term is the one already in the circuit.
+
+* Pitfall
+With don't-cares the circuit's output on the unused codes is whatever the chosen cover says (here 1010 lights segment \(a\)): fine only if those codes really never occur. Joint minimization by hand is error-prone; for several outputs, tools do it (the [[id:two-level-minimization][multiple-output]] version of the cover problem).

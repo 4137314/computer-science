@@ -4,7 +4,7 @@
 :AREA:     power
 :KIND:     construction
 :REQUIRES: cmos-power sequential-logic
-:SEE:      low-power-encoding dvfs-parallelism power-gating
+:SEE:      low-power-encoding dvfs-parallelism power-gating registers-shift-registers
 :ALIASES:  clock gating, gated clock, integrated clock gating cell, ICG, enable, latch-based gating, operand isolation
 :END:
 #+title: Clock gating and operand isolation

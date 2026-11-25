@@ -1,0 +1,44 @@
+:PROPERTIES:
+:ID:       multiplexer
+:DOMAIN:   hardware
+:AREA:     combinational
+:KIND:     construction
+:REQUIRES: canonical-forms
+:SEE:      decoder-encoder registers-shift-registers register-transfer-buses fpga-architecture vhdl-concurrent-assignments
+:ALIASES:  multiplexer, mux, multiplexer 2 a 1, multiplexer 4 a 1, demultiplexer, demux, selector, data selector, hierarchical design, progetto gerarchico
+:END:
+#+title: Multiplexer and demultiplexer
+#+summary: A \(2^n\)-to-1 multiplexer routes one of \(2^n\) data inputs to the output under an \(n\)-bit select, \(m=\bar sa+sb\) for two inputs; large ones are built as trees of small ones (Shannon expansion in hardware), any function of \(n\) variables is a mux with the truth table on its data inputs; the demultiplexer does the reverse, a decoder whose outputs are gated by one data line.
+
+* Construction
+2-to-1: from the truth table on \(s,a,b\), the canonical SOP \(\bar sa\bar b+\bar sab+s\bar ab+sab\) reduces by adjacency to
+\[ m=\bar s\,a+s\,b \]
+(12 literals → 4). Prime implicants \(\bar sa\), \(sb\), \(ab\): the first two are essential, \(ab\) is redundant for the function (but cures a [[id:logic-hazards][static hazard]]).
+4-to-1 with select \(s_1s_0\): six inputs, too many for a comfortable map; built *hierarchically*: two 2-to-1 muxes choose between \(a,b\) and \(c,d\) with \(s_0\), a third chooses between their outputs with \(s_1\). Three levels instead of two, but obviously correct. The flat two-level form is \(m=\bar s_1\bar s_0a+\bar s_1s_0b+s_1\bar s_0c+s_1s_0d\).
+*Mux as universal function*: \(f(x_1,\dots,x_n)\) is a \(2^n\)-to-1 mux with select \(x_1\dots x_n\) and constants \(f(\text{row})\) on the data inputs — the [[id:rom-as-logic][lookup-table]] idea behind FPGAs; with one variable moved to the data inputs, a \(2^{n-1}\)-to-1 mux suffices (data inputs \(\in\{0,1,x_n,\bar x_n\}\)).
+*Demultiplexer* 1-to-\(2^n\): the data input \(x\) appears on the output selected by \(s\), the others are 0: \(y_k=x\cdot[s=k]\), i.e. a [[id:decoder-encoder][decoder]] of \(s\) whose outputs are ANDed with \(x\).
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize]
+\tikzset{g/.style={draw, logic gate inputs=nn, minimum height=0.9cm, minimum width=0.9cm}}
+\node[and gate US, g] (u) at (0,0.8) {};
+\node[and gate US, g] (d) at (0,-0.8) {};
+\node[or gate US, g, draw=kbcyan] (o) at (1.9,0) {};
+\node[not gate US, draw, anchor=output] (n) at ([xshift=-0.3cm]u.input 1) {};
+\draw (n.output) -- (u.input 1); \draw (n.input) -- ++(-0.4,0) node[left] {$s$};
+\draw (u.input 2) -- ++(-1.8,0) node[left] {$a$};
+\draw (d.input 1) -- ++(-1.8,0) node[left] {$s$}; \draw (d.input 2) -- ++(-1.8,0) node[left] {$b$};
+\draw (u.output) -- ++(0.3,0) |- (o.input 1); \draw (d.output) -- ++(0.3,0) |- (o.input 2);
+\draw (o.output) -- ++(0.4,0) node[right] {$m=\bar sa+sb$};
+\end{tikzpicture}
+The inverter on \(s\) makes the upper path one gate slower than the lower: the source of the mux glitch.
+
+* Example
+Realize \(f(a,b,c)=\sum m(1,2,6,7)\) with a 4-to-1 mux, select \(ab\): for \(ab=00\) \(f=c\); \(01\): \(\bar c\); \(10\): 0; \(11\): 1. Data inputs \(c,\bar c,0,1\).
+Uses: sharing a resource among several sources, [[id:registers-shift-registers][load enables]] in registers, [[id:register-transfer-buses][register transfers]], memory column selection (a decoder picks the row, a mux the column: 256 cells as \(16\times16\)).
+
+* Intuition
+A mux is Shannon's expansion built in gates: the select variable picks which cofactor reaches the output.
+
+* Pitfall
+The delay is not symmetric: a change on \(s\) crosses the inverter and takes one gate more than a change on \(a\) or \(b\) — worst-case timing must consider every input.

@@ -4,7 +4,7 @@
 :AREA:     arithmetic
 :KIND:     construction
 :REQUIRES: sequential-logic
-:SEE:      alu-design low-power-encoding vhdl-concurrent-assignments datapath-control
+:SEE:      alu-design low-power-encoding vhdl-concurrent-assignments datapath-control counters registers-shift-registers
 :ALIASES:  counter, ring counter, Johnson counter, barrel shifter, zero detector, one detector, thermometer code, comparator, shifter
 :END:
 #+title: Datapath subsystems: detectors, shifters, counters

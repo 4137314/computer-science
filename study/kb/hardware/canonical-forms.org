@@ -1,0 +1,46 @@
+:PROPERTIES:
+:ID:       canonical-forms
+:DOMAIN:   hardware
+:AREA:     combinational
+:KIND:     theorem
+:REQUIRES: boolean-algebra
+:SEE:      boolean-difference multiplexer karnaugh-maps rom-as-logic
+:ALIASES:  Shannon expansion, espansione di Shannon, minterm, maxterm, canonical form, forma canonica, sum of products, SOP, product of sums, POS, literal, letterale, implicant, implicante, two-level logic, sintesi a due livelli
+:END:
+#+title: Shannon expansion and canonical forms
+#+summary: Shannon's theorem \(f=x_1f(1,x_2,\dots)+\bar x_1f(0,x_2,\dots)\), applied to every variable, gives the first canonical form — the OR of the minterms where \(f=1\) — and its dual gives the second — the AND of the maxterms where \(f=0\); canonical forms are unique, so two functions are equal iff their canonical forms are, and they prove that AND, OR, NOT can build any function in two levels.
+
+* Statement
+*Shannon expansion*: for any \(f\) of \(n\) variables
+\[ f(x_1,\dots,x_n)=x_1\,f(1,x_2,\dots,x_n)+\bar x_1\,f(0,x_2,\dots,x_n) \]
+and dually \(f=(x_1+f(0,x_2,\dots))(\bar x_1+f(1,x_2,\dots))\). The two *cofactors* no longer depend on \(x_1\) (see [[id:boolean-difference][cofactors]]).
+
+Terms:
+- *literal*: a variable or its complement; the number of literals measures the cost (each is a gate input, so roughly transistors);
+- *minterm*: a product in which every variable appears once (\(a\bar bc\)); it is 1 on exactly one row;
+- *maxterm*: a sum in which every variable appears once (\(a+\bar b+c\)); it is 0 on exactly one row;
+- *implicant* \(g\) of \(f\): \(g=1\Rightarrow f=1\) (for us, a product of literals covering some ones of \(f\));
+- *level*: the largest number of gates from an input to the output (inverters on inputs not counted).
+
+*First canonical form* (canonical SOP): \(f=\sum\) minterms of the rows with \(f=1\). A variable appears plain if it is 1 in that row, complemented if 0.
+*Second canonical form* (canonical POS): \(f=\prod\) maxterms of the rows with \(f=0\). A variable appears plain if it is *0* in that row, complemented if 1.
+
+* Derivation
+Expanding on \(x_1\) and then on \(x_2\) in both cofactors:
+\[ f=x_1x_2f(1,1,\dots)+x_1\bar x_2f(1,0,\dots)+\bar x_1x_2f(0,1,\dots)+\bar x_1\bar x_2f(0,0,\dots). \]
+After all \(n\) variables every coefficient is a constant \(f(\text{row})\in\{0,1\}\): the products multiplied by 0 vanish, those multiplied by 1 stay. That is the first canonical form, read directly off the truth table. The dual expansion keeps the sums whose constant is 0 (a sum containing a 1 is 1 and disappears from the product).
+Uniqueness: the terms are fixed by the table, so equal functions have equal canonical forms — unlike ordinary expressions, where \(ab+\bar bc\) and \(\bar a\bar bc+a\bar bc+ab\bar c+abc\) look different and are the same function.
+
+* Example
+\(f(a,b,c)=\bar a(\bar b+\bar c)+c(a+\bar b)\). Truth table (rows \(abc\)): 000→1, 001→1, 010→1, 011→0, 100→0, 101→1, 110→0, 111→1.
+- SOP: \(f=\bar a\bar b\bar c+\bar a\bar bc+\bar ab\bar c+a\bar bc+abc\) — 5 minterms, 15 literals, \(\sum m(0,1,2,5,7)\).
+- POS: \(f=(a+\bar b+\bar c)(\bar a+b+c)(\bar a+\bar b+c)\) — maxterms of rows 011, 100, 110, \(\prod M(3,4,6)\).
+- Minimal two-level SOP ([[id:karnaugh-maps][map]]): \(f=\bar a\bar b+\bar a\bar c+ac\), 6 literals.
+
+Shannon on \(a\) by hand: \(f(1,b,c)=c\), \(f(0,b,c)=\bar b+\bar c\), so \(f=ac+\bar a(\bar b+\bar c)\) — exactly a [[id:multiplexer][2-to-1 multiplexer]] with select \(a\).
+
+* Intuition
+A minterm is a detector for one row; OR-ing the detectors of the ones rebuilds the table. A maxterm is a detector (active low) for one zero; AND-ing them forces the output to 0 exactly there.
+
+* Pitfall
+In the POS the polarity is reversed: row \(a b c=0\,1\,1\) with \(f=0\) gives \(a+\bar b+\bar c\), not \(\bar a+b+c\). Canonical forms are unique but rarely small: the parity \(x_1\oplus\dots\oplus x_n\) has \(2^{n-1}\) minterms and no two of them can be merged, and the top sum bit of an \(n\)-bit adder needs a number of products exponential in \(n\).

@@ -4,7 +4,7 @@
 :AREA:     logic-synthesis
 :KIND:     definition
 :REQUIRES: 
-:SEE:      algebraic-division multilevel-logic-optimization switching-activity generalized-bypass
+:SEE:      algebraic-division multilevel-logic-optimization switching-activity generalized-bypass canonical-forms
 :ALIASES:  Boolean difference, Shannon expansion, cofactor, observability, don't care, sensitivity
 :END:
 #+title: Shannon cofactors and the Boolean difference

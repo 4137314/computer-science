@@ -1,0 +1,40 @@
+:PROPERTIES:
+:ID:       fsm-patterns
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     construction
+:REQUIRES: asm-chart counters
+:SEE:      rtl-design vending-machine-design mealy-moore critical-races
+:ALIASES:  FSM patterns, pattern sequenziali, busy waiting, attesa attiva, choice, fire and check, timer, edge detector, rilevatore di fronti, derivatore, pulse width measurer, misuratore di impulsi, one-cycle pulse
+:END:
+#+title: Recurring state-machine patterns
+#+summary: A few fragments recur in every controller: busy-wait (a self-loop until a signal arrives), choice (branch on a signal), fire-and-check (start a counter or slow unit, then wait for its terminal count), edge detection (wait for 1, then for 0) and the one-cycle pulse; Moore versions react one cycle late and can miss short pulses, conditional (Mealy) outputs react at once; the simplest any-edge detector is one flip-flop and an XOR.
+
+* Construction
+- *Busy wait*: state W with a self-loop on \(\bar S\); \(S=1\) leads to the next state, entered one cycle after \(S\) rose (or act at once with a conditional output on the exit arrow).
+- *Choice*: a decision on \(S\) leading to two different paths.
+- *Fire and check*: SETUP (load the timer, \(\mathit{load}=1\)) → WAIT (\(\mathit{enable}=1\), self-loop until \(TC\)) → go on. Three states handle any delay, any count, any slow arithmetic unit: the counter, not the FSM, counts.
+- *Falling-edge detector*: wait for \(S=1\), then wait for \(S=0\), then signal — two busy waits in sequence.
+- *Any-edge detector* ("derivator", \(OUT=1\) for one cycle at each transition of \(S\)). Moore: four states — a (wait for 1), b (\(OUT=1\)), c (wait for 0), d (\(OUT=1\)) — two state bits; it reacts one cycle late and, while in b or d, does not look at \(S\), so a pulse shorter than a cycle can be lost (fix: test \(S\) also in b and d). Mealy: one flip-flop remembering the previous value, \(x^+=S\), \(OUT=x\oplus S\) — the difference between the present and the previous sample.
+
+* Example
+Pulse-width measurer: input \(L\) (synchronous), a counter with synchronous \(\mathit{init}\) and \(\mathit{count\_en}\), output \(\mathit{ready}\) for one cycle when the counter holds the width of the last pulse of ones.
+- IDLE: \(\mathit{init}=1\); \(L\to\) CNT.
+- CNT: \(\mathit{count\_en}=1\); \(\bar L\to\) RDY.
+- RDY: \(\mathit{ready}=1\); → IDLE.
+If \(L\) is 1 during cycles \(t_0,\dots,t_0+k-1\): IDLE sees it at \(t_0\), CNT lasts from \(t_0+1\) to \(t_0+k\) (it sees \(L=0\) at \(t_0+k\)), so the counter is enabled for exactly \(k\) cycles and shows \(k\) in RDY at \(t_0+k+1\). The one-cycle delay at the start and the one at the end cancel.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, ->, >={Stealth}, st/.style={draw, circle, minimum size=0.95cm, align=center}]
+\node[st] (i) at (0,0) {IDLE\\init}; \node[st, draw=kbcyan] (c) at (2.8,0) {CNT\\en}; \node[st] (r) at (5.6,0) {RDY\\ready};
+\draw (i) -- node[above] {$L$} (c); \draw (c) -- node[above] {$\bar L$} (r);
+\draw (r) to[bend left=35] (i);
+\draw (i) edge[loop above] node {$\bar L$} (i); \draw (c) edge[loop above] node {$L$} (c);
+\end{tikzpicture}
+Moore outputs written inside the states; RDY returns to IDLE unconditionally.
+
+* Intuition
+Let the datapath count and wait; let the state machine only decide when to start, stop and look.
+
+* Pitfall
+A Moore machine samples its inputs once per cycle: a signal must last longer than a clock period to be seen with certainty, and the reaction comes one cycle after it. Inputs not synchronous with the clock must be [[id:critical-races][synchronized]] before any of these patterns can rely on them.

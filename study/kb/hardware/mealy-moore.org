@@ -1,0 +1,48 @@
+:PROPERTIES:
+:ID:       mealy-moore
+:DOMAIN:   hardware
+:AREA:     sequential
+:KIND:     definition
+:REQUIRES: fsm-synthesis
+:SEE:      asm-chart fsm-patterns finite-state-machine critical-races
+:ALIASES:  Mealy machine, macchina di Mealy, Moore machine, macchina di Moore, conditional output, uscita condizionata, output timing, combinational loop, anello combinatorio
+:END:
+#+title: Mealy versus Moore machines
+#+summary: In a Moore machine the outputs depend only on the present state, so they are written inside the states, are constant for the whole clock cycle and react to an input one cycle late; in a Mealy machine they depend on state and inputs, are written on the arrows, react within the same cycle and often need fewer states — but they follow input glitches and two Mealy machines connected in a loop can close a combinational cycle.
+
+* Definition
+- *Moore*: \(OUT(n)=\Lambda(X(n))\). Output logic fed by the flip-flops only.
+- *Mealy*: \(OUT(n)=\Lambda(IN(n),X(n))\). Output logic fed by flip-flops and inputs.
+Every Moore machine is a Mealy machine whose outputs ignore the inputs; a Mealy machine is converted to Moore by splitting each state according to the output with which it is entered (more states, one cycle later).
+
+* Example
+Boiler (inputs \(H\), \(L\); output \(C\); state \(X\)=burner on).
+Moore: \(X^+=L+X\bar H\), \(C=X\). The burner switches on in the cycle *after* \(L\) is seen, when the state has become 1.
+Mealy: same next-state function, \(C=L+X\bar H\): the burner switches on in the same cycle in which \(L\) rises — \(C\) equals the next state instead of the present one.
+Timing, \(L\) rises in the middle of cycle 2:
+
+| cycle      | 1 | 2 | 3 | 4 |
+|------------+---+---+---+---|
+| L          | 0 | 1 | 0 | 0 |
+| X (state)  | 0 | 0 | 1 | 1 |
+| C Moore    | 0 | 0 | 1 | 1 |
+| C Mealy    | 0 | 1 | 1 | 1 |
+
+The Mealy output moves together with the input (even mid-cycle), the Moore output only after the edge.
+
+* Picture
+\begin{tikzpicture}[font=\scriptsize, ->, >={Stealth}, st/.style={draw, circle, minimum size=0.85cm, align=center}]
+\node[st] (a) at (0,0) {0\\$C{=}0$}; \node[st, draw=kbcyan] (b) at (2.6,0) {1\\$C{=}1$};
+\draw (a) to[bend left] node[above] {$L$} (b); \draw (b) to[bend left] node[below] {$H$} (a);
+\draw (a) edge[loop left] node {$\bar L$} (a); \draw (b) edge[loop right] node {$\bar H$} (b);
+\node[st] (c) at (6.3,0) {0}; \node[st, draw=kbcyan] (d) at (8.9,0) {1};
+\draw (c) to[bend left] node[above] {$L/C{=}1$} (d); \draw (d) to[bend left] node[below] {$H/C{=}0$} (c);
+\draw (c) edge[loop left] node {$\bar L/0$} (c); \draw (d) edge[loop right] node {$\bar H/1$} (d);
+\end{tikzpicture}
+Left Moore (output in the state), right Mealy (output on the arrow).
+
+* Intuition
+Moore answers "where am I?", Mealy answers "where am I and what is happening now?" — the second is quicker and more nervous.
+
+* Pitfall
+When several machines talk to each other, a Mealy output feeding another Mealy machine's input whose output comes back closes a loop with no flip-flop in it: possible oscillation. With Moore machines (or registered Mealy outputs) every loop crosses a register. In an [[id:asm-chart][ASM chart]] a Mealy output is a *conditional output* box, never a state.

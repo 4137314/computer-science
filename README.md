@@ -1,6 +1,6 @@
 # computer-science
 
-Study knowledge base for three university courses, read in a dedicated Emacs reader
+Study knowledge base for four university courses, read in a dedicated Emacs reader
 (the [`knowledge-base`](https://github.com/4137314/knowledge-base) flake input, as in
 the bachelor thesis):
 
@@ -12,19 +12,26 @@ the bachelor thesis):
   inheritance, polymorphism and the binding rule, abstract classes and interfaces, generics
   and wildcards, collections and iterators, `equals`/`hashCode`, ordering, exceptions,
   JavaFX (scene graph, events, layouts), user input.
+- **Logic networks (Reti Logiche)**: Boolean algebra, canonical forms, Karnaugh maps and
+  don't-cares, NAND/NOR synthesis, multiplexers, decoders and encoders, timing diagrams and
+  hazards, two's complement, comparators and BCD adders, latches and flip-flops, analysis and
+  synthesis of state machines (Mealy/Moore, ASM charts, state minimization), registers,
+  counters, recurring FSM patterns, critical races, the RTL method, register-transfer buses,
+  a worked controller design.
 - **Advanced logic design (VHDL)**: complexity, programmable logic and FPGAs, VHDL and
   simulation, static timing analysis, multi-level synthesis and technology mapping, design
   for timing and for low power, scheduling and binding, arithmetic circuits, CPU and RISC-V
   design, serial protocols (UART, SPI, I²C).
 
-The course PDFs live in `assets/` (`cpp/`, `java/`, `vhdl/`) and are not versioned.
+The course PDFs live in `assets/` (`cpp/`, `java/`, `vhdl/`, with the logic-networks material
+in `vhdl/logic-network/`) and are not versioned.
 
 ## Layout
 
 | path | content |
 |---|---|
 | `study/kb/programming/` | 70 notes: uml, memory, oop, cpp (also exception safety, copy-and-swap, casts, multiple inheritance, perfect forwarding), generic-programming (specialization, concepts), java (monitors, inner classes, streams, HashMap internals, immutability), concurrency (condition variables), gui (observer/MVC) |
-| `study/kb/hardware/` | 65 notes: complexity, programmable-logic, vhdl (also state encoding), simulation, timing (metastability, skew and jitter), logic-synthesis (two-level minimization), power (power gating), high-level-synthesis, arithmetic (Booth, fixed point), processors (pipeline hazards), interfaces |
+| `study/kb/hardware/` | 92 notes: combinational (Boolean algebra, Karnaugh maps, mux/decoders, hazards), sequential (latches, flip-flops, FSM analysis and synthesis, Mealy/Moore, ASM, counters, races, RTL), complexity, programmable-logic, vhdl (also state encoding), simulation, timing (metastability, skew and jitter), logic-synthesis (two-level minimization), power (power gating), high-level-synthesis, arithmetic (Booth, fixed point, two's complement, comparators, BCD), processors (pipeline hazards), interfaces |
 | `study/kb-config.el` | domains and areas in study order, forbidden words, extra TikZ libraries |
 | `study/study.mk` | `make study*` targets |
 | `study/computer-science.desktop.in` | launcher entry template |

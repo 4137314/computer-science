@@ -4,7 +4,7 @@
 :AREA:     timing
 :KIND:     theorem
 :REQUIRES: setup-hold-time
-:SEE:      uart clock-skew-jitter serial-communication
+:SEE:      uart clock-skew-jitter serial-communication critical-races
 :ALIASES:  metastability, synchronizer, two flip-flop synchronizer, MTBF, clock domain crossing, CDC, resolution time
 :END:
 #+title: Metastability and synchronizers

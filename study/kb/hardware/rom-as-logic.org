@@ -4,7 +4,7 @@
 :AREA:     programmable-logic
 :KIND:     construction
 :REQUIRES: 
-:SEE:      pla-pal fpga-architecture programming-technologies
+:SEE:      pla-pal fpga-architecture programming-technologies multiplexer
 :ALIASES:  ROM, lookup table, truth table in memory, memory as logic, decoder
 :END:
 #+title: Logic functions as memories
