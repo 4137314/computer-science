@@ -28,6 +28,7 @@
 #+end_src
 
 * Picture
+#+CAPTION: Java references: variables p and q on the stack refer to the same Person object on the heap.
 \begin{tikzpicture}[font=\small]
 \node[draw, kbcyan] (p) at (0,0) {p}; \node[draw, kbcyan] (q) at (0,-0.9) {q};
 \node[draw, kbamber, align=center] (o) at (3,-0.45) {Person\\name = Grace};

@@ -19,6 +19,7 @@ The maximum clock frequency is \(f_{max}=1/T_{min}\), set by the slowest registe
 A value launched by \(R_1\) at edge \(k\) leaves at \(t_{cq}\), crosses the logic in at most \(t_{max}\) and must arrive \(t_{su}\) before edge \(k+1\) at \(R_2\), which comes at \(T+t_{sk}\): \(t_{cq}+t_{max}+t_{su}\le T+t_{sk}\). The same edge \(k\) also makes \(R_2\) [[id:lambda-expressions][capture]] the *old* value; the new one, arriving at the earliest after \(t_{cq}+t_{min}\), must not corrupt it before \(t_h\) after the edge at \(R_2\): \(t_{cq}+t_{min}\ge t_{sk}+t_h\). \(T\) cancels from the second inequality.
 
 * Picture
+#+CAPTION: Setup and hold times: the data input \(d\) must be stable from \(t_{su}\) before the clock edge until \(t_h\) after it.
 \begin{tikzpicture}[font=\scriptsize, yscale=0.6]
 \draw[kbcyan] (0,2) -- (1.5,2) -- (1.5,2.8) -- (3.5,2.8) -- (3.5,2) -- (5.5,2) -- (5.5,2.8) -- (6.5,2.8); \node[left] at (0,2.4) {clk};
 \draw (0,0.4) -- (3.6,0.4) -- (3.8,0) -- (6.5,0); \draw (0,0) -- (3.6,0) -- (3.8,0.4) -- (6.5,0.4); \node[left] at (0,0.2) {d};

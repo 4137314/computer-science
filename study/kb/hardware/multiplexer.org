@@ -19,6 +19,7 @@
 *Demultiplexer* 1-to-\(2^n\): the data input \(x\) appears on the output selected by \(s\), the others are 0: \(y_k=x\cdot[s=k]\), i.e. a [[id:decoder-encoder][decoder]] of \(s\) whose outputs are ANDed with \(x\).
 
 * Picture
+#+CAPTION: A 2:1 multiplexer as gates: \(m=\bar sa+sb\) passes \(a\) when \(s=0\) and \(b\) when \(s=1\).
 \begin{tikzpicture}[font=\scriptsize]
 \tikzset{g/.style={draw, logic gate inputs=nn, minimum height=0.9cm, minimum width=0.9cm}}
 \node[and gate US, g] (u) at (0,0.8) {};

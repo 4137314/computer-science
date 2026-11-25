@@ -21,6 +21,7 @@ A Karnaugh map does the same by eye for up to 4–5 variables: largest power-of-
 \(f(a,b,c)=\sum m(0,1,2,5,6,7)\). Merging: \(000+001=\bar a\bar b\), \(000+010=\bar a\bar c\), \(001+101=\bar bc\), \(010+110=b\bar c\), \(101+111=ac\), \(110+111=ab\). No further merges: six primes. Every minterm is covered by two primes, none essential (a cyclic cover). Minimum covers have three primes: \(f=\bar a\bar b+b\bar c+ac\) or \(f=\bar a\bar c+\bar bc+ab\).
 
 * Picture
+#+CAPTION: A three-variable Karnaugh map with its prime implicants: the minimum cover is \(\bar a\bar b+b\bar c+ac\).
 \begin{tikzpicture}[font=\scriptsize]
 \foreach \c/\l in {0/00,1/01,2/11,3/10} \node at (\c*0.7+0.35,0.95) {\l};
 \node at (-0.35,0.95) {$a\backslash bc$};

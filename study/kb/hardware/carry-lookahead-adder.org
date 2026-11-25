@@ -20,6 +20,7 @@ The operator \((G,P)\circ(G',P')=(G+PG',\,PP')\) is associative, so all prefixes
 Simpler alternatives: *carry-skip* (bypass a block when \(P=1\)) and *carry-select* (precompute both block sums), see [[id:generalized-bypass][bypass and select]].
 
 * Picture
+#+CAPTION: A parallel-prefix carry network: each level combines generate–propagate pairs \((G,P)\circ(G',P')\) over doubling spans, so every carry \(G_{i:0}\) is ready after \(\log_2 n\) levels.
 \begin{tikzpicture}[font=\scriptsize, x=0.95cm, y=0.95cm]
 \foreach \i in {0,...,7} {\node at (7-\i,0.45) {bit $\i$}; \draw[kbguide] (7-\i,0.2) -- (7-\i,-3.1);}
 \foreach \l/\d in {1/1,2/2,3/4} {

@@ -23,6 +23,7 @@ And =x.equals(y)= implies =x.hashCode() == y.hashCode()=. The converse is not re
 A [[id:hashmap-internals][hash table]] stores an element in bucket \(h(x)\bmod m\) and, to look it up, scans only that bucket with =equals=. If two equal objects had different hashes they would land in different buckets, so =contains= on one would not find the other, and a =HashSet= would hold "duplicates". Lookup costs \(O(1)\) on average when the hash spreads the elements evenly.
 
 * Picture
+#+CAPTION: Buckets of a hash table: "ab" and "ba" have equal hash codes and share bucket 1, while "cd" goes elsewhere; equal objects must always land in the same bucket.
 \begin{tikzpicture}[font=\small]
 \foreach \i in {0,...,4} {\draw (0,-\i*0.55) rectangle (0.8,-\i*0.55+0.5); \node[font=\scriptsize] at (0.4,-\i*0.55+0.25) {\i};}
 \node[draw, kbcyan] (a) at (2.2,-0.3) {\texttt{ab}}; \node[draw, kbcyan] (b) at (3.6,-0.3) {\texttt{ba}};

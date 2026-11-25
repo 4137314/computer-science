@@ -19,6 +19,7 @@ For a path from \(R_1\) (clock at \(t_1\)) to \(R_2\) (clock at \(t_2\)), skew \
 Clock distribution: H-trees and balanced buffer trees equalise wire lengths; FPGAs provide dedicated global clock networks with low skew.
 
 * Picture
+#+CAPTION: Clock skew: the same clock edge reaches registers \(R_1\) and \(R_2\) at different times, separated by \(t_{sk}\).
 \begin{tikzpicture}[font=\scriptsize]
 \draw[kbcyan] (0,1.2) node[left, black] {clk at $R_1$} -- (1,1.2) -- (1,1.7) -- (2.5,1.7) -- (2.5,1.2) -- (4,1.2) -- (4,1.7) -- (5,1.7);
 \draw[kbamber] (0,0) node[left, black] {clk at $R_2$} -- (1.4,0) -- (1.4,0.5) -- (2.9,0.5) -- (2.9,0) -- (4.4,0) -- (4.4,0.5) -- (5,0.5);

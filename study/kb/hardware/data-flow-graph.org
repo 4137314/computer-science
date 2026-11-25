@@ -37,6 +37,7 @@ has 6 multiplications, 2 subtractions, 2 additions and a comparison \(x_1<a\):
 The longest chain v1 → v3 → v7 → v8 has four operations: with unit delays no schedule is shorter than 4 cycles.
 
 * Picture
+#+CAPTION: A data-flow graph scheduled in control steps: operations \(v_1\) to \(v_{11}\) placed in cycles, edges carrying data dependencies.
 \begin{tikzpicture}[font=\scriptsize, o/.style={draw, circle, minimum size=0.62cm, inner sep=0}, ->, >={Stealth}, x=1.3cm, y=1.1cm]
 \foreach \c in {1,...,4} {\node[kbguide, anchor=east] at (-0.6,1-\c) {cycle \c}; \draw[kbguide, densely dotted, -] (-0.55,1-\c-0.5) -- (4.5,1-\c-0.5);}
 \node[o, draw=kbcyan, label={[kbguide]above:$v_1$}] (v1) at (0,0) {$\times$};

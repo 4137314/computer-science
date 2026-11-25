@@ -35,6 +35,7 @@ JavaFX replaced Swing, which had replaced AWT; it is used mostly for desktop app
 #+end_src
 
 * Picture
+#+CAPTION: The JavaFX scene graph: a Stage holds a Scene, whose root StackPane contains a Button and a Circle.
 \begin{tikzpicture}[font=\small, level distance=1cm, sibling distance=2.3cm, every node/.style={draw}]
 \node[kbcyan] {Stage} child {node[kbcyan] {Scene} child {node[kbamber] {StackPane (Parent)} child {node {Button}} child {node {Circle}}}};
 \end{tikzpicture}

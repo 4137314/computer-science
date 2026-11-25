@@ -19,6 +19,7 @@
 Take =class A { int i; B* pb; };= with =pb= owning a heap =B=. The generated [[id:cpp-special-members][copy constructor]] copies =pb=: after =A a2(a);= both point to one =B=. Changing =a2='s =B= changes =a='s; when both die, =~A= deletes the same =B= twice. Defining the copy to allocate a new =B= restores one =B= per =A=.
 
 * Picture
+#+CAPTION: Shallow copy shares the buffer B between a and a2, so both point to it; deep copy gives each object its own buffer.
 \begin{tikzpicture}[font=\small]
 \node[draw] (a) at (0,0) {a.pb}; \node[draw] (a2) at (0,-1) {a2.pb};
 \node[draw, kbmagenta] (b) at (2.4,-0.5) {B};

@@ -18,6 +18,7 @@ Every input enters the AND plane in true and complemented form. Each AND line co
 - *CPLD*: several PAL-like blocks connected by a programmable interconnect.
 
 * Picture
+#+CAPTION: Structure of a PLA: a programmable AND plane forms the product terms \(P_k\) and a programmable OR plane sums them into the outputs \(f_j\); a PAL fixes the OR plane.
 \begin{tikzpicture}[font=\scriptsize]
 \foreach \i/\n in {0/$x_0$,1/$\bar x_0$,2/$x_1$,3/$\bar x_1$} {\draw (\i*0.6,0) -- (\i*0.6,3); \node at (\i*0.6,3.25) {\n};}
 \foreach \k in {0,1,2} {\draw (-0.3,0.5+\k*0.9) -- (5.2,0.5+\k*0.9); \node[anchor=east] at (-0.3,0.5+\k*0.9) {$P_\k$};}

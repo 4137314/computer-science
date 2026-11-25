@@ -20,6 +20,7 @@ Delay from input to output depends on the path: through a 2-to-1 [[id:multiplexe
 *Hazard (alea, glitch)*: a short spurious pulse during the transient. *Static-1*: output should stay 1 and drops; *static-0*: should stay 0 and rises; *dynamic*: should change once and changes three times.
 
 * Picture
+#+CAPTION: Timing diagram of a static hazard: unequal path delays make the output glitch for one gate delay \(\Delta\).
 \begin{tikzpicture}[font=\scriptsize, x=0.9cm, y=0.45cm]
 \foreach \n/\y in {$s$/8,$\bar s$/6,$sb$/4,$\bar sa$/2,$f$/0} \node[left] at (-0.1,\y+0.4) {\n};
 \draw[kbcyan, thick] (0,9) -- (1,9) -- (1,8) -- (6,8);

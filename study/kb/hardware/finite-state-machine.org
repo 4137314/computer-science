@@ -41,6 +41,7 @@ A sequence detector for =101= (Mealy, overlapping):
 #+end_src
 
 * Picture
+#+CAPTION: State diagram of a Mealy sequence detector for "101": edges are labelled input/output, and the output is 1 only on completing the sequence.
 \begin{tikzpicture}[font=\scriptsize, ->, >={Stealth}, st/.style={draw, circle, minimum size=0.8cm}]
 \node[st, draw=kbcyan] (a) at (0,0) {S0}; \node[st] (b) at (2.6,0) {S1}; \node[st] (c) at (5.2,0) {S10};
 \draw (a) to[bend left] node[above] {1/0} (b);

@@ -31,6 +31,7 @@ Timing, \(L\) rises in the middle of cycle 2:
 The Mealy output moves together with the input (even mid-cycle), the Moore output only after the edge.
 
 * Picture
+#+CAPTION: The same light controller as a Moore machine (outputs \(C\) in the states) and as a Mealy machine (outputs on the transitions), which reacts one clock earlier.
 \begin{tikzpicture}[font=\scriptsize, ->, >={Stealth}, st/.style={draw, circle, minimum size=0.85cm, align=center}]
 \node[st] (a) at (0,0) {0\\$C{=}0$}; \node[st, draw=kbcyan] (b) at (2.6,0) {1\\$C{=}1$};
 \draw (a) to[bend left] node[above] {$L$} (b); \draw (b) to[bend left] node[below] {$H$} (a);

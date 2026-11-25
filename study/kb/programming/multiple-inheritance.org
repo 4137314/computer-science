@@ -25,6 +25,7 @@
 - Two bases declaring the same member function: the call is ambiguous until the [[id:inheritance][derived class]] overrides it or qualifies it (=Student::print()=).
 
 * Picture
+#+CAPTION: The diamond of multiple inheritance: WorkingStudent inherits Person through both Student and Worker; virtual inheritance keeps a single Person subobject.
 \begin{tikzpicture}[font=\scriptsize, box/.style={draw, minimum width=2.2cm, minimum height=0.55cm}]
 \node[box, draw=kbcyan] (p) at (0,0) {Person};
 \node[box] (s) at (-1.9,-1.3) {Student}; \node[box] (w) at (1.9,-1.3) {Worker};

@@ -19,6 +19,7 @@
 A binary operator tree of height \(h\) has at most \(2^h\) leaves, so \(n\) operands need \(h\ge\lceil\log_2 n\rceil\), and the balanced tree reaches the bound. With delay \(d\) per operator, the chain costs \((n-1)d\), the tree \(\lceil\log_2 n\rceil d\).
 
 * Picture
+#+CAPTION: Tree height reduction: the chain \(((a+b)+c)+d\) of depth 3 is rebalanced into \((a+b)+(c+d)\) of depth 2, using associativity.
 \begin{tikzpicture}[font=\scriptsize, o/.style={draw, circle, inner sep=1pt}]
 \node[o] (p1) at (0,0) {+}; \node[o] (p2) at (0.5,0.7) {+}; \node[o] (p3) at (1,1.4) {+};
 \node at (-0.4,-0.6) {a}; \node at (0.4,-0.6) {b}; \node at (1.0,0.1) {c}; \node at (1.5,0.8) {d};

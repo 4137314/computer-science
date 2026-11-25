@@ -34,6 +34,7 @@ Every concurrent assignment is re-evaluated whenever a signal on its right-hand 
 =when ... else= builds a chain of 2-to-1 multiplexers: the first condition has priority, conditions may overlap — natural for a priority encoder. =with ... select= builds one wide multiplexer: choices must be distinct constants and cover every value (=others= for the rest, including =U=, =X=, … of =std_logic=). The choices are values, not conditions.
 
 * Picture
+#+CAPTION: The hardware behind VHDL concurrent assignments: with–select builds a 4:1 multiplexer, while when–else builds a priority chain in which the first true condition wins.
 \begin{tikzpicture}[font=\scriptsize]
 \draw[kbcyan] (0,0) -- (0,2.2) -- (1,1.8) -- (1,0.4) -- cycle; \node at (0.5,1.1) {4:1};
 \foreach \i in {0,1,2,3} {\draw (-0.6,0.3+\i*0.53) -- (0,0.3+\i*0.53); \node[anchor=east] at (-0.6,0.3+\i*0.53) {$d_\i$};}

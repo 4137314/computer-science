@@ -42,6 +42,7 @@
 #+end_src
 
 * Picture
+#+CAPTION: A stack and a queue on the same sequence: the stack pops its newest element (top), the queue its oldest (head).
 \begin{tikzpicture}[font=\small, >={Stealth}]
 \foreach \i/\v in {0/a,1/b,2/c} {\draw (\i*0.9,0) rectangle (\i*0.9+0.9,0.7); \node at (\i*0.9+0.45,0.35) {\v};}
 \node[kbguide, font=\scriptsize] at (0.45,-0.3) {head (oldest)}; \node[kbguide, font=\scriptsize] at (2.25,-0.3) {top (newest)};

@@ -40,6 +40,7 @@ Shared state protected by one mutex; one condition variable per condition waited
 #+end_src
 
 * Picture
+#+CAPTION: Producer–consumer on a bounded buffer: the producer waits on a condition variable while the buffer is full, the consumer while it is empty.
 \begin{tikzpicture}[font=\scriptsize, >={Stealth}]
 \node[draw, kbcyan] (p) at (0,0) {producer}; \node[draw, kbamber] (c) at (6,0) {consumer};
 \foreach \i in {0,...,4} \draw (2.2+\i*0.4,-0.25) rectangle ++(0.4,0.5);

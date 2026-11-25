@@ -18,6 +18,7 @@ with \(S=(s_i)\), \(C=(c_i)\): the sum is kept in *redundant* form (two words), 
 *Adder trees*: \(k\) operands need \(k-2\) CSA rows. In a chain they cost \(k-2\) full-adder delays; in a *Wallace tree* each level reduces the count by a factor \(3/2\), so \(\approx\log_{3/2}(k/2)\) levels. A final carry-propagate adder (ripple or lookahead) gives the result. A plain tree of carry-propagate adders would cost \(\lceil\log_2k\rceil\) full additions instead.
 
 * Picture
+#+CAPTION: A carry-save adder tree reducing six operands: layers of CSAs turn three numbers into two without propagating carries, and one carry-propagate adder (CPA) finishes the sum.
 \begin{tikzpicture}[font=\scriptsize, c/.style={draw, kbcyan, minimum width=1.6cm, minimum height=0.5cm}]
 \node[c] (a) at (0,0) {CSA}; \node[c] (b) at (2.4,0) {CSA}; \node[c] (d) at (1.2,-1) {CSA}; \node[c] (e) at (1.2,-2) {CSA};
 \node[draw, kbamber, minimum width=1.6cm, minimum height=0.5cm] (f) at (1.2,-3) {CPA};

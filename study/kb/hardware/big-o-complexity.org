@@ -21,6 +21,7 @@ Classes, from slow to fast growth: \(O(1)\), \(O(\log n)\), \(O(n)\), \(O(n\log 
 Count operations through the algorithm. Shifting every component of a circuit by one position is one operation each: \(n\) operations, and doubling \(n\) doubles the time. Comparing every pair of components is \(n(n-1)/2=O(n^2)\): doubling \(n\) quadruples the time, tripling it multiplies by nine. Trying every subset of \(n\) gates is \(2^n\): adding one gate doubles the time. Rules: \(O(f)+O(g)=O(\max(f,g))\) along a sequence, \(O(f)\cdot O(g)=O(fg)\) for nested loops, constants disappear: \(O(3n^2+5n)=O(n^2)\).
 
 * Picture
+#+CAPTION: Operation counts of \(n\log n\), \(n^2\), \(n^3\) and \(2^n\) algorithms versus input size \(n\): the exponential overtakes every polynomial.
 \begin{tikzpicture}
 \begin{axis}[width=7.2cm, height=5cm, axis lines=left, xlabel={$n$}, ylabel={operations}, xmin=1, xmax=12, ymin=0, ymax=600]
 \addplot+[domain=1:12, samples=40] {x*ln(x)/ln(2)}; \addlegendentry{$n\log n$}

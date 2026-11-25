@@ -17,6 +17,7 @@ A *glitch* is a transition of a node that is not needed by its final value in th
 \(f=ab+\bar a c\) with \(b=c=1\): \(f=1\) whatever \(a\). When \(a\) falls, the term \(ab\) turns off immediately while \(\bar a c\) turns on only after the inverter delay: \(f\) dips to 0 for one inverter delay. The redundant consensus term \(bc\) holds \(f=1\) and removes the hazard.
 
 * Picture
+#+CAPTION: A static-1 glitch in \(f=ab+\bar a c\) with \(b=c=1\): when \(a\) falls, \(ab\) drops before \(\bar a c\) rises and the output briefly goes to 0.
 \begin{tikzpicture}[font=\scriptsize, yscale=0.55]
 \foreach \y/\l in {4/{$a$},3/{$\bar a$},2/{$ab$},1/{$\bar a c$},0/{$f=ab+\bar a c$}} \node[anchor=east] at (-0.2,\y*1.4+0.3) {\l};
 \draw (0,5.6+0.6) -- (2,5.6+0.6) -- (2,5.6) -- (6,5.6);

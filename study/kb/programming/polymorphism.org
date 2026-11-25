@@ -27,6 +27,7 @@ Java binds every instance method dynamically, except =static=, =private=, =final
 #+end_src
 
 * Picture
+#+CAPTION: Static and dynamic type: a Point reference to a NamedPoint object; the static type decides what may be called, the dynamic type which body runs.
 \begin{tikzpicture}[font=\small, >={Stealth}]
 \node[draw, kbcyan] (v) at (0,0) {Point p};
 \node[draw, kbamber, align=center] (o) at (5,0) {NamedPoint\\object};

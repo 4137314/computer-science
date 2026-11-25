@@ -16,6 +16,7 @@ Shift registers present \(a_i\) and \(b_i\) at cycle \(i\); a [[id:ripple-carry-
 *Digit-serial*: process \(d\) bits per cycle with a \(d\)-bit adder: \(n/d\) cycles. Serial multipliers combine a serial operand with a parallel one (\(n\) cycles, \(n\) adders).
 
 * Picture
+#+CAPTION: A bit-serial adder: one full adder and one flip-flop add two numbers a bit per clock, the D flip-flop storing the carry for the next bit.
 \begin{tikzpicture}[font=\scriptsize]
 \node[draw, kbcyan, minimum width=1cm, minimum height=1cm] (fa) at (0,0) {FA};
 \node[draw, kbamber, minimum width=0.7cm] (ff) at (0,-1.4) {D};

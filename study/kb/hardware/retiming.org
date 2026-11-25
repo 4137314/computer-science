@@ -16,6 +16,7 @@ Model the circuit as a graph: nodes are combinational blocks with delay \(d(v)\)
 legal if all \(w_r\ge0\). Around any cycle the total weight is unchanged (the lags cancel), so loops keep their latency, and the cycle-level behaviour is preserved. The [[id:setup-hold-time][clock period]] is the [[id:static-timing-analysis][longest path]] with zero registers; Leiserson and Saxe find the minimum period by testing candidate periods, each check being a system of difference constraints solved as shortest paths.
 
 * Picture
+#+CAPTION: Retiming a chain of adders: moving registers across the logic cuts the clock period from 9 to 3 delay units with the same latency.
 \begin{tikzpicture}[font=\scriptsize, g/.style={draw, minimum width=0.8cm, minimum height=0.5cm}, r/.style={draw, fill=kbamber, fill opacity=0.4, text opacity=1, minimum width=0.25cm, minimum height=0.5cm, inner sep=0}]
 \node[g] (a) at (0,0) {+3}; \node[g] (b) at (1.6,0) {+3}; \node[g] (c) at (3.2,0) {+3}; \node[r] (r1) at (4.2,0) {}; \node[r] (r2) at (4.6,0) {};
 \draw[-{Stealth}] (-0.9,0) -- (a); \draw[-{Stealth}] (a) -- (b); \draw[-{Stealth}] (b) -- (c); \draw[-{Stealth}] (c) -- (r1); \draw (r2) -- (5.2,0);

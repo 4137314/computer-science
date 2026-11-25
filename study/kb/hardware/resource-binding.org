@@ -17,6 +17,7 @@
 - Sharing adds multiplexers at the unit inputs and register inputs: their area and delay limit how much sharing pays.
 
 * Algorithm
+#+CAPTION: The left-edge algorithm: sort lifetimes by start and pack each register with non-overlapping intervals; the number of registers equals the maximum overlap.
 \begin{algorithmic}[1]
 \Require lifetimes $[s_i,e_i)$
 \State sort the intervals by $s_i$; $r\gets0$
@@ -30,6 +31,7 @@
 \end{algorithmic}
 
 * Picture
+#+CAPTION: Register binding by the left-edge algorithm: variable lifetimes over the control steps packed into registers R1, R2 and R3.
 \begin{tikzpicture}[font=\scriptsize]
 \foreach \c in {0,...,5} {\draw[kbguide] (\c,0.2) -- (\c,-2.3); \node at (\c,0.4) {\c};}
 \draw[kbcyan, line width=3pt] (0,-0.3) -- (2,-0.3); \draw[kbcyan, line width=3pt] (2,-0.3) -- (4,-0.3);

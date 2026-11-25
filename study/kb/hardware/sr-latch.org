@@ -27,6 +27,7 @@ NAND latch (\(\bar S\bar R\)): inputs active low, \(\bar S=\bar R=1\) holds, \(\
 *D latch*: gated SR with \(S=D\), \(R=\bar D\) (the forbidden combination can no longer occur). \(C=1\): *transparent*, \(Q\) follows \(D\). \(C=0\): \(Q\) keeps the last value \(D\) had before \(C\) fell.
 
 * Picture
+#+CAPTION: An SR latch built from two cross-coupled NOR gates: \(S\) sets \(Q\), \(R\) resets it, and the feedback holds the state.
 \begin{tikzpicture}[font=\scriptsize]
 \node[nor gate US, draw, logic gate inputs=nn] (n1) at (0,0.8) {};
 \node[nor gate US, draw, logic gate inputs=nn] (n2) at (0,-0.8) {};

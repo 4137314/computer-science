@@ -29,6 +29,7 @@ The [[id:data-flow-graph][solver graph]] with all delays 1, \(\bar\lambda=4\):
 The critical path is v1, v2 → v3 → v7 → v8 (mobility 0). ASAP needs four multipliers in cycle 1; the mobility of v4, v5, v6 is exactly the freedom a [[id:list-scheduling][resource-constrained scheduler]] uses to spread them.
 
 * Picture
+#+CAPTION: ASAP and ALAP schedules of a data-flow graph: an operation's mobility \(\mu\) is the number of cycles between its earliest and latest start (here \(\mu=2\)).
 \begin{tikzpicture}[font=\scriptsize]
 \foreach \c in {1,2,3,4} {\draw[kbguide] (-0.3,-\c*0.6+0.3) -- (4.6,-\c*0.6+0.3); \node[anchor=east] at (-0.3,-\c*0.6) {cycle \c};}
 \foreach \x in {0,0.9,1.8,2.7} {\node[draw, kbcyan, circle, inner sep=1pt] at (\x,-0.6) {$\times$};}

@@ -18,6 +18,7 @@ Per bit \(i\): *generate* \(g_i=a_ib_i\) (a carry is born), *propagate* \(p_i=a_
 Two's complement: an \(n\)-bit word represents \(-a_{n-1}2^{n-1}+\sum_{i<n-1}a_i2^i\). Subtraction \(a-b=a+\bar b+1\): invert \(b\), set \(c_0=1\). Overflow (signed) when \(c_n\ne c_{n-1}\).
 
 * Picture
+#+CAPTION: A 4-bit ripple-carry adder: four full adders (FA), each passing its carry to the next, from \(c_0\) to \(c_4\).
 \begin{tikzpicture}[font=\scriptsize, fa/.style={draw, minimum width=0.9cm, minimum height=0.7cm}]
 \foreach \i/\x in {0/4.5,1/3,2/1.5,3/0} {\node[fa, draw=kbcyan] (f\i) at (\x,0) {FA}; \draw (\x-0.2,0.8) node[above] {$a_\i$} -- (\x-0.2,0.35); \draw (\x+0.2,0.8) node[above] {$b_\i$} -- (\x+0.2,0.35); \draw (\x,-0.35) -- (\x,-0.8) node[below] {$s_\i$};}
 \draw[kbamber, -{Stealth}] (5.5,0) node[right] {$c_0$} -- (f0); \draw[kbamber, -{Stealth}] (f0) -- (f1); \draw[kbamber, -{Stealth}] (f1) -- (f2); \draw[kbamber, -{Stealth}] (f2) -- (f3); \draw[kbamber, -{Stealth}] (f3) -- (-1,0) node[left] {$c_4$};

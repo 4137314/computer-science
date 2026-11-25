@@ -18,6 +18,7 @@
 - *[[id:carry-save-adder][Adder tree]] / CSA*: the \(N\) products summed in carry-save form.
 
 * Picture
+#+CAPTION: Direct-form FIR filter: the input \(x[n]\) passes through a chain of delays T, each tap is weighted by \(h_k\) and the products are summed into \(y[n]\).
 \begin{tikzpicture}[font=\scriptsize, r/.style={draw, kbamber, minimum width=0.45cm, minimum height=0.45cm}, m/.style={draw, kbcyan, circle, inner sep=1pt}, a/.style={draw, circle, inner sep=1pt}]
 \draw (-0.6,1.2) node[left] {$x[n]$} -- (4.6,1.2);
 \foreach \k/\x in {0/0,1/1.5,2/3,3/4.5} {\node[m] (m\k) at (\x,0.4) {$\times$}; \draw (\x,1.2) -- (m\k); \node at (\x+0.35,0.75) {$h_\k$};}

@@ -21,6 +21,7 @@ The gain \(K=\prod_i\sqrt{1+2^{-2i}}\to1.6468\) is constant, so it is compensate
 A true rotation multiplies by \(\cos\theta_i\) and by \(\begin{pmatrix}1&-\tan\theta_i\\ \tan\theta_i&1\end{pmatrix}\). Choosing \(\tan\theta_i=2^{-i}\) turns the matrix product into shifts; dropping the \(\cos\theta_i\) factors leaves the constant gain. Since \(\sum_{k>i}\theta_k\ge\theta_i\), any angle in \([-1.74,1.74]\) rad is reachable, and each step adds about one bit of precision.
 
 * Algorithm
+#+CAPTION: CORDIC in rotation mode: \(n\) iterations of shifts and additions rotate \((x,y)\) by \(z\), steering each micro-rotation by the sign of the residual angle.
 \begin{algorithmic}[1]
 \Require angle $\theta$, iterations $n$, table $t_i=\arctan2^{-i}$
 \State $x\gets1/K$; $y\gets0$; $z\gets\theta$

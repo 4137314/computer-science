@@ -30,6 +30,7 @@ A class that manages a resource defines (or ~= default~ / ~= delete~ explicitly)
 The compiler picks the =&&= overload when the argument is an [[id:value-categories][rvalue]]: returning a local by value, passing a temporary, =v.push_back(A(3))=, or an explicit =std::move(x)=, which only casts =x= to an rvalue and moves nothing by itself.
 
 * Picture
+#+CAPTION: Moving an object: the destination takes over the source's buffer pointer, and the source is left holding nullptr, with no copy of the buffer.
 \begin{tikzpicture}[font=\small]
 \node[draw] (s) at (0,0) {source.pb}; \node[draw] (d) at (0,-1.1) {dest.pb};
 \node[draw, kbcyan] (b) at (3,-0.55) {B};

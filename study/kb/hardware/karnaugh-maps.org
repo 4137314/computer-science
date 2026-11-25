@@ -21,6 +21,7 @@
 *Five variables*: two 4-variable maps for \(v=0\) and \(v=1\) (Shannon on \(v\)), imagined one on top of the other: same cell in both maps = adjacent. Six: four maps. Beyond, split with Shannon.
 
 * Picture
+#+CAPTION: A four-variable Karnaugh map: the four corners give \(\bar y\bar w\), \(yw\) is essential, and \(zw\), \(xw\) complete the minimal cover \(f=\bar y\bar w+yw+xw+zw\).
 \begin{tikzpicture}[font=\scriptsize]
 \foreach \c/\l in {0/00,1/01,2/11,3/10} {\node at (\c*0.7+0.35,0.95) {\l}; \node at (-0.3,0.35-\c*0.7) {\l};}
 \node at (-0.45,1.0) {$xy\backslash zw$};

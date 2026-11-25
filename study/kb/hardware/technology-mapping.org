@@ -21,6 +21,7 @@ Dynamic programming on a tree: for each node \(v\) in post-order,
 with \(\mathrm{cost}=0\) at the leaves. Optimal cover of the tree; \(O(n\cdot p)\) for \(n\) nodes and \(p\) pattern nodes.
 
 * Algorithm
+#+CAPTION: Tree covering by dynamic programming: visit the nodes in post-order and keep, for each, the cheapest library pattern matching there plus the best covers of its inputs.
 \begin{algorithmic}[1]
 \Require subject tree with root $t$, patterns $P$
 \ForAll{nodes $v$ in post-order}
@@ -34,6 +35,7 @@ with \(\mathrm{cost}=0\) at the leaves. Optimal cover of the tree; \(O(n\cdot p)
 \end{algorithmic}
 
 * Picture
+#+CAPTION: Covering a NAND–inverter subject tree with library cells: one AND2 and two NAND2 cover the tree at the minimum area.
 \begin{tikzpicture}[font=\scriptsize, n/.style={draw, circle, minimum size=0.55cm, inner sep=0}]
 \node[n] (r) at (0,0) {N}; \node[n] (i) at (-1.2,-1) {I}; \node[n] (m) at (1.2,-1) {N}; \node[n] (j) at (-1.2,-2) {N};
 \node (a) at (-1.7,-3) {$a$}; \node (b) at (-0.7,-3) {$b$}; \node (c) at (0.8,-2) {$c$}; \node (d) at (1.6,-2) {$d$};

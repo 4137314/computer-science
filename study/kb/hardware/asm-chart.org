@@ -22,6 +22,7 @@ Boiler, Moore: state OFF (\(C=0\)): diamond \(L\); 1 → ON, 0 → OFF. State ON
 Mealy version: in OFF, on the \(L=1\) path a conditional box \(C=1\) — the burner starts in the same cycle in which \(L\) is seen.
 
 * Picture
+#+CAPTION: An ASM chart of a light controller: state boxes OFF and ON with their outputs, and decision boxes on the inputs \(L\) and \(H\) choosing the next state.
 \begin{tikzpicture}[font=\scriptsize, >={Stealth}, st/.style={draw, minimum width=1.6cm, minimum height=0.55cm}, dec/.style={draw, diamond, aspect=2, inner sep=1pt}, co/.style={draw, rounded corners=6pt, minimum width=1.2cm, minimum height=0.5cm}]
 \node[st] (off) at (0,0) {OFF};
 \node[dec] (l) at (0,-1.1) {$L$};

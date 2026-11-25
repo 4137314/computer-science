@@ -18,6 +18,7 @@
 *Latency-constrained* (minimise units for a bound \(\bar\lambda\)): compute ALAP times; in each cycle schedule all ready operations with zero slack (forced), adding units if needed, then the others that fit in the units already allocated.
 
 * Algorithm
+#+CAPTION: Resource-constrained list scheduling: at each cycle, start the ready operations of highest priority up to the number of units of each type, until the sink is scheduled.
 \begin{algorithmic}[1]
 \Require sequencing graph, units $a_k$, priority (e.g. least mobility)
 \State $l\gets1$

@@ -36,6 +36,7 @@ Prefer =std::make_unique<T>(args)= and =std::make_shared<T>(args)= to =new=.
 #+end_src
 
 * Picture
+#+CAPTION: shared_ptr and weak_ptr: sp1 and sp2 share the object T through a control block counting two owners; the weak_ptr wp observes it without owning.
 \begin{tikzpicture}[font=\small]
 \node[draw] (p1) at (0,0) {sp1}; \node[draw] (p2) at (0,-0.9) {sp2}; \node[draw, dashed] (w) at (0,-1.8) {wp};
 \node[draw, kbamber, align=center] (cb) at (2.6,-0.9) {control\\count = 2};

@@ -21,6 +21,7 @@ and a *link* is one of its pairs \((o_1,o_2)\). Each end of the association can 
 An *association attribute* belongs to the link, not to either object: the grade of an exam is a property of the pair (student, course).
 
 * Picture
+#+CAPTION: A UML association between Student and Course, with multiplicity 0..* at both ends and an association class Exam holding the grade.
 \begin{tikzpicture}[font=\small, cls/.style={draw, rectangle split, rectangle split parts=2, align=left, minimum width=2.8cm}]
 \node[cls, draw=kbcyan] (s) at (0,0) {\textbf{Student}\nodepart{two}Name: string\\Number: int};
 \node[cls, draw=kbcyan] (c) at (6,0) {\textbf{Course}\nodepart{two}Name: string\\Subject: string};

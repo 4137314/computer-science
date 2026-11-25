@@ -21,6 +21,7 @@ Keeping several (area, delay) pairs per node — the Pareto front — allows tra
 A node can be covered with delay 10, area 12, or delay 12, area 9 (same output arrival 12 when the input arrives late), or delay 13, area 11. The second dominates the third; both the first and second are on the Pareto front, and the choice depends on the slack.
 
 * Picture
+#+CAPTION: Delay–area trade-off of technology mappings: the Pareto-optimal covers (dots, dashed curve) dominate the others (crosses).
 \begin{tikzpicture}
 \begin{axis}[width=6.4cm, height=4.4cm, axis lines=left, xlabel={delay}, ylabel={area}, xmin=8, xmax=15, ymin=7, ymax=14]
 \addplot+[only marks, mark=*, kbcyan] coordinates {(10,12) (12,9) (14,8)};

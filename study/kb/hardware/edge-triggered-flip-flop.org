@@ -21,6 +21,7 @@ There is never a transparent path from \(D\) to \(Q\). This one is *negative-edg
 *Preset and clear*: asynchronous inputs (often active low, \(\bar S\), \(\bar R\)) that force \(Q=1\) or \(Q=0\) immediately, regardless of the clock — used to start from a known state at power-up.
 
 * Picture
+#+CAPTION: Timing of an edge-triggered D flip-flop: the output \(Q\) copies the input \(D\) only at the rising edges of the clock \(C\).
 \begin{tikzpicture}[font=\scriptsize, x=0.6cm, y=0.4cm]
 \foreach \n/\y in {$C$/6,$D$/3,$Q$/0} \node[left] at (-0.1,\y+0.5) {\n};
 \draw[kbcyan, thick] (0,6) -- (1,6) -- (1,7) -- (3,7) -- (3,6) -- (5,6) -- (5,7) -- (7,7) -- (7,6) -- (9,6) -- (9,7) -- (11,7) -- (11,6) -- (12,6);

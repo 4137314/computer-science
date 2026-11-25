@@ -21,6 +21,7 @@ For a block of \(k\) bits of an adder with carry-in \(c_{in}\), propagate \(p_i=
 - *carry-select*: compute the block sum for \(c_{in}=0\) and \(c_{in}=1\) in parallel; \(c_{in}\) selects. Delay \(O(\sqrt n)\) with blocks of growing size.
 
 * Picture
+#+CAPTION: The generalised select transform: \(f\) is computed for \(x=0\) and \(x=1\) in parallel and the late-arriving \(x\) only drives the final multiplexer.
 \begin{tikzpicture}[font=\scriptsize]
 \draw (0,0) rectangle (2,0.8); \node at (1,0.4) {$f$ with $x=0$};
 \draw (0,-1.1) rectangle (2,-0.3); \node at (1,-0.7) {$f$ with $x=1$};

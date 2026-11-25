@@ -19,6 +19,7 @@
 Java is C-like in syntax but removes pointers with arithmetic and manual memory, and adds classes, inheritance, polymorphism and a standard library for I/O, threads, [[id:java-collections][collections]], [[id:java-exceptions][exceptions]] and networking.
 
 * Picture
+#+CAPTION: The Java platform: javac compiles Hello.java to bytecode, which the JVM of each system (Linux, Windows) runs unchanged.
 \begin{tikzpicture}[font=\small, box/.style={draw, minimum height=0.7cm, align=center}]
 \node[box, draw=kbcyan] (s) at (0,0) {Hello.java};
 \node[box] (c) at (3,0) {javac};

@@ -23,6 +23,7 @@ Reference: one unit, capacitance \(C\), voltage \(V\), frequency \(f\): \(P_{ref
 Area roughly doubles: power is traded for silicon.
 
 * Picture
+#+CAPTION: Parallelism for low power: two units, each at half the clock frequency and a lower supply voltage, give the same throughput with less energy per operation.
 \begin{tikzpicture}[font=\scriptsize]
 \draw (0,0.6) rectangle (0.3,1.4); \draw (0,-0.6) rectangle (0.3,0.2);
 \draw[kbcyan] (0.8,0.6) rectangle (2,1.4); \node at (1.4,1) {unit A}; \draw[kbcyan] (0.8,-0.6) rectangle (2,0.2); \node at (1.4,-0.2) {unit B};

@@ -20,6 +20,7 @@ A *class* is a box with three compartments: the name, the attributes =name: type
 - An attribute is a local property: its value does not depend on other objects. The class fixes which attributes the instances have, not their values.
 
 * Picture
+#+CAPTION: A UML class and its instances: the class Book and the objects DivComm and Iliad, linked by instance-of.
 \begin{tikzpicture}[font=\small, cls/.style={draw, rectangle split, rectangle split parts=2, align=left, minimum width=3.2cm}]
 \node[cls, draw=kbcyan] (c) at (0,0) {\textbf{Book}\nodepart{two}Title: string\\Pages: int};
 \node[cls, draw=kbamber] (o1) at (-2.4,-2.8) {\underline{DivComm : Book}\nodepart{two}Title = ``Commedia''\\Pages = 1243};

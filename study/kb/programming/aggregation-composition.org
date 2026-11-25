@@ -18,6 +18,7 @@
 In C++ the difference decides who calls =delete=: in composition the whole is responsible for the memory of its parts; in aggregation it only points to them.
 
 * Picture
+#+CAPTION: Composition and aggregation in UML: a Car is composed of its Engine (filled diamond, same lifetime), while it only aggregates its Tyres (hollow diamond).
 \begin{tikzpicture}[font=\small, box/.style={draw, minimum width=2cm, minimum height=0.7cm}]
 \node[box, draw=kbcyan] (e) at (0,0) {Engine};
 \node[box] (p) at (4,0) {Piston};

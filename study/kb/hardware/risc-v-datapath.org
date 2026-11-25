@@ -20,6 +20,7 @@
 A control FSM (FETCH → DECODE → EXECUTE → MEM → WB) handles the BRAM latencies: loads and jumps take extra states.
 
 * Picture
+#+CAPTION: A single-cycle RISC-V datapath: fetch, decode, execute, memory and write-back in one clock, with the next-PC logic closing the loop.
 \begin{tikzpicture}[font=\scriptsize, s/.style={draw, rounded corners, minimum width=1.3cm, minimum height=0.6cm}]
 \node[s, draw=kbcyan] (f) at (0,0) {fetch}; \node[s] (d) at (2,0) {decode}; \node[s, draw=kbamber] (e) at (4,0) {execute}; \node[s] (m) at (6,0) {memory}; \node[s, draw=kbmagenta] (w) at (8,0) {write back};
 \foreach \a/\b in {f/d,d/e,e/m,m/w} \draw[-{Stealth}] (\a) -- (\b);

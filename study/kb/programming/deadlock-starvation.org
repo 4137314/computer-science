@@ -21,6 +21,7 @@ Coffman's conditions: a deadlock can occur only if all four hold.
 Order the mutexes globally and make every thread lock in increasing order. A cycle in the waits-for graph would need some thread to hold a higher mutex while waiting for a lower one, which the rule forbids; so condition 4 fails and no deadlock can occur. =std::lock(m1, m2)= achieves the same with a back-off algorithm.
 
 * Picture
+#+CAPTION: A deadlock: thread A holds mutex m1 and waits for m2, while B holds m2 and waits for m1, a cycle in the wait-for graph.
 \begin{tikzpicture}[font=\small]
 \node[draw, circle, kbcyan] (a) at (0,0) {A}; \node[draw, circle, kbcyan] (b) at (4,0) {B};
 \node[draw, kbamber] (m1) at (2,1) {m1}; \node[draw, kbamber] (m2) at (2,-1) {m2};

@@ -25,6 +25,7 @@ Pulse-width measurer: input \(L\) (synchronous), a counter with synchronous \(\m
 If \(L\) is 1 during cycles \(t_0,\dots,t_0+k-1\): IDLE sees it at \(t_0\), CNT lasts from \(t_0+1\) to \(t_0+k\) (it sees \(L=0\) at \(t_0+k\)), so the counter is enabled for exactly \(k\) cycles and shows \(k\) in RDY at \(t_0+k+1\). The one-cycle delay at the start and the one at the end cancel.
 
 * Picture
+#+CAPTION: A recurring controller pattern: IDLE initialises, CNT counts while enabled, RDY signals completion, with transitions on the input \(L\).
 \begin{tikzpicture}[font=\scriptsize, ->, >={Stealth}, st/.style={draw, circle, minimum size=0.95cm, align=center}]
 \node[st] (i) at (0,0) {IDLE\\init}; \node[st, draw=kbcyan] (c) at (2.8,0) {CNT\\en}; \node[st] (r) at (5.6,0) {RDY\\ready};
 \draw (i) -- node[above] {$L$} (c); \draw (c) -- node[above] {$\bar L$} (r);

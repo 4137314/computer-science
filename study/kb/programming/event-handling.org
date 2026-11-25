@@ -32,6 +32,7 @@
 Inner and anonymous classes can access the members of the enclosing object, which keeps state in one place and improves encapsulation.
 
 * Picture
+#+CAPTION: JavaFX event dispatch through the scene graph: the event is captured from Stage down to the target Button (filters) and bubbles back up (handlers).
 \begin{tikzpicture}[font=\small]
 \node[draw] (s) at (0,0) {Stage}; \node[draw] (sc) at (0,-0.9) {Scene}; \node[draw] (p) at (0,-1.8) {Pane}; \node[draw, kbamber] (b) at (0,-2.7) {Button};
 \draw[-{Stealth}, kbcyan] (-1.2,0) -- node[left, font=\scriptsize]{capturing (filters)} (-1.2,-2.7);

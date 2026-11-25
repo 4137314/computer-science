@@ -27,6 +27,7 @@ They reproduce part of pointer behaviour through overloaded operators, but they 
 #+end_src
 
 * Picture
+#+CAPTION: An STL range: begin() points to the first element and end() one past the last, so iteration stops when the iterator equals end().
 \begin{tikzpicture}[font=\small]
 \foreach \i/\v in {0/3,1/1,2/4} {\draw (\i,0) rectangle (\i+1,0.7); \node at (\i+0.5,0.35) {\v};}
 \draw[dashed, kbguide] (3,0) rectangle (4,0.7);

@@ -35,6 +35,7 @@ Constructors are not inherited. The constructor of =D= first builds the =B= part
 #+end_src
 
 * Picture
+#+CAPTION: Memory layout of a derived object: the base part B (data, size) comes first, followed by the members D adds (head).
 \begin{tikzpicture}[font=\small]
 \draw[kbcyan, line width=1pt] (0,0) rectangle (3,1.2); \node[anchor=west] at (0.1,0.6) {B part: data, size};
 \draw[kbamber, line width=1pt] (0,-0.8) rectangle (3,0); \node[anchor=west] at (0.1,-0.4) {D part: head};

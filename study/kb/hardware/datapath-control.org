@@ -19,6 +19,7 @@
 - *Memory-mapped I/O*: peripherals respond to addresses, so load and store instructions talk to devices.
 
 * Picture
+#+CAPTION: A datapath with its control unit: register file, ALU and shifter, data memory and multiplexers, driven by control words (DA, AA, BA, RW, FS, MB, MD, MW) and returning status flags.
 \begin{tikzpicture}[font=\scriptsize, b/.style={draw, minimum height=0.6cm, align=center}, >={Stealth}]
 \node[b, draw=kbcyan, minimum width=3cm] (rf) at (0,0) {register file};
 \node[b, draw=kbamber, minimum width=2.2cm] (alu) at (-0.6,-1.8) {ALU / shifter};

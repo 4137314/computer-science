@@ -23,6 +23,7 @@ The implicants are exactly those of the AND–OR (or OR–AND) form: the map wor
 three 2-input NANDs (\(\bar y\bar w\), \(yw\), \(x\bar z\)), the literal \(z\) complemented to \(\bar z\), and one 4-input NAND at the output: two levels, one gate type.
 
 * Picture
+#+CAPTION: NAND–NAND realisation of \(ab+cd\): a sum of products maps directly onto two levels of NAND gates.
 \begin{tikzpicture}[font=\scriptsize, g/.style={draw, logic gate inputs=nn, minimum height=0.9cm, minimum width=0.9cm}]
 \node[nand gate US, g] (g1) at (0,0.8) {};
 \node[nand gate US, g] (g2) at (0,-0.8) {};

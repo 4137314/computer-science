@@ -23,6 +23,7 @@ Operations:
 A script alternates them (eliminate, simplify, extract, resubstitute) until no gain.
 
 * Picture
+#+CAPTION: Multi-level optimisation by extraction: the common sub-expression \(x=a+b\) is factored out of \(f\) and \(g\) and computed once.
 \begin{tikzpicture}[font=\scriptsize, n/.style={draw, circle, minimum size=0.55cm}]
 \node[n] (a) at (0,1.2) {a}; \node[n] (b) at (0,0.4) {b}; \node[n] (c) at (0,-0.4) {c}; \node[n] (e) at (0,-1.2) {e};
 \node[n, draw=kbamber] (x) at (1.6,0.8) {x}; \node[n, draw=kbcyan] (f) at (3.2,0.4) {f}; \node[n, draw=kbcyan] (g) at (3.2,-0.8) {g};

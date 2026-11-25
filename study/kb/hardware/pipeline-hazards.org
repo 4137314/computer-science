@@ -17,6 +17,7 @@
 Performance: \(\mathrm{CPI}=1+\) stall cycles per instruction; time \(=N\cdot\mathrm{CPI}\cdot T\).
 
 * Picture
+#+CAPTION: A load-use data hazard in a five-stage RISC-V pipeline: add needs x1 one cycle after lw loads it, so it stalls once and then receives the value forwarded from MEM to EX.
 \begin{tikzpicture}[font=\scriptsize, s/.style={draw, minimum width=0.75cm, minimum height=0.42cm, inner sep=1pt}]
 \foreach \c in {1,...,7} \node[kbguide] at (\c*0.8+0.6,0.45) {\c};
 \node[anchor=east] at (0.9,0) {\texttt{lw x1,0(x2)}};

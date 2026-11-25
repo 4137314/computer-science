@@ -24,6 +24,7 @@ A generalization relates a [[id:inheritance][superclass]] to one or more subclas
 From "every Book has a Title" and "every HistoricalBook is a Book" it follows that every HistoricalBook has a Title. Inheritance is the transitivity of inclusion: if \(x\in\mathrm{ext}(\text{Sub})\subseteq\mathrm{ext}(\text{Super})\) and every element of \(\mathrm{ext}(\text{Super})\) has the property, so does \(x\).
 
 * Picture
+#+CAPTION: Generalisation in UML: Student and Worker are kinds of Person, and WorkingStudent is both.
 \begin{tikzpicture}[font=\small, box/.style={draw, minimum width=2cm, minimum height=0.6cm}]
 \node[box, draw=kbcyan] (p) at (0,0) {Person};
 \node[box] (s) at (-2.2,-1.8) {Student};

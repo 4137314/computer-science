@@ -19,6 +19,7 @@
 With [[id:uml-generalization][multiple inheritance]] of classes, two superclasses can provide conflicting implementations of the same method (the [[id:multiple-inheritance][diamond problem]]). Java separates the two uses of inheritance: a single hierarchy of classes for implementation, a multiple hierarchy of interfaces for types. An =Animal= can be both =Flying= and =Swimming= (a duck) without inheriting two bodies of =move()=.
 
 * Picture
+#+CAPTION: UML of a class extending the abstract class Animal and implementing the interfaces Flying and Swimming: Duck.
 \begin{tikzpicture}[font=\small, box/.style={draw, minimum width=1.9cm, minimum height=0.6cm}]
 \node[box] (a) at (0,0) {Animal};
 \node[box, draw=kbcyan, dashed] (f) at (3,0) {Flying};

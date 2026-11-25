@@ -20,6 +20,7 @@
 Every class with virtual methods gets a *vtable*: an array with one [[id:function-objects][function pointer]] per virtual method. Every object of such a class stores a hidden pointer =vptr= to its class's vtable. A call =p->f()= becomes =(*(p->vptr[k]))(p)= with \(k\) the slot of =f=, fixed at compile time: one indirect load and one indirect call.
 
 * Picture
+#+CAPTION: Dynamic dispatch through the virtual table: the object's hidden vptr points to Wizard's vtable, so a call through a Character pointer runs Wizard::act.
 \begin{tikzpicture}[font=\small]
 \node[draw, kbcyan, align=left] (o) at (0,0) {Wizard object\\vptr\\name};
 \node[draw, kbamber, align=left] (t) at (3.6,0) {Wizard vtable\\0: Wizard::act\\1: Wizard::\textasciitilde Wizard};

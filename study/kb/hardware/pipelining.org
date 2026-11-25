@@ -18,6 +18,7 @@ For a feed-forward path (no loops), add registers on a *cut* that separates inpu
 Without pipelining one result leaves every \(D+t_{reg}\). With \(k\) balanced stages a new input enters every \(T_k\), and \(k\) operations are in flight at once. The speed-up of throughput is \((D+t_{reg})/(D/k+t_{reg})\to (D+t_{reg})/t_{reg}\) as \(k\to\infty\): register overhead caps the gain, and latency only grows.
 
 * Picture
+#+CAPTION: Throughput and latency versus the number of pipeline stages \(k\): throughput grows with \(k\) but saturates as register overhead dominates, while latency grows.
 \begin{tikzpicture}
 \begin{axis}[width=6.8cm, height=4.6cm, axis lines=left, xlabel={stages $k$}, ylabel={relative value}, xmin=1, xmax=16, ymin=0, ymax=6]
 \addplot+[domain=1:16, samples=16] {(10+1)/(10/x+1)}; \addlegendentry{throughput}

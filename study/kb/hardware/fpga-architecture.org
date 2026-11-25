@@ -18,6 +18,7 @@
 - *Configuration*: SRAM bits set every LUT, mux and switch; the bitstream is loaded at power-up.
 
 * Picture
+#+CAPTION: Island-style FPGA: an array of configurable logic blocks (CLB) in a mesh of routing channels, joined by programmable switch boxes at the crossings.
 \begin{tikzpicture}[font=\scriptsize]
 \foreach \x in {0,1,2} \foreach \y in {0,1,2} {\draw[kbcyan, fill=kbcyan, fill opacity=0.12] (\x*1.6,\y*1.6) rectangle (\x*1.6+0.9,\y*1.6+0.9); \node at (\x*1.6+0.45,\y*1.6+0.45) {CLB};}
 \foreach \x in {0,1,2,3} {\draw[kbguide] (\x*1.6-0.35,-0.4) -- (\x*1.6-0.35,4.5);}

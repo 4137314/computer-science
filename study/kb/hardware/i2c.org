@@ -29,6 +29,7 @@ Slaves can hold SCL low to slow the master (clock stretching).
 In a testbench, =sda <= 'H';= models the pull-up; [[id:std-logic][resolution]] gives =0= when a device drives low.
 
 * Picture
+#+CAPTION: I²C bus signals: a START condition (SDA falls while SCL is high), data bits sampled on SCL high, and a STOP condition (SDA rises while SCL is high).
 \begin{tikzpicture}[font=\scriptsize, yscale=0.55]
 \draw[kbcyan] (0,2.2) node[left, black] {SCL} -- (1.2,2.2) -- (1.2,1.4) \foreach \i in {0,...,3} {-- ++(0.5,0) -- ++(0,0.8) -- ++(0.5,0) -- ++(0,-0.8)} -- (5.6,1.4) -- (5.6,2.2) -- (6.5,2.2);
 \draw (0,0.8) node[left] {SDA} -- (0.7,0.8) -- (0.7,0) -- (1.4,0) -- (1.4,0.8) -- (2.4,0.8) -- (2.4,0) -- (6.0,0) -- (6.0,0.8) -- (6.5,0.8);

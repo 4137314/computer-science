@@ -17,6 +17,7 @@ A gate input is *sensitised* when every other input of the gate holds the non-co
 Two multiplexers in series with the same select \(s\): the long path through the "1" input of the first mux and the "0" input of the second needs \(s=1\) for the first and \(s=0\) for the second. No vector does both: the path is false, and the real [[id:static-timing-analysis][critical path]] is shorter than the topological one. Carry-skip adders are built exactly this way: the long ripple path through a block is false when the skip path is taken.
 
 * Picture
+#+CAPTION: A false path: the long logic is selected by \(s=1\) at the first multiplexer and \(s=0\) at the second, so no input change can travel along it.
 \begin{tikzpicture}[font=\scriptsize, >={Stealth}]
 \draw (0,0) rectangle (1.6,0.7); \node at (0.8,0.35) {long logic};
 \draw[kbcyan] (2.4,-0.5) -- (2.4,1.2) -- (3.0,0.9) -- (3.0,-0.2) -- cycle; \node at (2.7,0.35) {M1};

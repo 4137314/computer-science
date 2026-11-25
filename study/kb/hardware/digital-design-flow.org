@@ -30,6 +30,7 @@ A typical flow: specification → HDL description at RTL → functional simulati
 They conflict: a faster circuit is bigger, a lower-power circuit is slower. Design is choosing a point on the [[id:timing-driven-mapping][Pareto front]].
 
 * Picture
+#+CAPTION: The digital design flow: specification, RTL in VHDL, logic synthesis, technology mapping and place and route, checked along the way by simulation and timing analysis.
 \begin{tikzpicture}[font=\small, node distance=0.35cm, box/.style={draw, minimum width=3.4cm, minimum height=0.55cm}]
 \node[box, draw=kbcyan] (a) {specification};
 \node[box, below=of a] (b) {RTL in VHDL};

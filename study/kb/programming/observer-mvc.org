@@ -17,6 +17,7 @@
 - *[[id:javafx-scene-graph][JavaFX]] properties*: =IntegerProperty=, =StringProperty= are observable; =label.textProperty().bind(model.nameProperty())= keeps the view in sync automatically.
 
 * Picture
+#+CAPTION: Model–view–controller: the controller turns user events into updates of the model, which notifies its views (the observer pattern).
 \begin{tikzpicture}[font=\scriptsize, >={Stealth}, b/.style={draw, minimum width=1.9cm, minimum height=0.6cm}]
 \node[b, draw=kbcyan] (m) at (0,0) {Model}; \node[b, draw=kbamber] (v) at (4,0.9) {View}; \node[b, draw=kbmagenta] (c) at (4,-0.9) {Controller};
 \draw[->, dashed] (m) -- node[above, sloped] {notifies} (v);

@@ -25,6 +25,7 @@ For =c <= a and b; e <= c or d;= with =a= rising from 0 to 1 at time 10 ns while
 In a waveform viewer =c= and =e= both change "at 10 ns", but =e= is after =c=.
 
 * Picture
+#+CAPTION: Delta cycles in a VHDL simulation: at simulated time 10 ns the change of \(a\) updates \(c\) one delta later and \(e\) one delta after that, all without advancing time.
 \begin{tikzpicture}[font=\scriptsize, >={Stealth}]
 \draw[->] (-0.6,0) -- (10.2,0) node[right] {$\delta$};
 \node[kbguide, anchor=west] at (-0.6,-0.75) {all at simulated time $t=10$ ns};

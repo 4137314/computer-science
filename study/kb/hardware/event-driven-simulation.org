@@ -14,6 +14,7 @@
 Types of simulation: compiled (evaluate every gate every cycle) or event-driven (evaluate only on change); zero-delay, unit-delay or real-delay. Only a small fraction of the circuit is active at any time, which event-driven simulation exploits.
 
 * Algorithm
+#+CAPTION: The event-driven simulation loop: take the next events from the queue, apply those that change a signal, evaluate the gates they reach and schedule the new output events.
 \begin{algorithmic}[1]
 \Require initial events in the queue $Q$
 \While{$Q$ not empty and $t<t_{stop}$}
@@ -36,6 +37,7 @@ With \(n\) gates, simulated time \(T\) and activity proportional to \(n\) per ti
 - *timing wheel*: a circular array of [[id:hashmap-internals][buckets]], one per time unit up to the maximum delay; inserting at \(t+d\) is indexing bucket \((t+d)\bmod W\): \(O(1)\), total \(O(Tn)\). Events beyond the wheel go to an overflow list.
 
 * Picture
+#+CAPTION: A timing wheel: a circular array of event buckets, one per time unit; the pointer advances one bucket per step and wraps around.
 \begin{tikzpicture}[font=\scriptsize, >={Stealth}]
 \foreach \i in {0,...,7} {\draw[kbcyan] (\i*0.8,0) rectangle ++(0.8,0.6); \node at (\i*0.8+0.4,0.3) {\i};}
 \draw[->, kbamber, line width=1pt] (2.8,1.5) node[above] {now: $t \bmod 8=3$} -- (2.8,0.65);
